@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ซอง (Pouch) | ONE FOR ALL PACKAGING</title>
+    <meta name="description" content="ซองบรรจุภัณฑ์อาหาร ทนความชื้น เข้าไมโครเวฟได้ หลากหลายขนาด รับพิมพ์ลายแบรนด์ได้">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --dark-blue: #0B1F3A;
+            --deep-purple: #1A2E4F;
+            --silver: #E5E7EB;
+            --silver-light: #F3F4F6;
+            --gold: #C9A227;
+            --white: #ffffff;
+            --gray-light: #F9FAFB;
+            --gray: #6B7280;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Prompt', sans-serif;
+            color: #333;
+            line-height: 1.6;
+            background: var(--white);
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--dark-blue) 0%, var(--deep-purple) 100%);
+            color: var(--white);
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-area img {
+            height: 52px;
+            width: auto;
+        }
+
+        .logo-text {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--silver);
+            line-height: 1.2;
+        }
+
+        .logo-text span {
+            display: block;
+            font-size: 0.65rem;
+            font-weight: 400;
+            letter-spacing: 2px;
+            color: var(--gold);
+        }
+
+        nav {
+            display: flex;
+            gap: 28px;
+        }
+
+        nav a {
+            color: var(--silver-light);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        nav a:hover { color: var(--gold); }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gold);
+            transition: width 0.3s;
+        }
+
+        nav a:hover::after { width: 100%; }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--gold);
+            text-decoration: none;
+            font-size: 0.9rem;
+            padding: 20px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+        }
+
+        .back-link:hover { text-decoration: underline; }
+
+        .hero {
+            background: linear-gradient(135deg, var(--dark-blue) 0%, var(--deep-purple) 100%);
+            color: var(--white);
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--silver);
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.8);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .section { padding: 60px 40px; max-width: 1100px; margin: 0 auto; }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .section-header h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--dark-blue);
+            margin-bottom: 10px;
+        }
+
+        .section-divider {
+            width: 55px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--gold), var(--silver));
+            margin: 12px auto 18px;
+            border-radius: 2px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 28px;
+        }
+
+        .product-card {
+            background: var(--white);
+            border: 1px solid #e8e8e8;
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 40px rgba(26,26,78,0.15);
+            border-color: var(--gold);
+        }
+
+        .product-icon {
+            height: 220px;
+            background: #f5f5f7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            padding: 0;
+        }
+
+        .product-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            margin: 0;
+            padding: 0;
+            display: block;
+        }
+
+        .product-info {
+            padding: 22px;
+            text-align: center;
+        }
+
+        .product-info h3 {
+            font-size: 1.1rem;
+            color: var(--dark-blue);
+            margin-bottom: 8px;
+        }
+
+        .product-info p {
+            color: var(--gray);
+            font-size: 0.88rem;
+            line-height: 1.6;
+        }
+
+        .cta-section {
+            background: var(--gray-light);
+            text-align: center;
+            padding: 60px 40px;
+        }
+
+        .cta-section h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.7rem;
+            color: var(--dark-blue);
+            margin-bottom: 12px;
+        }
+
+        .phone-big {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.4rem;
+            font-weight: 700;
+            color: var(--dark-blue);
+            letter-spacing: 3px;
+            margin: 20px 0;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 13px 28px;
+            border-radius: 8px;
+            font-family: 'Prompt', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--gold) 0%, #b8962e 100%);
+            color: var(--dark-blue);
+            box-shadow: 0 4px 15px rgba(212,175,55,0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(212,175,55,0.5);
+        }
+
+        footer {
+            background: #0d0d2b;
+            color: rgba(255,255,255,0.45);
+            padding: 25px 40px;
+            text-align: center;
+            font-size: 0.82rem;
+        }
+
+        footer a { color: var(--gold); text-decoration: none; }
+
+        @media (max-width: 768px) {
+            .header-top { padding: 10px 18px; }
+            nav { display: none; }
+            .hero { padding: 40px 20px; }
+            .hero h1 { font-size: 1.8rem; }
+            .section { padding: 40px 20px; }
+            .products-grid { grid-template-columns: 1fr; gap: 18px; }
+            .phone-big { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-top">
+        <div class="logo-area">
+            <img src="LOGO.png" alt="ONE FOR ALL PACKAGING" onerror="this.style.display='none'">
+            <div class="logo-text">
+                ONE FOR ALL
+                <span>PACKAGING</span>
+            </div>
+        </div>
+        <nav>
+            <a href="index.html">หน้าแรก</a>
+            <a href="index.html#products">สินค้า</a>
+            <a href="index.html#about">เกี่ยวกับเรา</a>
+            <a href="index.html#contact">ติดต่อ</a>
+        </nav>
+    </div>
+</header>
+
+<div style="padding: 20px 40px; max-width: 1200px; margin: 0 auto;">
+    <a href="index.html" class="back-link" style="padding:0; margin:0;">← กลับหน้าแรก</a>
+</div>
+
+<section class="hero">
+    <div class="hero-content">
+        <h1>ซอง (Pouch)</h1>
+        <p>ซองบรรจุภัณฑ์อาหาร ทนความชื้น เข้าไมโครเวฟได้ หลากหลายขนาด รับพิมพ์ลายแบรนด์ได้</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="section-header">
+        <div class="section-divider"></div>
+        <h2>สินค้าในหมวด ซอง</h2>
+    </div>
+    <div class="products-grid">
+        <div class="product-card">
+            <div class="product-icon"><img src="รูปสินค้า/song1.jpg" alt="Handle Zip Pouch"></div>
+            <div class="product-info">
+                <h3>Handle Zip Pouch</h3>
+                <p>ตั้งโชว์สวย มองเห็นสินค้า พกพาสะดวก</p>
+            </div>
+        </div>
+        <div class="product-card">
+            <div class="product-icon"><img src="รูปสินค้า/song2.jpg" alt="3-Side Seal Pouch"></div>
+            <div class="product-info">
+                <h3>3-Side Seal Pouch</h3>
+                <p>ซีลแน่น เหมาะกับอาหารและสินค้าอุตสาหกรรม</p>
+            </div>
+        </div>
+        <div class="product-card">
+            <div class="product-icon"><img src="รูปสินค้า/song3.jpg" alt="Vacuum / Retort Pouch"></div>
+            <div class="product-info">
+                <h3>Vacuum / Retort Pouch</h3>
+                <p>รองรับงานซีล ทนแรงดันและความร้อน</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="cta-section">
+    <h2>สนใจสั่งซื้อหรือสอบถามราคา?</h2>
+    <div class="phone-big">097-154-8638</div>
+    <a href="tel:0971548638" class="btn btn-primary">📞 โทรเดี๋ยวนี้</a>
+</section>
+
+<footer>
+    <p>© 2024 บริษัท วันฟอร์ออล แพคเกจจิ้ง จำกัด | บรรจุภัณฑ์อาหาร ซอง ม้วน ถุง คุณภาพดี ราคาถูก</p>
+</footer>
+
+</body>
+</html>
