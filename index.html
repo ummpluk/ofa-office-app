@@ -488,7 +488,38 @@
         .contact-card a:hover { color: var(--gold); }
 
         /* CTA */
-        .cta-section { background: var(--gray-light); text-align: center; }
+        .cta-section {
+            background: var(--gray-light);
+            text-align: center;
+        }
+        .cta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+            max-width: 1050px;
+            margin: 0 auto;
+        }
+        .cta-address {
+            text-align: left;
+            color: var(--dark-blue);
+        }
+        .cta-address h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: var(--gray);
+            margin-bottom: 8px;
+        }
+        .cta-address p {
+            font-size: 0.95rem;
+            color: var(--dark-blue);
+            line-height: 1.7;
+        }
+        .cta-content {
+            text-align: center;
+        }
 
         .cta-section h2 {
             font-family: 'Montserrat', sans-serif;
@@ -551,6 +582,9 @@
             .about-grid { grid-template-columns: 1fr; gap: 28px; }
             .contact-grid { grid-template-columns: 1fr; }
             .phone-big { font-size: 1.8rem; }
+            .cta-grid { grid-template-columns: 1fr; gap: 28px; }
+            .cta-address { text-align: center; }
+            .cta-content { text-align: center; }
         }
     </style>
 </head>
@@ -678,22 +712,27 @@
             <h3>Email</h3>
             <p><a href="mailto:sales@oneforallpackaging.com">sales@oneforallpackaging.com</a></p>
         </div>
-        <div class="contact-card">
-            <div class="contact-icon">📍</div>
-            <h3>ที่อยู่</h3>
-            <p>555/17 ต.บางเพรียง<br>อ.บางบ่อ จ.สมุทรปราการ 10560</p>
-        </div>
     </div>
 </section>
 
 <!-- CTA -->
 <section class="section cta-section">
-    <h2>พร้อมสั่งซื้อหรือสอบถามราคา?</h2>
-    <p>โทร Line หรือ Email มาคุยกับเราได้เลย</p>
-    <div class="phone-big">097-154-8638</div>
-    <div style="display:flex;gap:15px;justify-content:center;flex-wrap:wrap;">
-        <a href="tel:0971548638" class="btn btn-primary">📞 โทรเดี๋ยวนี้</a>
-        <a href="mailto:sales@oneforallpackaging.com" class="btn btn-outline" style="background:transparent;color:#0B1F3A;border:2px solid #0B1F3A;">✉️ Send Email</a>
+    <div class="cta-grid">
+        <div class="cta-address">
+            <h3>ที่อยู่บริษัท</h3>
+            <p>บริษัท วันฟอร์ออล แพคเกจจิ้ง จำกัด<br>
+            555/17 ต.บางเพรียง<br>
+            อ.บางบ่อ จ.สมุทรปราการ 10560</p>
+        </div>
+        <div class="cta-content">
+            <h2>พร้อมสั่งซื้อหรือสอบถามราคา?</h2>
+            <p>โทร Line หรือ Email มาคุยกับเราได้เลย</p>
+            <div class="phone-big">097-154-8638</div>
+            <div style="display:flex;gap:15px;justify-content:center;flex-wrap:wrap;">
+                <a href="tel:0971548638" class="btn btn-primary">📞 โทรเดี๋ยวนี้</a>
+                <a href="mailto:sales@oneforallpackaging.com" class="btn btn-outline" style="background:transparent;color:#0B1F3A;border:2px solid #0B1F3A;">✉️ Send Email</a>
+            </div>
+        </div>
     </div>
 </section>
 
