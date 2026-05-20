@@ -22,7 +22,6 @@ jobs:
           cp "DOC/โฟลเดอร์ใหม่/OFAFirebaseHosting2/ofa-hosting/.firebaserc" ./.firebaserc
 
       - name: Deploy to Firebase Hosting
-        run: |
-          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > /tmp/sa.json
-          export GOOGLE_APPLICATION_CREDENTIALS=/tmp/sa.json
-          firebase deploy --only hosting --project oneforall-office
+        run: firebase deploy --only hosting --project oneforall-office --non-interactive
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
