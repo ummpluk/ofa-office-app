@@ -525,9 +525,9 @@ label{font-size:13px;font-weight:600;color:var(--text2)}
     <div class="form-row">
       <div class="fg"><label>เลขที่ (ออโต้)</label><input type="text" id="qm-num" placeholder="กำลังสร้าง..." readonly style="background:#f0f4f8;cursor:default;color:var(--navy);font-weight:600"></div>
       <div class="fg"><label>วันที่</label><input type="date" id="qm-date"></div>
-      <div class="fg full"><label>ลูกค้า / บริษัท</label><select id="qm-cust" onchange="onQCustChange()"><option value="">-- เลือกลูกค้า --</option></select></div>
-      <div class="fg"><label>ผู้ติดต่อ</label><input type="text" id="qm-contact" readonly style="background:#f0f4f8;cursor:default"></div>
-      <div class="fg"><label>โทรศัพท์</label><input type="text" id="qm-phone" readonly style="background:#f0f4f8;cursor:default"></div>
+      <div class="fg full"><label>ลูกค้า / บริษัท</label><input type="text" id="qm-cust" placeholder="บริษัท..." list="cust-list"><datalist id="cust-list"></datalist></div>
+      <div class="fg"><label>ผู้ติดต่อ</label><input type="text" id="qm-contact" placeholder="ชื่อ"></div>
+      <div class="fg"><label>โทรศัพท์</label><input type="text" id="qm-phone"></div>
       <div class="fg"><label>สถานะ</label>
         <select id="qm-status"><option value="draft">ร่าง</option><option value="sent">ส่งแล้ว</option><option value="approved">ยืนยัน</option><option value="cancelled">ยกเลิก</option></select>
       </div>
@@ -1084,7 +1084,11 @@ function populateMonthFilter(){
   const sorted=[...months].sort().reverse();
   sel.innerHTML='<option value="">ทุกเดือน</option>'+sorted.map(m=>`<option value="${m}">${m}</option>`).join('');
 }
-function populateCustDatalist(){/* ไม่ใช้แล้ว */}
+function populateCustDatalist(){
+  const dl=document.getElementById('cust-list');if(!dl)return;
+  const names=new Set([...allQ.map(q=>q.customer),...allC.map(c=>c.company_name)].filter(Boolean));
+  dl.innerHTML=[...names].map(n=>`<option value="${n}">`).join('');
+}
 function buildContactOptions(selectedCompany=''){
   return '<option value="">-- เลือกลูกค้า --</option>'+
     allC.map(c=>`<option value="${(c.company_name||'').replace(/"/g,'&quot;')}" data-contact="${(c.contact_name||'').replace(/"/g,'&quot;')}" data-phone="${(c.phone||'').replace(/"/g,'&quot;')}"${c.company_name===selectedCompany?' selected':''}>${c.company_name||''}</option>`).join('');
@@ -1113,12 +1117,11 @@ function onItemSel(sel){
 function openQModal(id){
   editId=id||null;
   document.getElementById('q-modal-title').textContent=id?'แก้ไขใบเสนอราคา':'สร้างใบเสนอราคาใหม่';
-  const custSel=document.getElementById('qm-cust');
   if(id){
     const q=allQ.find(x=>x.id===id);if(!q)return;
-    custSel.innerHTML=buildContactOptions(q.customer||'');
     document.getElementById('qm-num').value=q.number||'';
     document.getElementById('qm-date').value=q.date||'';
+    document.getElementById('qm-cust').value=q.customer||'';
     document.getElementById('qm-contact').value=q.contact_name||'';
     document.getElementById('qm-phone').value=q.contact_phone||'';
     document.getElementById('qm-status').value=q.status||'draft';
@@ -1127,16 +1130,16 @@ function openQModal(id){
     iIdx=0;document.getElementById('items-wrap').innerHTML='';
     (q.items||[]).forEach(it=>addItem(it));
   } else {
-    custSel.innerHTML=buildContactOptions();
     document.getElementById('qm-num').value='กำลังสร้าง...';
     genQNumber().then(n=>document.getElementById('qm-num').value=n);
     document.getElementById('qm-date').value=new Date().toISOString().split('T')[0];
-    document.getElementById('qm-contact').value='';
+    document.getElementById('qm-cust').value='';document.getElementById('qm-contact').value='';
     document.getElementById('qm-phone').value='';document.getElementById('qm-status').value='draft';
     document.getElementById('qm-validity').value=30;document.getElementById('qm-note').value='';
     iIdx=0;document.getElementById('items-wrap').innerHTML='';addItem();
   }
   calcTotals();
+  populateCustDatalist();
   document.getElementById('q-modal').style.display='flex';
 }
 function addItem(it){
