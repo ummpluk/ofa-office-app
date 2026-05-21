@@ -201,31 +201,35 @@ label{font-size:13px;font-weight:600;color:var(--text2)}
 .print-doc{background:#fff;width:820px;max-width:98vw;max-height:95vh;overflow-y:auto;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
 .print-actions{display:flex;gap:10px;justify-content:flex-end;padding:14px 20px;border-bottom:1px solid var(--border);background:#f7f9fc;border-radius:12px 12px 0 0}
 .print-body{padding:40px 50px;font-family:'Sarabun','Segoe UI',sans-serif;color:#1a2533}
-.print-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px;padding-bottom:18px;border-bottom:2px solid #0d2137}
-.print-hdr-left h1{font-size:16px;font-weight:800;color:#0d2137;margin-bottom:3px}
-.print-hdr-left p{font-size:11px;color:#5a6a7a;line-height:1.7}
+.print-hdr{display:flex;justify-content:space-between;align-items:center;padding-bottom:18px;border-bottom:3px solid #0d2137;margin-bottom:22px}
+.print-hdr-left{display:flex;align-items:center;gap:18px}
+.print-hdr-logo{height:62px;width:auto}
+.print-hdr-left h1{font-size:13px;font-weight:800;color:#0d2137;margin-bottom:4px}
+.print-hdr-left p{font-size:10.5px;color:#5a6a7a;line-height:1.8}
 .print-docinfo{text-align:right}
-.print-docinfo h2{font-size:14px;font-weight:700;color:#5a6a7a;letter-spacing:1px;text-transform:uppercase}
-.print-docinfo .pnum{font-size:20px;font-weight:800;color:#0d2137;margin-top:4px}
-.print-docinfo .pdate{font-size:12px;color:#5a6a7a;margin-top:3px}
-.print-custbox{background:#f0f4f8;border-radius:10px;padding:16px 20px;margin-bottom:22px}
-.print-custbox h4{font-size:10px;font-weight:700;color:#5a6a7a;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
-.print-custbox .pcname{font-size:15px;font-weight:700;color:#0d2137}
-.print-custbox .pcdet{font-size:12px;color:#5a6a7a;margin-top:3px}
+.print-doc-type{font-size:9px;font-weight:700;color:#5a6a7a;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:5px}
+.pnum{font-size:22px;font-weight:800;color:#0d2137}
+.pdate{font-size:11px;color:#5a6a7a;margin-top:4px}
+.print-custbox{background:#f5f7fa;border-left:4px solid #0d2137;border-radius:0 8px 8px 0;padding:14px 20px;margin-bottom:20px}
+.print-custbox h4{font-size:9px;font-weight:700;color:#8a9ab0;text-transform:uppercase;letter-spacing:2px;margin-bottom:7px}
+.pcname{font-size:16px;font-weight:700;color:#0d2137}
+.pcdet{font-size:12px;color:#5a6a7a;margin-top:4px}
 .print-items-tbl{width:100%;border-collapse:collapse;margin-bottom:14px}
-.print-items-tbl th{background:#0d2137;color:#fff;padding:9px 14px;font-size:12px;font-weight:700;text-align:left}
-.print-items-tbl th:nth-child(n+2),.print-items-tbl td:nth-child(n+2){text-align:right}
-.print-items-tbl td{padding:9px 14px;font-size:13px;border-bottom:1px solid #e0e7ef}
-.print-totals-wrap{display:flex;justify-content:flex-end;margin-bottom:20px}
-.print-totals-tbl{width:260px;border-collapse:collapse}
-.print-totals-tbl td{padding:5px 12px;font-size:13px}
+.print-items-tbl th{background:#0d2137;color:#fff;padding:10px 14px;font-size:11px;font-weight:700;text-align:left;letter-spacing:.5px}
+.print-items-tbl th:nth-child(n+2),.print-items-tbl td:nth-child(n+2){text-align:center}
+.print-items-tbl th:last-child,.print-items-tbl td:last-child{text-align:right}
+.print-items-tbl td{padding:9px 14px;font-size:12.5px;border-bottom:1px solid #e8edf3}
+.print-items-tbl tr:nth-child(even) td{background:#f8fafc}
+.print-totals-wrap{display:flex;justify-content:flex-end;margin-bottom:22px}
+.print-totals-tbl{width:280px;border-collapse:collapse}
+.print-totals-tbl td{padding:6px 14px;font-size:12.5px;border-bottom:1px solid #e8edf3}
 .print-totals-tbl td:last-child{text-align:right;font-weight:600}
-.print-grand-row td{background:#0d2137;color:#fff!important;font-size:14px;font-weight:700;padding:8px 12px}
-.print-note-box{background:#fff8e1;border-radius:8px;padding:12px 16px;font-size:12px;color:#7a5a00;margin-bottom:18px}
-.print-sign-row{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:28px;padding-top:18px;border-top:1px solid #e0e7ef}
-.sign-space{height:50px}
-.sign-line{border-top:1px solid #888;padding-top:7px;font-size:12px;color:#5a6a7a;text-align:center}
-.print-validity-note{font-size:11px;color:#5a6a7a;text-align:center;margin-top:14px}
+.print-grand-row td{background:#0d2137;color:#fff!important;font-size:14px;font-weight:700;padding:10px 14px;border-bottom:none}
+.print-note-box{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:12px 16px;font-size:12px;color:#7a5a00;margin-bottom:18px}
+.print-sign-row{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:32px;padding-top:20px;border-top:2px solid #e0e7ef}
+.sign-space{height:55px}
+.sign-line{border-top:1.5px solid #aaa;padding-top:8px;font-size:11.5px;color:#5a6a7a;text-align:center}
+.print-validity-note{font-size:10.5px;color:#8a9ab0;text-align:center;margin-top:16px;border-top:1px dashed #dde3ec;padding-top:10px}
 @media print{
   @page{size:A4;margin:12mm}
   body>*{display:none!important}
@@ -1375,8 +1379,8 @@ function doPrint(){
   setTimeout(()=>{document.title=old;},1500);
 }
 
-function buildCompanyHeader(){
-  return`<div class="print-hdr"><div class="print-hdr-left"><h1>${CO_NAME}</h1><p>${CO_ADDR}<br>โทร ${CO_TEL} &nbsp;|&nbsp; ${CO_EMAIL}<br>เลขประจำตัวผู้เสียภาษีอากร ${CO_TAX}</p></div><div class="print-docinfo" id="pi-docinfo"></div></div>`;
+function buildCompanyHeader(docType,docNum,docDate){
+  return`<div class="print-hdr"><div class="print-hdr-left"><img src="logo.png" class="print-hdr-logo" onerror="this.style.display='none'"><div><h1>${CO_NAME}</h1><p>${CO_ADDR}<br>โทร ${CO_TEL} &nbsp;|&nbsp; ${CO_EMAIL}<br>เลขประจำตัวผู้เสียภาษีอากร ${CO_TAX}</p></div></div><div class="print-docinfo"><div class="print-doc-type">${docType||''}</div><div class="pnum">${docNum||'-'}</div><div class="pdate">วันที่ ${docDate||'-'}</div></div></div>`;
 }
 
 function buildItemsTable(items){
@@ -1394,12 +1398,7 @@ function printQ(id){
   const vat=q.vat||sub*0.07;
   const total=q.total||sub+vat;
   const validity=q.validity_days||30;
-  const html=buildCompanyHeader()+`
-  <div id="pi-docinfo" style="text-align:right;margin-top:-80px">
-    <h2 style="font-size:14px;font-weight:700;color:#5a6a7a;letter-spacing:1px">ใบเสนอราคา</h2>
-    <div class="pnum">${q.number||'-'}</div>
-    <div class="pdate">วันที่ ${q.date||'-'}</div>
-  </div>
+  const html=buildCompanyHeader('ใบเสนอราคา',q.number,q.date)+`
   <div class="print-custbox">
     <h4>เสนอราคาแก่</h4>
     <div class="pcname">${q.customer||'-'}</div>
@@ -1423,12 +1422,7 @@ function printSO(id){
   const sub=so.subtotal||(so.items||[]).reduce((a,it)=>a+(it.qty||1)*(it.price||0),0);
   const vat=so.vat||sub*0.07;
   const total=so.total||sub+vat;
-  const html=buildCompanyHeader()+`
-  <div style="text-align:right;margin-top:-80px">
-    <h2 style="font-size:14px;font-weight:700;color:#5a6a7a;letter-spacing:1px">ใบสั่งขาย</h2>
-    <div class="pnum">${so.number||'-'}</div>
-    <div class="pdate">วันที่ ${so.date||'-'}</div>
-  </div>
+  const html=buildCompanyHeader('ใบสั่งขาย',so.number,so.date)+`
   <div class="print-custbox">
     <h4>ลูกค้า</h4>
     <div class="pcname">${so.customer||'-'}</div>

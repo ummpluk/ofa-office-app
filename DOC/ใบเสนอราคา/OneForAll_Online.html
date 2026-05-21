@@ -154,9 +154,9 @@ label{font-size:13px;font-weight:600;color:var(--text2)}
 /* ITEMS */
 .items-sec{margin-top:14px}
 .items-sec h4{font-size:14px;font-weight:700;margin-bottom:10px;color:var(--navy)}
-.items-hdr{display:grid;grid-template-columns:3fr 1fr 1fr auto;gap:8px;margin-bottom:6px}
+.items-hdr{display:grid;grid-template-columns:3fr 1fr 0.7fr 1fr auto;gap:8px;margin-bottom:6px}
 .items-hdr span{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;padding:0 4px}
-.item-row{display:grid;grid-template-columns:3fr 1fr 1fr auto;gap:8px;margin-bottom:7px;align-items:center}
+.item-row{display:grid;grid-template-columns:3fr 1fr 0.7fr 1fr auto;gap:8px;margin-bottom:7px;align-items:center}
 .item-row input{padding:8px 11px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;outline:none;font-family:inherit}
 .item-row input:focus{border-color:var(--accent)}
 .btn-icon{width:32px;height:32px;border-radius:7px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:all .2s}
@@ -201,32 +201,43 @@ label{font-size:13px;font-weight:600;color:var(--text2)}
 .print-doc{background:#fff;width:820px;max-width:98vw;max-height:95vh;overflow-y:auto;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
 .print-actions{display:flex;gap:10px;justify-content:flex-end;padding:14px 20px;border-bottom:1px solid var(--border);background:#f7f9fc;border-radius:12px 12px 0 0}
 .print-body{padding:40px 50px;font-family:'Sarabun','Segoe UI',sans-serif;color:#1a2533}
-.print-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px;padding-bottom:18px;border-bottom:2px solid #0d2137}
-.print-hdr-left h1{font-size:16px;font-weight:800;color:#0d2137;margin-bottom:3px}
-.print-hdr-left p{font-size:11px;color:#5a6a7a;line-height:1.7}
+.print-hdr{display:flex;justify-content:space-between;align-items:center;padding-bottom:18px;border-bottom:3px solid #0d2137;margin-bottom:22px}
+.print-hdr-left{display:flex;align-items:center;gap:18px}
+.print-hdr-logo{height:62px;width:auto}
+.print-hdr-left h1{font-size:13px;font-weight:800;color:#0d2137;margin-bottom:4px}
+.print-hdr-left p{font-size:10.5px;color:#5a6a7a;line-height:1.8}
 .print-docinfo{text-align:right}
-.print-docinfo h2{font-size:14px;font-weight:700;color:#5a6a7a;letter-spacing:1px;text-transform:uppercase}
-.print-docinfo .pnum{font-size:20px;font-weight:800;color:#0d2137;margin-top:4px}
-.print-docinfo .pdate{font-size:12px;color:#5a6a7a;margin-top:3px}
-.print-custbox{background:#f0f4f8;border-radius:10px;padding:16px 20px;margin-bottom:22px}
-.print-custbox h4{font-size:10px;font-weight:700;color:#5a6a7a;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
-.print-custbox .pcname{font-size:15px;font-weight:700;color:#0d2137}
-.print-custbox .pcdet{font-size:12px;color:#5a6a7a;margin-top:3px}
+.print-doc-type{font-size:9px;font-weight:700;color:#5a6a7a;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:5px}
+.pnum{font-size:22px;font-weight:800;color:#0d2137}
+.pdate{font-size:11px;color:#5a6a7a;margin-top:4px}
+.print-custbox{background:#f5f7fa;border-left:4px solid #0d2137;border-radius:0 8px 8px 0;padding:14px 20px;margin-bottom:20px}
+.print-custbox h4{font-size:9px;font-weight:700;color:#8a9ab0;text-transform:uppercase;letter-spacing:2px;margin-bottom:7px}
+.pcname{font-size:16px;font-weight:700;color:#0d2137}
+.pcdet{font-size:12px;color:#5a6a7a;margin-top:4px}
 .print-items-tbl{width:100%;border-collapse:collapse;margin-bottom:14px}
-.print-items-tbl th{background:#0d2137;color:#fff;padding:9px 14px;font-size:12px;font-weight:700;text-align:left}
-.print-items-tbl th:nth-child(n+2),.print-items-tbl td:nth-child(n+2){text-align:right}
-.print-items-tbl td{padding:9px 14px;font-size:13px;border-bottom:1px solid #e0e7ef}
-.print-totals-wrap{display:flex;justify-content:flex-end;margin-bottom:20px}
-.print-totals-tbl{width:260px;border-collapse:collapse}
-.print-totals-tbl td{padding:5px 12px;font-size:13px}
+.print-items-tbl th{background:#0d2137;color:#fff;padding:10px 14px;font-size:11px;font-weight:700;text-align:left;letter-spacing:.5px}
+.print-items-tbl th:nth-child(n+2),.print-items-tbl td:nth-child(n+2){text-align:center}
+.print-items-tbl th:last-child,.print-items-tbl td:last-child{text-align:right}
+.print-items-tbl td{padding:9px 14px;font-size:12.5px;border-bottom:1px solid #e8edf3}
+.print-items-tbl tr:nth-child(even) td{background:#f8fafc}
+.print-totals-wrap{display:flex;justify-content:flex-end;margin-bottom:22px}
+.print-totals-tbl{width:280px;border-collapse:collapse}
+.print-totals-tbl td{padding:6px 14px;font-size:12.5px;border-bottom:1px solid #e8edf3}
 .print-totals-tbl td:last-child{text-align:right;font-weight:600}
-.print-grand-row td{background:#0d2137;color:#fff!important;font-size:14px;font-weight:700;padding:8px 12px}
-.print-note-box{background:#fff8e1;border-radius:8px;padding:12px 16px;font-size:12px;color:#7a5a00;margin-bottom:18px}
-.print-sign-row{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:28px;padding-top:18px;border-top:1px solid #e0e7ef}
-.sign-space{height:50px}
-.sign-line{border-top:1px solid #888;padding-top:7px;font-size:12px;color:#5a6a7a;text-align:center}
-.print-validity-note{font-size:11px;color:#5a6a7a;text-align:center;margin-top:14px}
-@media print{body>*:not(#print-area-root){display:none}#print-area-root{display:block}.print-actions{display:none!important}}
+.print-grand-row td{background:#0d2137;color:#fff!important;font-size:14px;font-weight:700;padding:10px 14px;border-bottom:none}
+.print-note-box{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:12px 16px;font-size:12px;color:#7a5a00;margin-bottom:18px}
+.print-sign-row{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:32px;padding-top:20px;border-top:2px solid #e0e7ef}
+.sign-space{height:55px}
+.sign-line{border-top:1.5px solid #aaa;padding-top:8px;font-size:11.5px;color:#5a6a7a;text-align:center}
+.print-validity-note{font-size:10.5px;color:#8a9ab0;text-align:center;margin-top:16px;border-top:1px dashed #dde3ec;padding-top:10px}
+@media print{
+  @page{size:A4;margin:12mm}
+  body>*{display:none!important}
+  .print-overlay{display:block!important;position:static!important;background:none!important;overflow:visible!important}
+  .print-doc{box-shadow:none!important;border-radius:0!important;max-height:none!important;overflow:visible!important;width:100%!important}
+  .print-actions{display:none!important}
+  .print-items-tbl td:first-child{white-space:normal;word-break:break-word}
+}
 </style>
 </head>
 <body>
@@ -535,7 +546,7 @@ label{font-size:13px;font-weight:600;color:var(--text2)}
     </div>
     <div class="items-sec">
       <h4>รายการสินค้า</h4>
-      <div class="items-hdr"><span>รายการ</span><span>จำนวน</span><span>ราคา/หน่วย</span><span></span></div>
+      <div class="items-hdr"><span>รายการ</span><span>จำนวน</span><span>หน่วย</span><span>ราคา/หน่วย</span><span></span></div>
       <div id="items-wrap"></div>
       <button class="btn btn-outline btn-sm" onclick="addItem()" style="margin-top:8px">+ เพิ่มรายการ</button>
       <div class="total-box">
@@ -662,7 +673,7 @@ label{font-size:13px;font-weight:600;color:var(--text2)}
     </div>
     <div class="items-sec">
       <h4>รายการสั่งซื้อ</h4>
-      <div class="items-hdr"><span>รายการ</span><span>จำนวน</span><span>ราคา/หน่วย</span><span></span></div>
+      <div class="items-hdr"><span>รายการ</span><span>จำนวน</span><span>หน่วย</span><span>ราคา/หน่วย</span><span></span></div>
       <div id="po-items-wrap"></div>
       <button class="btn btn-outline btn-sm" onclick="addPOItem()" style="margin-top:8px">+ เพิ่มรายการ</button>
       <div class="total-box">
@@ -727,7 +738,7 @@ label{font-size:13px;font-weight:600;color:var(--text2)}
   <div class="print-doc" id="print-doc">
     <div class="print-actions">
       <button class="btn btn-outline btn-sm" onclick="closePrint()">✕ ปิด</button>
-      <button class="btn btn-blue btn-sm" onclick="window.print()">🖨️ พิมพ์ / บันทึก PDF</button>
+      <button class="btn btn-blue btn-sm" onclick="doPrint()">🖨️ พิมพ์ / บันทึก PDF</button>
     </div>
     <div class="print-body" id="print-body"></div>
   </div>
@@ -740,9 +751,9 @@ label{font-size:13px;font-weight:600;color:var(--text2)}
     <div class="form-row">
       <div class="fg"><label>เลข SO (ออโต้)</label><input type="text" id="som-num" placeholder="กำลังสร้าง..." readonly style="background:#f0f4f8;cursor:default;color:var(--navy);font-weight:600"></div>
       <div class="fg"><label>วันที่</label><input type="date" id="som-date"></div>
-      <div class="fg full"><label>ลูกค้า / บริษัท</label><input type="text" id="som-cust" placeholder="บริษัท..." list="so-cust-list"><datalist id="so-cust-list"></datalist></div>
-      <div class="fg"><label>ผู้ติดต่อ</label><input type="text" id="som-contact" placeholder="ชื่อ"></div>
-      <div class="fg"><label>โทรศัพท์</label><input type="text" id="som-phone"></div>
+      <div class="fg full"><label>ลูกค้า / บริษัท</label><select id="som-cust" onchange="onSOCustChange()"><option value="">-- เลือกลูกค้า --</option></select></div>
+      <div class="fg"><label>ผู้ติดต่อ</label><input type="text" id="som-contact" readonly style="background:#f0f4f8;cursor:default"></div>
+      <div class="fg"><label>โทรศัพท์</label><input type="text" id="som-phone" readonly style="background:#f0f4f8;cursor:default"></div>
       <div class="fg"><label>สถานะ</label>
         <select id="som-status">
           <option value="pending">รอดำเนินการ</option>
@@ -759,7 +770,7 @@ label{font-size:13px;font-weight:600;color:var(--text2)}
     </div>
     <div class="items-sec">
       <h4>รายการสินค้า</h4>
-      <div class="items-hdr"><span>รายการ</span><span>จำนวน</span><span>ราคา/หน่วย</span><span></span></div>
+      <div class="items-hdr"><span>รายการ</span><span>จำนวน</span><span>หน่วย</span><span>ราคา/หน่วย</span><span></span></div>
       <div id="so-items-wrap"></div>
       <button class="btn btn-outline btn-sm" onclick="addSOItem()" style="margin-top:8px">+ เพิ่มรายการ</button>
       <div class="total-box">
@@ -1089,6 +1100,34 @@ function populateCustDatalist(){
   const names=new Set([...allQ.map(q=>q.customer),...allC.map(c=>c.company_name)].filter(Boolean));
   dl.innerHTML=[...names].map(n=>`<option value="${n}">`).join('');
 }
+function buildContactOptions(selectedCompany=''){
+  return '<option value="">-- เลือกลูกค้า --</option>'+
+    allC.map(c=>`<option value="${(c.company_name||'').replace(/"/g,'&quot;')}" data-contact="${(c.contact_name||'').replace(/"/g,'&quot;')}" data-phone="${(c.phone||'').replace(/"/g,'&quot;')}"${c.company_name===selectedCompany?' selected':''}>${c.company_name||''}</option>`).join('');
+}
+function buildProductOptions(selectedName=''){
+  return '<option value="">-- เลือกสินค้า --</option>'+
+    allP.map(p=>`<option value="${(p.name||'').replace(/"/g,'&quot;')}" data-price="${p.price||0}" data-unit="${(p.unit||'').replace(/"/g,'&quot;')}"${p.name===selectedName?' selected':''}>${p.code?p.code+' – ':''} ${p.name||''}</option>`).join('');
+}
+function onQCustChange(){
+  const sel=document.getElementById('qm-cust');
+  const opt=sel.options[sel.selectedIndex];
+  document.getElementById('qm-contact').value=opt?.dataset?.contact||'';
+  document.getElementById('qm-phone').value=opt?.dataset?.phone||'';
+}
+function onSOCustChange(){
+  const sel=document.getElementById('som-cust');
+  const opt=sel.options[sel.selectedIndex];
+  document.getElementById('som-contact').value=opt?.dataset?.contact||'';
+  document.getElementById('som-phone').value=opt?.dataset?.phone||'';
+}
+function onItemSel(sel){
+  const opt=sel.options[sel.selectedIndex];
+  const row=sel.closest('.item-row');
+  const priceInput=row.querySelector('.it-price');
+  const unitInput=row.querySelector('.it-unit');
+  if(priceInput&&opt?.dataset?.price!==undefined) priceInput.value=parseFloat(opt.dataset.price)||0;
+  if(unitInput&&opt?.dataset?.unit!==undefined) unitInput.value=opt.dataset.unit||'';
+}
 function openQModal(id){
   editId=id||null;
   document.getElementById('q-modal-title').textContent=id?'แก้ไขใบเสนอราคา':'สร้างใบเสนอราคาใหม่';
@@ -1114,12 +1153,13 @@ function openQModal(id){
     iIdx=0;document.getElementById('items-wrap').innerHTML='';addItem();
   }
   calcTotals();
+  populateCustDatalist();
   document.getElementById('q-modal').style.display='flex';
 }
 function addItem(it){
   const idx=iIdx++;const div=document.createElement('div');
   div.className='item-row';div.id='irow-'+idx;
-  div.innerHTML=`<input type="text" placeholder="ชื่อสินค้า" class="it-name" value="${(it?.name||it?.product_name||'').replace(/"/g,'&quot;')}" oninput="calcTotals()"><input type="number" min="1" class="it-qty" value="${it?.qty||1}" oninput="calcTotals()"><input type="number" min="0" step="0.01" class="it-price" value="${it?.price||it?.unit_price||0}" oninput="calcTotals()"><button class="btn btn-sm btn-danger" onclick="document.getElementById('irow-${idx}').remove();calcTotals()">✕</button>`;
+  div.innerHTML=`<input type="text" placeholder="ชื่อสินค้า" class="it-name" value="${(it?.name||it?.product_name||'').replace(/"/g,'&quot;')}" oninput="calcTotals()"><input type="number" min="1" class="it-qty" value="${it?.qty||1}" oninput="calcTotals()"><input type="text" placeholder="หน่วย" class="it-unit" value="${(it?.unit||'').replace(/"/g,'&quot;')}" list="unit-list" style="padding:8px 6px"><input type="number" min="0" step="0.01" class="it-price" value="${it?.price||it?.unit_price||0}" oninput="calcTotals()"><button class="btn btn-sm btn-danger" onclick="document.getElementById('irow-${idx}').remove();calcTotals()">✕</button>`;
   document.getElementById('items-wrap').appendChild(div);calcTotals();
 }
 function calcTotals(){
@@ -1131,9 +1171,9 @@ function calcTotals(){
   document.getElementById('tot-disp').textContent='฿'+fmt(sub+vat);
 }
 async function saveQ(){
-  const items=[...document.querySelectorAll('#items-wrap .item-row')].map(r=>({name:r.querySelector('.it-name').value,qty:parseFloat(r.querySelector('.it-qty').value)||1,price:parseFloat(r.querySelector('.it-price').value)||0,total:(parseFloat(r.querySelector('.it-qty').value)||1)*(parseFloat(r.querySelector('.it-price').value)||0)})).filter(it=>it.name.trim());
+  const items=[...document.querySelectorAll('#items-wrap .item-row')].map(r=>({name:r.querySelector('.it-name').value,qty:parseFloat(r.querySelector('.it-qty').value)||1,unit:r.querySelector('.it-unit')?.value||'',price:parseFloat(r.querySelector('.it-price').value)||0,total:(parseFloat(r.querySelector('.it-qty').value)||1)*(parseFloat(r.querySelector('.it-price').value)||0)})).filter(it=>it.name.trim());
   const sub=items.reduce((a,it)=>a+it.total,0);
-  const payload={number:document.getElementById('qm-num').value.trim(),date:document.getElementById('qm-date').value,customer:document.getElementById('qm-cust').value.trim(),contact_name:document.getElementById('qm-contact').value.trim(),contact_phone:document.getElementById('qm-phone').value.trim(),status:document.getElementById('qm-status').value,validity_days:parseInt(document.getElementById('qm-validity').value)||30,note:document.getElementById('qm-note').value.trim(),items,subtotal:sub,vat:sub*0.07,total:sub*1.07};
+  const payload={number:document.getElementById('qm-num').value.trim(),date:document.getElementById('qm-date').value,customer:document.getElementById('qm-cust').value.trim(),contact_name:document.getElementById('qm-contact').value.trim(),contact_phone:document.getElementById('qm-phone').value.trim(),status:document.getElementById('qm-status').value,validity_days:parseInt(document.getElementById('qm-validity').value)||30,note:document.getElementById('qm-note').value.trim(),items,subtotal:sub,vat:sub*0.07,total:sub*1.07,user_id:currentUser.id};
   const {error}=editId?await db.from('quotations').update(payload).eq('id',editId):await db.from('quotations').insert(payload);
   if(error){toast('บันทึกไม่สำเร็จ: '+error.message,'error');return;}
   closeModal('q-modal');toast('บันทึกสำเร็จ','success');loadQ();
@@ -1161,7 +1201,7 @@ function openPModal(id){
   document.getElementById('p-modal').style.display='flex';
 }
 async function saveP(){
-  const payload={code:document.getElementById('pm-code').value.trim(),type:document.getElementById('pm-type').value,name:document.getElementById('pm-name').value.trim(),price:parseFloat(document.getElementById('pm-price').value)||0,unit:document.getElementById('pm-unit').value,description:document.getElementById('pm-desc').value.trim()};
+  const payload={code:document.getElementById('pm-code').value.trim(),type:document.getElementById('pm-type').value,name:document.getElementById('pm-name').value.trim(),price:parseFloat(document.getElementById('pm-price').value)||0,unit:document.getElementById('pm-unit').value,description:document.getElementById('pm-desc').value.trim(),user_id:currentUser.id};
   if(!payload.name){toast('กรุณากรอกชื่อสินค้า','error');return;}
   const {error}=editId?await db.from('products').update(payload).eq('id',editId):await db.from('products').insert(payload);
   if(error){toast('บันทึกไม่สำเร็จ: '+error.message,'error');return;}
@@ -1186,7 +1226,7 @@ function openCModal(id){
   document.getElementById('c-modal').style.display='flex';
 }
 async function saveC(){
-  const payload={company_name:document.getElementById('cm-company').value.trim(),contact_name:document.getElementById('cm-name').value.trim(),phone:document.getElementById('cm-phone').value.trim(),email:document.getElementById('cm-email').value.trim(),line_id:document.getElementById('cm-line').value.trim(),address:document.getElementById('cm-address').value.trim(),tax_id:document.getElementById('cm-taxid').value.trim(),note:document.getElementById('cm-note').value.trim()};
+  const payload={company_name:document.getElementById('cm-company').value.trim(),contact_name:document.getElementById('cm-name').value.trim(),phone:document.getElementById('cm-phone').value.trim(),email:document.getElementById('cm-email').value.trim(),line_id:document.getElementById('cm-line').value.trim(),address:document.getElementById('cm-address').value.trim(),tax_id:document.getElementById('cm-taxid').value.trim(),note:document.getElementById('cm-note').value.trim(),user_id:currentUser.id};
   if(!payload.company_name){toast('กรุณากรอกชื่อบริษัท','error');return;}
   const {error}=editId?await db.from('contacts').update(payload).eq('id',editId):await db.from('contacts').insert(payload);
   if(error){toast('บันทึกไม่สำเร็จ: '+error.message,'error');return;}
@@ -1250,7 +1290,7 @@ function openPOModal(id){
 }
 function addPOItem(it){
   const idx=poIIdx++;const div=document.createElement('div');div.className='item-row';div.id='poirow-'+idx;
-  div.innerHTML=`<input type="text" placeholder="ชื่อสินค้า/วัตถุดิบ" class="it-name" value="${(it?.name||'').replace(/"/g,'&quot;')}" oninput="calcPOTotals()"><input type="number" min="1" class="it-qty" value="${it?.qty||1}" oninput="calcPOTotals()"><input type="number" min="0" step="0.01" class="it-price" value="${it?.price||0}" oninput="calcPOTotals()"><button class="btn btn-sm btn-danger" onclick="document.getElementById('poirow-${idx}').remove();calcPOTotals()">✕</button>`;
+  div.innerHTML=`<input type="text" placeholder="ชื่อสินค้า/วัตถุดิบ" class="it-name" value="${(it?.name||'').replace(/"/g,'&quot;')}" oninput="calcPOTotals()"><input type="number" min="1" class="it-qty" value="${it?.qty||1}" oninput="calcPOTotals()"><input type="text" placeholder="หน่วย" class="it-unit" value="${(it?.unit||'').replace(/"/g,'&quot;')}" list="unit-list" style="padding:8px 6px"><input type="number" min="0" step="0.01" class="it-price" value="${it?.price||0}" oninput="calcPOTotals()"><button class="btn btn-sm btn-danger" onclick="document.getElementById('poirow-${idx}').remove();calcPOTotals()">✕</button>`;
   document.getElementById('po-items-wrap').appendChild(div);calcPOTotals();
 }
 function calcPOTotals(){
@@ -1259,7 +1299,7 @@ function calcPOTotals(){
 }
 async function savePO(){
   const supEl=document.getElementById('pom-supplier');const supId=supEl.value;const supName=supEl.options[supEl.selectedIndex]?.getAttribute('data-name')||'';
-  const items=[...document.querySelectorAll('#po-items-wrap .item-row')].map(r=>({name:r.querySelector('.it-name').value,qty:parseFloat(r.querySelector('.it-qty').value)||1,price:parseFloat(r.querySelector('.it-price').value)||0,total:(parseFloat(r.querySelector('.it-qty').value)||1)*(parseFloat(r.querySelector('.it-price').value)||0)})).filter(it=>it.name.trim());
+  const items=[...document.querySelectorAll('#po-items-wrap .item-row')].map(r=>({name:r.querySelector('.it-name').value,qty:parseFloat(r.querySelector('.it-qty').value)||1,unit:r.querySelector('.it-unit')?.value||'',price:parseFloat(r.querySelector('.it-price').value)||0,total:(parseFloat(r.querySelector('.it-qty').value)||1)*(parseFloat(r.querySelector('.it-price').value)||0)})).filter(it=>it.name.trim());
   const sub=items.reduce((a,it)=>a+it.total,0);
   const payload={number:document.getElementById('pom-num').value.trim(),order_date:document.getElementById('pom-date').value,supplier_id:supId||null,supplier_name:supName,expected_date:document.getElementById('pom-expected').value||null,status:document.getElementById('pom-status').value,quote_id:document.getElementById('pom-quote').value||null,note:document.getElementById('pom-note').value.trim(),items,subtotal:sub,vat:sub*0.07,total:sub*1.07};
   if(!supId){toast('กรุณาเลือกซัพพลายเออร์','error');return;}
@@ -1330,15 +1370,22 @@ const CO_TAX='0115566014924';
 const CO_LINE='@004isack';
 const CO_EMAIL='sales@oneforallpackaging.com';
 
+let _printDocNum='';
 function closePrint(){document.getElementById('print-overlay').classList.remove('open');}
+function doPrint(){
+  const old=document.title;
+  if(_printDocNum) document.title=_printDocNum;
+  window.print();
+  setTimeout(()=>{document.title=old;},1500);
+}
 
-function buildCompanyHeader(){
-  return`<div class="print-hdr"><div class="print-hdr-left"><h1>${CO_NAME}</h1><p>${CO_ADDR}<br>โทร ${CO_TEL} &nbsp;|&nbsp; Line ${CO_LINE}<br>${CO_EMAIL} &nbsp;|&nbsp; เลขภาษี ${CO_TAX}</p></div><div class="print-docinfo" id="pi-docinfo"></div></div>`;
+function buildCompanyHeader(docType,docNum,docDate){
+  return`<div class="print-hdr"><div class="print-hdr-left"><img src="logo.png" class="print-hdr-logo" onerror="this.style.display='none'"><div><h1>${CO_NAME}</h1><p>${CO_ADDR}<br>โทร ${CO_TEL} &nbsp;|&nbsp; ${CO_EMAIL}<br>เลขประจำตัวผู้เสียภาษีอากร ${CO_TAX}</p></div></div><div class="print-docinfo"><div class="print-doc-type">${docType||''}</div><div class="pnum">${docNum||'-'}</div><div class="pdate">วันที่ ${docDate||'-'}</div></div></div>`;
 }
 
 function buildItemsTable(items){
-  const rows=(items||[]).map((it,i)=>`<tr><td>${i+1}. ${it.name||it.product_name||''}</td><td>${fmt(it.qty||1)}</td><td>${fmt(it.price||it.unit_price||0)}</td><td>${fmt((it.qty||1)*(it.price||it.unit_price||0))}</td></tr>`).join('');
-  return`<table class="print-items-tbl"><thead><tr><th>รายการ</th><th>จำนวน</th><th>ราคา/หน่วย</th><th>จำนวนเงิน</th></tr></thead><tbody>${rows}</tbody></table>`;
+  const rows=(items||[]).map((it,i)=>`<tr><td>${i+1}. ${it.name||it.product_name||''}</td><td>${fmt(it.qty||1)}</td><td>${it.unit||''}</td><td>${fmt(it.price||it.unit_price||0)}</td><td>${fmt((it.qty||1)*(it.price||it.unit_price||0))}</td></tr>`).join('');
+  return`<table class="print-items-tbl"><thead><tr><th>รายการ</th><th>จำนวน</th><th>หน่วย</th><th>ราคา/หน่วย</th><th>จำนวนเงิน</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
 function buildTotals(sub,vat,total){
@@ -1351,12 +1398,7 @@ function printQ(id){
   const vat=q.vat||sub*0.07;
   const total=q.total||sub+vat;
   const validity=q.validity_days||30;
-  const html=buildCompanyHeader()+`
-  <div id="pi-docinfo" style="text-align:right;margin-top:-80px">
-    <h2 style="font-size:14px;font-weight:700;color:#5a6a7a;letter-spacing:1px">ใบเสนอราคา</h2>
-    <div class="pnum">${q.number||'-'}</div>
-    <div class="pdate">วันที่ ${q.date||'-'}</div>
-  </div>
+  const html=buildCompanyHeader('ใบเสนอราคา',q.number,q.date)+`
   <div class="print-custbox">
     <h4>เสนอราคาแก่</h4>
     <div class="pcname">${q.customer||'-'}</div>
@@ -1370,6 +1412,7 @@ function printQ(id){
     <div class="print-sign"><div class="sign-space"></div><div class="sign-line">ผู้รับมอบอำนาจ / Customer Acceptance</div></div>
   </div>
   <div class="print-validity-note">ใบเสนอราคานี้มีอายุ ${validity} วัน นับจากวันที่ออกเอกสาร</div>`;
+  _printDocNum=q.number||'ใบเสนอราคา';
   document.getElementById('print-body').innerHTML=html;
   document.getElementById('print-overlay').classList.add('open');
 }
@@ -1379,12 +1422,7 @@ function printSO(id){
   const sub=so.subtotal||(so.items||[]).reduce((a,it)=>a+(it.qty||1)*(it.price||0),0);
   const vat=so.vat||sub*0.07;
   const total=so.total||sub+vat;
-  const html=buildCompanyHeader()+`
-  <div style="text-align:right;margin-top:-80px">
-    <h2 style="font-size:14px;font-weight:700;color:#5a6a7a;letter-spacing:1px">ใบสั่งขาย</h2>
-    <div class="pnum">${so.number||'-'}</div>
-    <div class="pdate">วันที่ ${so.date||'-'}</div>
-  </div>
+  const html=buildCompanyHeader('ใบสั่งขาย',so.number,so.date)+`
   <div class="print-custbox">
     <h4>ลูกค้า</h4>
     <div class="pcname">${so.customer||'-'}</div>
@@ -1398,6 +1436,7 @@ function printSO(id){
     <div class="print-sign"><div class="sign-space"></div><div class="sign-line">ผู้อนุมัติ / Approved By<br>${CO_NAME}</div></div>
     <div class="print-sign"><div class="sign-space"></div><div class="sign-line">ผู้รับสินค้า / Received By</div></div>
   </div>`;
+  _printDocNum=so.number||'ใบสั่งขาย';
   document.getElementById('print-body').innerHTML=html;
   document.getElementById('print-overlay').classList.add('open');
 }
@@ -1423,21 +1462,18 @@ function renderSOTable(){
   }).join('');
 }
 function filterSO(){renderSOTable();}
-function populateSOCustDatalist(){
-  const dl=document.getElementById('so-cust-list');if(!dl)return;
-  const names=new Set([...allSO.map(s=>s.customer),...allQ.map(q=>q.customer),...allC.map(c=>c.company_name)].filter(Boolean));
-  dl.innerHTML=[...names].map(n=>`<option value="${n}">`).join('');
-}
+function populateSOCustDatalist(){/* ไม่ใช้แล้ว */}
 function openSOModal(id){
   editSOId=id||null;
   document.getElementById('so-modal-title').textContent=id?'แก้ไขใบสั่งขาย':'สร้างใบสั่งขาย (SO)';
+  const custSel=document.getElementById('som-cust');
   const qsel=document.getElementById('som-quote');
   qsel.innerHTML='<option value="">-- ไม่เชื่อม --</option>'+allQ.filter(q=>q.status!=='cancelled').map(q=>`<option value="${q.id}">${q.number||q.id} - ${q.customer||''}</option>`).join('');
   if(id){
     const s=allSO.find(x=>x.id===id);if(!s)return;
+    custSel.innerHTML=buildContactOptions(s.customer||'');
     document.getElementById('som-num').value=s.number||'';
     document.getElementById('som-date').value=s.date||'';
-    document.getElementById('som-cust').value=s.customer||'';
     document.getElementById('som-contact').value=s.contact_name||'';
     document.getElementById('som-phone').value=s.contact_phone||'';
     document.getElementById('som-status').value=s.status||'pending';
@@ -1447,22 +1483,23 @@ function openSOModal(id){
     soIIdx=0;document.getElementById('so-items-wrap').innerHTML='';
     (s.items||[]).forEach(it=>addSOItem(it));
   } else {
+    custSel.innerHTML=buildContactOptions();
     document.getElementById('som-num').value='กำลังสร้าง...';
     genSONumber().then(n=>document.getElementById('som-num').value=n);
     document.getElementById('som-date').value=new Date().toISOString().split('T')[0];
-    document.getElementById('som-cust').value='';document.getElementById('som-contact').value='';
+    document.getElementById('som-contact').value='';
     document.getElementById('som-phone').value='';document.getElementById('som-status').value='pending';
     document.getElementById('som-delivery').value='';document.getElementById('som-quote').value='';
     document.getElementById('som-note').value='';
     soIIdx=0;document.getElementById('so-items-wrap').innerHTML='';addSOItem();
   }
   calcSOTotals();
-  populateSOCustDatalist();
   document.getElementById('so-modal').style.display='flex';
 }
 function addSOItem(it){
   const idx=soIIdx++;const div=document.createElement('div');div.className='item-row';div.id='soirow-'+idx;
-  div.innerHTML=`<input type="text" placeholder="ชื่อสินค้า" class="it-name" value="${(it?.name||it?.product_name||'').replace(/"/g,'&quot;')}" oninput="calcSOTotals()"><input type="number" min="1" class="it-qty" value="${it?.qty||1}" oninput="calcSOTotals()"><input type="number" min="0" step="0.01" class="it-price" value="${it?.price||it?.unit_price||0}" oninput="calcSOTotals()"><button class="btn btn-sm btn-danger" onclick="document.getElementById('soirow-${idx}').remove();calcSOTotals()">✕</button>`;
+  const pName=it?.name||it?.product_name||'';
+  div.innerHTML=`<select class="it-name" onchange="onItemSel(this);calcSOTotals()">${buildProductOptions(pName)}</select><input type="number" min="1" class="it-qty" value="${it?.qty||1}" oninput="calcSOTotals()"><input type="text" placeholder="หน่วย" class="it-unit" value="${(it?.unit||'').replace(/"/g,'&quot;')}" list="unit-list" style="padding:8px 6px"><input type="number" min="0" step="0.01" class="it-price" value="${it?.price||it?.unit_price||0}" oninput="calcSOTotals()"><button class="btn btn-sm btn-danger" onclick="document.getElementById('soirow-${idx}').remove();calcSOTotals()">✕</button>`;
   document.getElementById('so-items-wrap').appendChild(div);calcSOTotals();
 }
 function calcSOTotals(){
@@ -1473,7 +1510,7 @@ function calcSOTotals(){
   document.getElementById('so-tot-disp').textContent='฿'+fmt(sub+vat);
 }
 async function saveSO(){
-  const items=[...document.querySelectorAll('#so-items-wrap .item-row')].map(r=>({name:r.querySelector('.it-name').value,qty:parseFloat(r.querySelector('.it-qty').value)||1,price:parseFloat(r.querySelector('.it-price').value)||0,total:(parseFloat(r.querySelector('.it-qty').value)||1)*(parseFloat(r.querySelector('.it-price').value)||0)})).filter(it=>it.name.trim());
+  const items=[...document.querySelectorAll('#so-items-wrap .item-row')].map(r=>({name:r.querySelector('.it-name').value,qty:parseFloat(r.querySelector('.it-qty').value)||1,unit:r.querySelector('.it-unit')?.value||'',price:parseFloat(r.querySelector('.it-price').value)||0,total:(parseFloat(r.querySelector('.it-qty').value)||1)*(parseFloat(r.querySelector('.it-price').value)||0)})).filter(it=>it.name.trim());
   const sub=items.reduce((a,it)=>a+it.total,0);
   const payload={number:document.getElementById('som-num').value.trim(),date:document.getElementById('som-date').value,customer:document.getElementById('som-cust').value.trim(),contact_name:document.getElementById('som-contact').value.trim(),contact_phone:document.getElementById('som-phone').value.trim(),status:document.getElementById('som-status').value,delivery_date:document.getElementById('som-delivery').value||null,quote_id:document.getElementById('som-quote').value||null,note:document.getElementById('som-note').value.trim(),items,subtotal:sub,vat:sub*0.07,total:sub*1.07};
   if(!payload.customer){toast('กรุณากรอกชื่อลูกค้า','error');return;}
@@ -1483,5 +1520,11 @@ async function saveSO(){
 }
 async function deleteSO(id){const {error}=await db.from('sale_orders').delete().eq('id',id);if(error){toast('ลบไม่สำเร็จ','error');return;}toast('ลบแล้ว','success');loadSO();}
 </script>
+<datalist id="unit-list">
+  <option value="ใบ"><option value="ชิ้น"><option value="กก."><option value="ลูก">
+  <option value="แผ่น"><option value="ม้วน"><option value="กล่อง"><option value="ถุง">
+  <option value="เมตร"><option value="ลิตร"><option value="โหล"><option value="ห่อ">
+  <option value="ปีก"><option value="อัน"><option value="คู่"><option value="ชุด">
+</datalist>
 </body>
 </html>
