@@ -525,9 +525,9 @@ label{font-size:13px;font-weight:600;color:var(--text2)}
     <div class="form-row">
       <div class="fg"><label>เลขที่ (ออโต้)</label><input type="text" id="qm-num" placeholder="กำลังสร้าง..." readonly style="background:#f0f4f8;cursor:default;color:var(--navy);font-weight:600"></div>
       <div class="fg"><label>วันที่</label><input type="date" id="qm-date"></div>
-      <div class="fg full"><label>ลูกค้า / บริษัท</label><input type="text" id="qm-cust" placeholder="บริษัท..." list="cust-list"><datalist id="cust-list"></datalist></div>
-      <div class="fg"><label>ผู้ติดต่อ</label><input type="text" id="qm-contact" placeholder="ชื่อ"></div>
-      <div class="fg"><label>โทรศัพท์</label><input type="text" id="qm-phone"></div>
+      <div class="fg full"><label>ลูกค้า / บริษัท</label><select id="qm-cust" onchange="onQCustChange()"><option value="">-- เลือกลูกค้า --</option></select></div>
+      <div class="fg"><label>ผู้ติดต่อ</label><input type="text" id="qm-contact" readonly style="background:#f0f4f8;cursor:default"></div>
+      <div class="fg"><label>โทรศัพท์</label><input type="text" id="qm-phone" readonly style="background:#f0f4f8;cursor:default"></div>
       <div class="fg"><label>สถานะ</label>
         <select id="qm-status"><option value="draft">ร่าง</option><option value="sent">ส่งแล้ว</option><option value="approved">ยืนยัน</option><option value="cancelled">ยกเลิก</option></select>
       </div>
@@ -740,9 +740,9 @@ label{font-size:13px;font-weight:600;color:var(--text2)}
     <div class="form-row">
       <div class="fg"><label>เลข SO (ออโต้)</label><input type="text" id="som-num" placeholder="กำลังสร้าง..." readonly style="background:#f0f4f8;cursor:default;color:var(--navy);font-weight:600"></div>
       <div class="fg"><label>วันที่</label><input type="date" id="som-date"></div>
-      <div class="fg full"><label>ลูกค้า / บริษัท</label><input type="text" id="som-cust" placeholder="บริษัท..." list="so-cust-list"><datalist id="so-cust-list"></datalist></div>
-      <div class="fg"><label>ผู้ติดต่อ</label><input type="text" id="som-contact" placeholder="ชื่อ"></div>
-      <div class="fg"><label>โทรศัพท์</label><input type="text" id="som-phone"></div>
+      <div class="fg full"><label>ลูกค้า / บริษัท</label><select id="som-cust" onchange="onSOCustChange()"><option value="">-- เลือกลูกค้า --</option></select></div>
+      <div class="fg"><label>ผู้ติดต่อ</label><input type="text" id="som-contact" readonly style="background:#f0f4f8;cursor:default"></div>
+      <div class="fg"><label>โทรศัพท์</label><input type="text" id="som-phone" readonly style="background:#f0f4f8;cursor:default"></div>
       <div class="fg"><label>สถานะ</label>
         <select id="som-status">
           <option value="pending">รอดำเนินการ</option>
@@ -1084,19 +1084,41 @@ function populateMonthFilter(){
   const sorted=[...months].sort().reverse();
   sel.innerHTML='<option value="">ทุกเดือน</option>'+sorted.map(m=>`<option value="${m}">${m}</option>`).join('');
 }
-function populateCustDatalist(){
-  const dl=document.getElementById('cust-list');if(!dl)return;
-  const names=new Set([...allQ.map(q=>q.customer),...allC.map(c=>c.company_name)].filter(Boolean));
-  dl.innerHTML=[...names].map(n=>`<option value="${n}">`).join('');
+function populateCustDatalist(){/* ไม่ใช้แล้ว */}
+function buildContactOptions(selectedCompany=''){
+  return '<option value="">-- เลือกลูกค้า --</option>'+
+    allC.map(c=>`<option value="${(c.company_name||'').replace(/"/g,'&quot;')}" data-contact="${(c.contact_name||'').replace(/"/g,'&quot;')}" data-phone="${(c.phone||'').replace(/"/g,'&quot;')}"${c.company_name===selectedCompany?' selected':''}>${c.company_name||''}</option>`).join('');
+}
+function buildProductOptions(selectedName=''){
+  return '<option value="">-- เลือกสินค้า --</option>'+
+    allP.map(p=>`<option value="${(p.name||'').replace(/"/g,'&quot;')}" data-price="${p.price||0}"${p.name===selectedName?' selected':''}>${p.code?p.code+' – ':''} ${p.name||''}</option>`).join('');
+}
+function onQCustChange(){
+  const sel=document.getElementById('qm-cust');
+  const opt=sel.options[sel.selectedIndex];
+  document.getElementById('qm-contact').value=opt?.dataset?.contact||'';
+  document.getElementById('qm-phone').value=opt?.dataset?.phone||'';
+}
+function onSOCustChange(){
+  const sel=document.getElementById('som-cust');
+  const opt=sel.options[sel.selectedIndex];
+  document.getElementById('som-contact').value=opt?.dataset?.contact||'';
+  document.getElementById('som-phone').value=opt?.dataset?.phone||'';
+}
+function onItemSel(sel){
+  const opt=sel.options[sel.selectedIndex];
+  const priceInput=sel.closest('.item-row').querySelector('.it-price');
+  if(priceInput&&opt?.dataset?.price!==undefined) priceInput.value=parseFloat(opt.dataset.price)||0;
 }
 function openQModal(id){
   editId=id||null;
   document.getElementById('q-modal-title').textContent=id?'แก้ไขใบเสนอราคา':'สร้างใบเสนอราคาใหม่';
+  const custSel=document.getElementById('qm-cust');
   if(id){
     const q=allQ.find(x=>x.id===id);if(!q)return;
+    custSel.innerHTML=buildContactOptions(q.customer||'');
     document.getElementById('qm-num').value=q.number||'';
     document.getElementById('qm-date').value=q.date||'';
-    document.getElementById('qm-cust').value=q.customer||'';
     document.getElementById('qm-contact').value=q.contact_name||'';
     document.getElementById('qm-phone').value=q.contact_phone||'';
     document.getElementById('qm-status').value=q.status||'draft';
@@ -1105,10 +1127,11 @@ function openQModal(id){
     iIdx=0;document.getElementById('items-wrap').innerHTML='';
     (q.items||[]).forEach(it=>addItem(it));
   } else {
+    custSel.innerHTML=buildContactOptions();
     document.getElementById('qm-num').value='กำลังสร้าง...';
     genQNumber().then(n=>document.getElementById('qm-num').value=n);
     document.getElementById('qm-date').value=new Date().toISOString().split('T')[0];
-    document.getElementById('qm-cust').value='';document.getElementById('qm-contact').value='';
+    document.getElementById('qm-contact').value='';
     document.getElementById('qm-phone').value='';document.getElementById('qm-status').value='draft';
     document.getElementById('qm-validity').value=30;document.getElementById('qm-note').value='';
     iIdx=0;document.getElementById('items-wrap').innerHTML='';addItem();
@@ -1119,7 +1142,8 @@ function openQModal(id){
 function addItem(it){
   const idx=iIdx++;const div=document.createElement('div');
   div.className='item-row';div.id='irow-'+idx;
-  div.innerHTML=`<input type="text" placeholder="ชื่อสินค้า" class="it-name" value="${(it?.name||it?.product_name||'').replace(/"/g,'&quot;')}" oninput="calcTotals()"><input type="number" min="1" class="it-qty" value="${it?.qty||1}" oninput="calcTotals()"><input type="number" min="0" step="0.01" class="it-price" value="${it?.price||it?.unit_price||0}" oninput="calcTotals()"><button class="btn btn-sm btn-danger" onclick="document.getElementById('irow-${idx}').remove();calcTotals()">✕</button>`;
+  const pName=it?.name||it?.product_name||'';
+  div.innerHTML=`<select class="it-name" onchange="onItemSel(this);calcTotals()">${buildProductOptions(pName)}</select><input type="number" min="1" class="it-qty" value="${it?.qty||1}" oninput="calcTotals()"><input type="number" min="0" step="0.01" class="it-price" value="${it?.price||it?.unit_price||0}" oninput="calcTotals()"><button class="btn btn-sm btn-danger" onclick="document.getElementById('irow-${idx}').remove();calcTotals()">✕</button>`;
   document.getElementById('items-wrap').appendChild(div);calcTotals();
 }
 function calcTotals(){
@@ -1133,7 +1157,7 @@ function calcTotals(){
 async function saveQ(){
   const items=[...document.querySelectorAll('#items-wrap .item-row')].map(r=>({name:r.querySelector('.it-name').value,qty:parseFloat(r.querySelector('.it-qty').value)||1,price:parseFloat(r.querySelector('.it-price').value)||0,total:(parseFloat(r.querySelector('.it-qty').value)||1)*(parseFloat(r.querySelector('.it-price').value)||0)})).filter(it=>it.name.trim());
   const sub=items.reduce((a,it)=>a+it.total,0);
-  const payload={number:document.getElementById('qm-num').value.trim(),date:document.getElementById('qm-date').value,customer:document.getElementById('qm-cust').value.trim(),contact_name:document.getElementById('qm-contact').value.trim(),contact_phone:document.getElementById('qm-phone').value.trim(),status:document.getElementById('qm-status').value,validity_days:parseInt(document.getElementById('qm-validity').value)||30,note:document.getElementById('qm-note').value.trim(),items,subtotal:sub,vat:sub*0.07,total:sub*1.07};
+  const payload={number:document.getElementById('qm-num').value.trim(),date:document.getElementById('qm-date').value,customer:document.getElementById('qm-cust').value.trim(),contact_name:document.getElementById('qm-contact').value.trim(),contact_phone:document.getElementById('qm-phone').value.trim(),status:document.getElementById('qm-status').value,validity_days:parseInt(document.getElementById('qm-validity').value)||30,note:document.getElementById('qm-note').value.trim(),items,subtotal:sub,vat:sub*0.07,total:sub*1.07,user_id:currentUser.id};
   const {error}=editId?await db.from('quotations').update(payload).eq('id',editId):await db.from('quotations').insert(payload);
   if(error){toast('บันทึกไม่สำเร็จ: '+error.message,'error');return;}
   closeModal('q-modal');toast('บันทึกสำเร็จ','success');loadQ();
@@ -1161,7 +1185,7 @@ function openPModal(id){
   document.getElementById('p-modal').style.display='flex';
 }
 async function saveP(){
-  const payload={code:document.getElementById('pm-code').value.trim(),type:document.getElementById('pm-type').value,name:document.getElementById('pm-name').value.trim(),price:parseFloat(document.getElementById('pm-price').value)||0,unit:document.getElementById('pm-unit').value,description:document.getElementById('pm-desc').value.trim()};
+  const payload={code:document.getElementById('pm-code').value.trim(),type:document.getElementById('pm-type').value,name:document.getElementById('pm-name').value.trim(),price:parseFloat(document.getElementById('pm-price').value)||0,unit:document.getElementById('pm-unit').value,description:document.getElementById('pm-desc').value.trim(),user_id:currentUser.id};
   if(!payload.name){toast('กรุณากรอกชื่อสินค้า','error');return;}
   const {error}=editId?await db.from('products').update(payload).eq('id',editId):await db.from('products').insert(payload);
   if(error){toast('บันทึกไม่สำเร็จ: '+error.message,'error');return;}
@@ -1186,7 +1210,7 @@ function openCModal(id){
   document.getElementById('c-modal').style.display='flex';
 }
 async function saveC(){
-  const payload={company_name:document.getElementById('cm-company').value.trim(),contact_name:document.getElementById('cm-name').value.trim(),phone:document.getElementById('cm-phone').value.trim(),email:document.getElementById('cm-email').value.trim(),line_id:document.getElementById('cm-line').value.trim(),address:document.getElementById('cm-address').value.trim(),tax_id:document.getElementById('cm-taxid').value.trim(),note:document.getElementById('cm-note').value.trim()};
+  const payload={company_name:document.getElementById('cm-company').value.trim(),contact_name:document.getElementById('cm-name').value.trim(),phone:document.getElementById('cm-phone').value.trim(),email:document.getElementById('cm-email').value.trim(),line_id:document.getElementById('cm-line').value.trim(),address:document.getElementById('cm-address').value.trim(),tax_id:document.getElementById('cm-taxid').value.trim(),note:document.getElementById('cm-note').value.trim(),user_id:currentUser.id};
   if(!payload.company_name){toast('กรุณากรอกชื่อบริษัท','error');return;}
   const {error}=editId?await db.from('contacts').update(payload).eq('id',editId):await db.from('contacts').insert(payload);
   if(error){toast('บันทึกไม่สำเร็จ: '+error.message,'error');return;}
@@ -1423,21 +1447,18 @@ function renderSOTable(){
   }).join('');
 }
 function filterSO(){renderSOTable();}
-function populateSOCustDatalist(){
-  const dl=document.getElementById('so-cust-list');if(!dl)return;
-  const names=new Set([...allSO.map(s=>s.customer),...allQ.map(q=>q.customer),...allC.map(c=>c.company_name)].filter(Boolean));
-  dl.innerHTML=[...names].map(n=>`<option value="${n}">`).join('');
-}
+function populateSOCustDatalist(){/* ไม่ใช้แล้ว */}
 function openSOModal(id){
   editSOId=id||null;
   document.getElementById('so-modal-title').textContent=id?'แก้ไขใบสั่งขาย':'สร้างใบสั่งขาย (SO)';
+  const custSel=document.getElementById('som-cust');
   const qsel=document.getElementById('som-quote');
   qsel.innerHTML='<option value="">-- ไม่เชื่อม --</option>'+allQ.filter(q=>q.status!=='cancelled').map(q=>`<option value="${q.id}">${q.number||q.id} - ${q.customer||''}</option>`).join('');
   if(id){
     const s=allSO.find(x=>x.id===id);if(!s)return;
+    custSel.innerHTML=buildContactOptions(s.customer||'');
     document.getElementById('som-num').value=s.number||'';
     document.getElementById('som-date').value=s.date||'';
-    document.getElementById('som-cust').value=s.customer||'';
     document.getElementById('som-contact').value=s.contact_name||'';
     document.getElementById('som-phone').value=s.contact_phone||'';
     document.getElementById('som-status').value=s.status||'pending';
@@ -1447,22 +1468,23 @@ function openSOModal(id){
     soIIdx=0;document.getElementById('so-items-wrap').innerHTML='';
     (s.items||[]).forEach(it=>addSOItem(it));
   } else {
+    custSel.innerHTML=buildContactOptions();
     document.getElementById('som-num').value='กำลังสร้าง...';
     genSONumber().then(n=>document.getElementById('som-num').value=n);
     document.getElementById('som-date').value=new Date().toISOString().split('T')[0];
-    document.getElementById('som-cust').value='';document.getElementById('som-contact').value='';
+    document.getElementById('som-contact').value='';
     document.getElementById('som-phone').value='';document.getElementById('som-status').value='pending';
     document.getElementById('som-delivery').value='';document.getElementById('som-quote').value='';
     document.getElementById('som-note').value='';
     soIIdx=0;document.getElementById('so-items-wrap').innerHTML='';addSOItem();
   }
   calcSOTotals();
-  populateSOCustDatalist();
   document.getElementById('so-modal').style.display='flex';
 }
 function addSOItem(it){
   const idx=soIIdx++;const div=document.createElement('div');div.className='item-row';div.id='soirow-'+idx;
-  div.innerHTML=`<input type="text" placeholder="ชื่อสินค้า" class="it-name" value="${(it?.name||it?.product_name||'').replace(/"/g,'&quot;')}" oninput="calcSOTotals()"><input type="number" min="1" class="it-qty" value="${it?.qty||1}" oninput="calcSOTotals()"><input type="number" min="0" step="0.01" class="it-price" value="${it?.price||it?.unit_price||0}" oninput="calcSOTotals()"><button class="btn btn-sm btn-danger" onclick="document.getElementById('soirow-${idx}').remove();calcSOTotals()">✕</button>`;
+  const pName=it?.name||it?.product_name||'';
+  div.innerHTML=`<select class="it-name" onchange="onItemSel(this);calcSOTotals()">${buildProductOptions(pName)}</select><input type="number" min="1" class="it-qty" value="${it?.qty||1}" oninput="calcSOTotals()"><input type="number" min="0" step="0.01" class="it-price" value="${it?.price||it?.unit_price||0}" oninput="calcSOTotals()"><button class="btn btn-sm btn-danger" onclick="document.getElementById('soirow-${idx}').remove();calcSOTotals()">✕</button>`;
   document.getElementById('so-items-wrap').appendChild(div);calcSOTotals();
 }
 function calcSOTotals(){
