@@ -154,9 +154,9 @@ label{font-size:13px;font-weight:600;color:var(--text2)}
 /* ITEMS */
 .items-sec{margin-top:14px}
 .items-sec h4{font-size:14px;font-weight:700;margin-bottom:10px;color:var(--navy)}
-.items-hdr{display:grid;grid-template-columns:3fr 1fr 1fr auto;gap:8px;margin-bottom:6px}
+.items-hdr{display:grid;grid-template-columns:3fr 1fr 0.7fr 1fr auto;gap:8px;margin-bottom:6px}
 .items-hdr span{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;padding:0 4px}
-.item-row{display:grid;grid-template-columns:3fr 1fr 1fr auto;gap:8px;margin-bottom:7px;align-items:center}
+.item-row{display:grid;grid-template-columns:3fr 1fr 0.7fr 1fr auto;gap:8px;margin-bottom:7px;align-items:center}
 .item-row input{padding:8px 11px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;outline:none;font-family:inherit}
 .item-row input:focus{border-color:var(--accent)}
 .btn-icon{width:32px;height:32px;border-radius:7px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:all .2s}
@@ -535,7 +535,7 @@ label{font-size:13px;font-weight:600;color:var(--text2)}
     </div>
     <div class="items-sec">
       <h4>รายการสินค้า</h4>
-      <div class="items-hdr"><span>รายการ</span><span>จำนวน</span><span>ราคา/หน่วย</span><span></span></div>
+      <div class="items-hdr"><span>รายการ</span><span>จำนวน</span><span>หน่วย</span><span>ราคา/หน่วย</span><span></span></div>
       <div id="items-wrap"></div>
       <button class="btn btn-outline btn-sm" onclick="addItem()" style="margin-top:8px">+ เพิ่มรายการ</button>
       <div class="total-box">
@@ -662,7 +662,7 @@ label{font-size:13px;font-weight:600;color:var(--text2)}
     </div>
     <div class="items-sec">
       <h4>รายการสั่งซื้อ</h4>
-      <div class="items-hdr"><span>รายการ</span><span>จำนวน</span><span>ราคา/หน่วย</span><span></span></div>
+      <div class="items-hdr"><span>รายการ</span><span>จำนวน</span><span>หน่วย</span><span>ราคา/หน่วย</span><span></span></div>
       <div id="po-items-wrap"></div>
       <button class="btn btn-outline btn-sm" onclick="addPOItem()" style="margin-top:8px">+ เพิ่มรายการ</button>
       <div class="total-box">
@@ -759,7 +759,7 @@ label{font-size:13px;font-weight:600;color:var(--text2)}
     </div>
     <div class="items-sec">
       <h4>รายการสินค้า</h4>
-      <div class="items-hdr"><span>รายการ</span><span>จำนวน</span><span>ราคา/หน่วย</span><span></span></div>
+      <div class="items-hdr"><span>รายการ</span><span>จำนวน</span><span>หน่วย</span><span>ราคา/หน่วย</span><span></span></div>
       <div id="so-items-wrap"></div>
       <button class="btn btn-outline btn-sm" onclick="addSOItem()" style="margin-top:8px">+ เพิ่มรายการ</button>
       <div class="total-box">
@@ -1095,7 +1095,7 @@ function buildContactOptions(selectedCompany=''){
 }
 function buildProductOptions(selectedName=''){
   return '<option value="">-- เลือกสินค้า --</option>'+
-    allP.map(p=>`<option value="${(p.name||'').replace(/"/g,'&quot;')}" data-price="${p.price||0}"${p.name===selectedName?' selected':''}>${p.code?p.code+' – ':''} ${p.name||''}</option>`).join('');
+    allP.map(p=>`<option value="${(p.name||'').replace(/"/g,'&quot;')}" data-price="${p.price||0}" data-unit="${(p.unit||'').replace(/"/g,'&quot;')}"${p.name===selectedName?' selected':''}>${p.code?p.code+' – ':''} ${p.name||''}</option>`).join('');
 }
 function onQCustChange(){
   const sel=document.getElementById('qm-cust');
@@ -1111,8 +1111,11 @@ function onSOCustChange(){
 }
 function onItemSel(sel){
   const opt=sel.options[sel.selectedIndex];
-  const priceInput=sel.closest('.item-row').querySelector('.it-price');
+  const row=sel.closest('.item-row');
+  const priceInput=row.querySelector('.it-price');
+  const unitInput=row.querySelector('.it-unit');
   if(priceInput&&opt?.dataset?.price!==undefined) priceInput.value=parseFloat(opt.dataset.price)||0;
+  if(unitInput&&opt?.dataset?.unit!==undefined) unitInput.value=opt.dataset.unit||'';
 }
 function openQModal(id){
   editId=id||null;
@@ -1145,7 +1148,7 @@ function openQModal(id){
 function addItem(it){
   const idx=iIdx++;const div=document.createElement('div');
   div.className='item-row';div.id='irow-'+idx;
-  div.innerHTML=`<input type="text" placeholder="ชื่อสินค้า" class="it-name" value="${(it?.name||it?.product_name||'').replace(/"/g,'&quot;')}" oninput="calcTotals()"><input type="number" min="1" class="it-qty" value="${it?.qty||1}" oninput="calcTotals()"><input type="number" min="0" step="0.01" class="it-price" value="${it?.price||it?.unit_price||0}" oninput="calcTotals()"><button class="btn btn-sm btn-danger" onclick="document.getElementById('irow-${idx}').remove();calcTotals()">✕</button>`;
+  div.innerHTML=`<input type="text" placeholder="ชื่อสินค้า" class="it-name" value="${(it?.name||it?.product_name||'').replace(/"/g,'&quot;')}" oninput="calcTotals()"><input type="number" min="1" class="it-qty" value="${it?.qty||1}" oninput="calcTotals()"><input type="text" placeholder="หน่วย" class="it-unit" value="${(it?.unit||'').replace(/"/g,'&quot;')}" list="unit-list" style="padding:8px 6px"><input type="number" min="0" step="0.01" class="it-price" value="${it?.price||it?.unit_price||0}" oninput="calcTotals()"><button class="btn btn-sm btn-danger" onclick="document.getElementById('irow-${idx}').remove();calcTotals()">✕</button>`;
   document.getElementById('items-wrap').appendChild(div);calcTotals();
 }
 function calcTotals(){
@@ -1157,7 +1160,7 @@ function calcTotals(){
   document.getElementById('tot-disp').textContent='฿'+fmt(sub+vat);
 }
 async function saveQ(){
-  const items=[...document.querySelectorAll('#items-wrap .item-row')].map(r=>({name:r.querySelector('.it-name').value,qty:parseFloat(r.querySelector('.it-qty').value)||1,price:parseFloat(r.querySelector('.it-price').value)||0,total:(parseFloat(r.querySelector('.it-qty').value)||1)*(parseFloat(r.querySelector('.it-price').value)||0)})).filter(it=>it.name.trim());
+  const items=[...document.querySelectorAll('#items-wrap .item-row')].map(r=>({name:r.querySelector('.it-name').value,qty:parseFloat(r.querySelector('.it-qty').value)||1,unit:r.querySelector('.it-unit')?.value||'',price:parseFloat(r.querySelector('.it-price').value)||0,total:(parseFloat(r.querySelector('.it-qty').value)||1)*(parseFloat(r.querySelector('.it-price').value)||0)})).filter(it=>it.name.trim());
   const sub=items.reduce((a,it)=>a+it.total,0);
   const payload={number:document.getElementById('qm-num').value.trim(),date:document.getElementById('qm-date').value,customer:document.getElementById('qm-cust').value.trim(),contact_name:document.getElementById('qm-contact').value.trim(),contact_phone:document.getElementById('qm-phone').value.trim(),status:document.getElementById('qm-status').value,validity_days:parseInt(document.getElementById('qm-validity').value)||30,note:document.getElementById('qm-note').value.trim(),items,subtotal:sub,vat:sub*0.07,total:sub*1.07,user_id:currentUser.id};
   const {error}=editId?await db.from('quotations').update(payload).eq('id',editId):await db.from('quotations').insert(payload);
@@ -1276,7 +1279,7 @@ function openPOModal(id){
 }
 function addPOItem(it){
   const idx=poIIdx++;const div=document.createElement('div');div.className='item-row';div.id='poirow-'+idx;
-  div.innerHTML=`<input type="text" placeholder="ชื่อสินค้า/วัตถุดิบ" class="it-name" value="${(it?.name||'').replace(/"/g,'&quot;')}" oninput="calcPOTotals()"><input type="number" min="1" class="it-qty" value="${it?.qty||1}" oninput="calcPOTotals()"><input type="number" min="0" step="0.01" class="it-price" value="${it?.price||0}" oninput="calcPOTotals()"><button class="btn btn-sm btn-danger" onclick="document.getElementById('poirow-${idx}').remove();calcPOTotals()">✕</button>`;
+  div.innerHTML=`<input type="text" placeholder="ชื่อสินค้า/วัตถุดิบ" class="it-name" value="${(it?.name||'').replace(/"/g,'&quot;')}" oninput="calcPOTotals()"><input type="number" min="1" class="it-qty" value="${it?.qty||1}" oninput="calcPOTotals()"><input type="text" placeholder="หน่วย" class="it-unit" value="${(it?.unit||'').replace(/"/g,'&quot;')}" list="unit-list" style="padding:8px 6px"><input type="number" min="0" step="0.01" class="it-price" value="${it?.price||0}" oninput="calcPOTotals()"><button class="btn btn-sm btn-danger" onclick="document.getElementById('poirow-${idx}').remove();calcPOTotals()">✕</button>`;
   document.getElementById('po-items-wrap').appendChild(div);calcPOTotals();
 }
 function calcPOTotals(){
@@ -1285,7 +1288,7 @@ function calcPOTotals(){
 }
 async function savePO(){
   const supEl=document.getElementById('pom-supplier');const supId=supEl.value;const supName=supEl.options[supEl.selectedIndex]?.getAttribute('data-name')||'';
-  const items=[...document.querySelectorAll('#po-items-wrap .item-row')].map(r=>({name:r.querySelector('.it-name').value,qty:parseFloat(r.querySelector('.it-qty').value)||1,price:parseFloat(r.querySelector('.it-price').value)||0,total:(parseFloat(r.querySelector('.it-qty').value)||1)*(parseFloat(r.querySelector('.it-price').value)||0)})).filter(it=>it.name.trim());
+  const items=[...document.querySelectorAll('#po-items-wrap .item-row')].map(r=>({name:r.querySelector('.it-name').value,qty:parseFloat(r.querySelector('.it-qty').value)||1,unit:r.querySelector('.it-unit')?.value||'',price:parseFloat(r.querySelector('.it-price').value)||0,total:(parseFloat(r.querySelector('.it-qty').value)||1)*(parseFloat(r.querySelector('.it-price').value)||0)})).filter(it=>it.name.trim());
   const sub=items.reduce((a,it)=>a+it.total,0);
   const payload={number:document.getElementById('pom-num').value.trim(),order_date:document.getElementById('pom-date').value,supplier_id:supId||null,supplier_name:supName,expected_date:document.getElementById('pom-expected').value||null,status:document.getElementById('pom-status').value,quote_id:document.getElementById('pom-quote').value||null,note:document.getElementById('pom-note').value.trim(),items,subtotal:sub,vat:sub*0.07,total:sub*1.07};
   if(!supId){toast('กรุณาเลือกซัพพลายเออร์','error');return;}
@@ -1363,8 +1366,8 @@ function buildCompanyHeader(){
 }
 
 function buildItemsTable(items){
-  const rows=(items||[]).map((it,i)=>`<tr><td>${i+1}. ${it.name||it.product_name||''}</td><td>${fmt(it.qty||1)}</td><td>${fmt(it.price||it.unit_price||0)}</td><td>${fmt((it.qty||1)*(it.price||it.unit_price||0))}</td></tr>`).join('');
-  return`<table class="print-items-tbl"><thead><tr><th>รายการ</th><th>จำนวน</th><th>ราคา/หน่วย</th><th>จำนวนเงิน</th></tr></thead><tbody>${rows}</tbody></table>`;
+  const rows=(items||[]).map((it,i)=>`<tr><td>${i+1}. ${it.name||it.product_name||''}</td><td>${fmt(it.qty||1)}</td><td>${it.unit||''}</td><td>${fmt(it.price||it.unit_price||0)}</td><td>${fmt((it.qty||1)*(it.price||it.unit_price||0))}</td></tr>`).join('');
+  return`<table class="print-items-tbl"><thead><tr><th>รายการ</th><th>จำนวน</th><th>หน่วย</th><th>ราคา/หน่วย</th><th>จำนวนเงิน</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
 function buildTotals(sub,vat,total){
@@ -1486,7 +1489,7 @@ function openSOModal(id){
 function addSOItem(it){
   const idx=soIIdx++;const div=document.createElement('div');div.className='item-row';div.id='soirow-'+idx;
   const pName=it?.name||it?.product_name||'';
-  div.innerHTML=`<select class="it-name" onchange="onItemSel(this);calcSOTotals()">${buildProductOptions(pName)}</select><input type="number" min="1" class="it-qty" value="${it?.qty||1}" oninput="calcSOTotals()"><input type="number" min="0" step="0.01" class="it-price" value="${it?.price||it?.unit_price||0}" oninput="calcSOTotals()"><button class="btn btn-sm btn-danger" onclick="document.getElementById('soirow-${idx}').remove();calcSOTotals()">✕</button>`;
+  div.innerHTML=`<select class="it-name" onchange="onItemSel(this);calcSOTotals()">${buildProductOptions(pName)}</select><input type="number" min="1" class="it-qty" value="${it?.qty||1}" oninput="calcSOTotals()"><input type="text" placeholder="หน่วย" class="it-unit" value="${(it?.unit||'').replace(/"/g,'&quot;')}" list="unit-list" style="padding:8px 6px"><input type="number" min="0" step="0.01" class="it-price" value="${it?.price||it?.unit_price||0}" oninput="calcSOTotals()"><button class="btn btn-sm btn-danger" onclick="document.getElementById('soirow-${idx}').remove();calcSOTotals()">✕</button>`;
   document.getElementById('so-items-wrap').appendChild(div);calcSOTotals();
 }
 function calcSOTotals(){
@@ -1497,7 +1500,7 @@ function calcSOTotals(){
   document.getElementById('so-tot-disp').textContent='฿'+fmt(sub+vat);
 }
 async function saveSO(){
-  const items=[...document.querySelectorAll('#so-items-wrap .item-row')].map(r=>({name:r.querySelector('.it-name').value,qty:parseFloat(r.querySelector('.it-qty').value)||1,price:parseFloat(r.querySelector('.it-price').value)||0,total:(parseFloat(r.querySelector('.it-qty').value)||1)*(parseFloat(r.querySelector('.it-price').value)||0)})).filter(it=>it.name.trim());
+  const items=[...document.querySelectorAll('#so-items-wrap .item-row')].map(r=>({name:r.querySelector('.it-name').value,qty:parseFloat(r.querySelector('.it-qty').value)||1,unit:r.querySelector('.it-unit')?.value||'',price:parseFloat(r.querySelector('.it-price').value)||0,total:(parseFloat(r.querySelector('.it-qty').value)||1)*(parseFloat(r.querySelector('.it-price').value)||0)})).filter(it=>it.name.trim());
   const sub=items.reduce((a,it)=>a+it.total,0);
   const payload={number:document.getElementById('som-num').value.trim(),date:document.getElementById('som-date').value,customer:document.getElementById('som-cust').value.trim(),contact_name:document.getElementById('som-contact').value.trim(),contact_phone:document.getElementById('som-phone').value.trim(),status:document.getElementById('som-status').value,delivery_date:document.getElementById('som-delivery').value||null,quote_id:document.getElementById('som-quote').value||null,note:document.getElementById('som-note').value.trim(),items,subtotal:sub,vat:sub*0.07,total:sub*1.07};
   if(!payload.customer){toast('กรุณากรอกชื่อลูกค้า','error');return;}
@@ -1507,5 +1510,11 @@ async function saveSO(){
 }
 async function deleteSO(id){const {error}=await db.from('sale_orders').delete().eq('id',id);if(error){toast('ลบไม่สำเร็จ','error');return;}toast('ลบแล้ว','success');loadSO();}
 </script>
+<datalist id="unit-list">
+  <option value="ใบ"><option value="ชิ้น"><option value="กก."><option value="ลูก">
+  <option value="แผ่น"><option value="ม้วน"><option value="กล่อง"><option value="ถุง">
+  <option value="เมตร"><option value="ลิตร"><option value="โหล"><option value="ห่อ">
+  <option value="ปีก"><option value="อัน"><option value="คู่"><option value="ชุด">
+</datalist>
 </body>
 </html>
