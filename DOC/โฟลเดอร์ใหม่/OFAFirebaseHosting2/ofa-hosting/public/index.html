@@ -1362,7 +1362,7 @@ const CO_EMAIL='sales@oneforallpackaging.com';
 function closePrint(){document.getElementById('print-overlay').classList.remove('open');}
 
 function buildCompanyHeader(){
-  return`<div class="print-hdr"><div class="print-hdr-left"><h1>${CO_NAME}</h1><p>${CO_ADDR}<br>โทร ${CO_TEL} &nbsp;|&nbsp; Line ${CO_LINE}<br>${CO_EMAIL} &nbsp;|&nbsp; เลขภาษี ${CO_TAX}</p></div><div class="print-docinfo" id="pi-docinfo"></div></div>`;
+  return`<div class="print-hdr"><div class="print-hdr-left"><h1>${CO_NAME}</h1><p>${CO_ADDR}<br>โทร ${CO_TEL} &nbsp;|&nbsp; ${CO_EMAIL}<br>เลขประจำตัวผู้เสียภาษีอากร ${CO_TAX}</p></div><div class="print-docinfo" id="pi-docinfo"></div></div>`;
 }
 
 function buildItemsTable(items){
