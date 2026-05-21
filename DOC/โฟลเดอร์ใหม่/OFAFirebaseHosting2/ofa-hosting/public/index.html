@@ -1218,4 +1218,270 @@ async function saveS(){
   const payload={code:document.getElementById('sm-code').value.trim(),name:document.getElementById('sm-name').value.trim(),contact_name:document.getElementById('sm-contact').value.trim(),phone:document.getElementById('sm-phone').value.trim(),email:document.getElementById('sm-email').value.trim(),line_id:document.getElementById('sm-line').value.trim(),products:document.getElementById('sm-products').value.trim(),payment_terms:document.getElementById('sm-payment').value,tax_id:document.getElementById('sm-taxid').value.trim(),address:document.getElementById('sm-address').value.trim(),note:document.getElementById('sm-note').value.trim()};
   if(!payload.name){toast('กรุณากรอกชื่อบริษัท','error');return;}
   const {error}=editSId?await db.from('suppliers').update(payload).eq('id',editSId):await db.from('suppliers').insert(payload);
-  if(error){toast('บันทึกไม่สำเร็จ: '+error.message,'err
+  if(error){toast('บันทึกไม่สำเร็จ: '+error.message,'error');return;}
+  closeModal('s-modal');toast('บันทึกสำเร็จ','success');loadS();
+}
+async function deleteS(id){const {error}=await db.from('suppliers').delete().eq('id',id);if(error){toast('ลบไม่สำเร็จ','error');return;}toast('ลบแล้ว','success');loadS();}
+
+// ========== PURCHASE ORDERS ==========
+async function loadPO(){
+  const {data}=await db.from('purchase_orders').select('*').order('created_at',{ascending:false});
+  allPO=data||[];renderPOTable();
+}
+function renderPOTable(){
+  const search=(document.getElementById('pof-search')?.value||'').toLowerCase();
+  const stat=document.getElementById('pof-status')?.value||'';
+  let rows=allPO.filter(p=>{if(stat&&p.status!==stat)return false;if(search&&!(p.number||'').toLowerCase().includes(search)&&!(p.supplier_name||'').toLowerCase().includes(search))return false;return true;});
+  const tb=document.getElementById('po-tb');
+  if(!rows.length){tb.innerHTML='<tr><td colspan="8"><div class="empty"><div class="ei">📋</div><p>ยังไม่มี PO</p></div></td></tr>';return;}
+  tb.innerHTML=rows.map(p=>`<tr><td><b>${p.number||'-'}</b></td><td>${p.supplier_name||'-'}</td><td>${(p.items||[]).map(it=>it.name||'').filter(Boolean).join(', ').slice(0,30)||'-'}</td><td>฿${fmt(p.total||0)}</td><td><span class="badge ${PO_BADGE[p.status]||'b-gray'}">${PO_STATUS[p.status]||p.status}</span></td><td>${p.order_date||'-'}</td><td>${p.expected_date||'-'}</td><td style="white-space:nowrap"><button class="btn btn-sm btn-outline" onclick="openPOModal('${p.id}')">✏️</button> <button class="btn btn-sm btn-danger" onclick="openConf('ลบ PO','ลบ ${(p.number||'').replace(/'/g,'')}?',()=>deletePO('${p.id}'))">🗑️</button></td></tr>`).join('');
+}
+function filterPO(){renderPOTable();}
+function openPOModal(id){
+  editPOId=id||null;
+  document.getElementById('po-modal-title').textContent=id?'แก้ไข PO':'สร้างใบสั่งซื้อ (PO)';
+  const sel=document.getElementById('pom-supplier');
+  sel.innerHTML='<option value="">-- เลือกซัพพลายเออร์ --</option>'+allS.map(s=>`<option value="${s.id}" data-name="${(s.name||'').replace(/"/g,'&quot;')}">${s.code?s.code+' - ':''}${s.name}</option>`).join('');
+  const qsel=document.getElementById('pom-quote');
+  qsel.innerHTML='<option value="">-- ไม่เชื่อม --</option>'+allQ.filter(q=>q.status!=='cancelled').map(q=>`<option value="${q.id}">${q.number||q.id} - ${q.customer||''}</option>`).join('');
+  if(id){const p=allPO.find(x=>x.id===id);if(!p)return;document.getElementById('pom-num').value=p.number||'';document.getElementById('pom-date').value=p.order_date||'';document.getElementById('pom-supplier').value=p.supplier_id||'';document.getElementById('pom-expected').value=p.expected_date||'';document.getElementById('pom-status').value=p.status||'pending';document.getElementById('pom-quote').value=p.quote_id||'';document.getElementById('pom-note').value=p.note||'';poIIdx=0;document.getElementById('po-items-wrap').innerHTML='';(p.items||[]).forEach(it=>addPOItem(it));}
+  else{document.getElementById('pom-num').value='กำลังสร้าง...';genPONumber().then(n=>document.getElementById('pom-num').value=n);['pom-expected','pom-note'].forEach(i=>document.getElementById(i).value='');document.getElementById('pom-date').value=new Date().toISOString().split('T')[0];document.getElementById('pom-supplier').value='';document.getElementById('pom-status').value='pending';document.getElementById('pom-quote').value='';poIIdx=0;document.getElementById('po-items-wrap').innerHTML='';addPOItem();}
+  calcPOTotals();document.getElementById('po-modal').style.display='flex';
+}
+function addPOItem(it){
+  const idx=poIIdx++;const div=document.createElement('div');div.className='item-row';div.id='poirow-'+idx;
+  div.innerHTML=`<input type="text" placeholder="ชื่อสินค้า/วัตถุดิบ" class="it-name" value="${(it?.name||'').replace(/"/g,'&quot;')}" oninput="calcPOTotals()"><input type="number" min="1" class="it-qty" value="${it?.qty||1}" oninput="calcPOTotals()"><input type="number" min="0" step="0.01" class="it-price" value="${it?.price||0}" oninput="calcPOTotals()"><button class="btn btn-sm btn-danger" onclick="document.getElementById('poirow-${idx}').remove();calcPOTotals()">✕</button>`;
+  document.getElementById('po-items-wrap').appendChild(div);calcPOTotals();
+}
+function calcPOTotals(){
+  let sub=0;document.querySelectorAll('#po-items-wrap .item-row').forEach(r=>{sub+=(parseFloat(r.querySelector('.it-qty')?.value||0))*(parseFloat(r.querySelector('.it-price')?.value||0));});
+  const vat=sub*0.07;document.getElementById('po-sub-disp').textContent='฿'+fmt(sub);document.getElementById('po-vat-disp').textContent='฿'+fmt(vat);document.getElementById('po-tot-disp').textContent='฿'+fmt(sub+vat);
+}
+async function savePO(){
+  const supEl=document.getElementById('pom-supplier');const supId=supEl.value;const supName=supEl.options[supEl.selectedIndex]?.getAttribute('data-name')||'';
+  const items=[...document.querySelectorAll('#po-items-wrap .item-row')].map(r=>({name:r.querySelector('.it-name').value,qty:parseFloat(r.querySelector('.it-qty').value)||1,price:parseFloat(r.querySelector('.it-price').value)||0,total:(parseFloat(r.querySelector('.it-qty').value)||1)*(parseFloat(r.querySelector('.it-price').value)||0)})).filter(it=>it.name.trim());
+  const sub=items.reduce((a,it)=>a+it.total,0);
+  const payload={number:document.getElementById('pom-num').value.trim(),order_date:document.getElementById('pom-date').value,supplier_id:supId||null,supplier_name:supName,expected_date:document.getElementById('pom-expected').value||null,status:document.getElementById('pom-status').value,quote_id:document.getElementById('pom-quote').value||null,note:document.getElementById('pom-note').value.trim(),items,subtotal:sub,vat:sub*0.07,total:sub*1.07};
+  if(!supId){toast('กรุณาเลือกซัพพลายเออร์','error');return;}
+  const {error}=editPOId?await db.from('purchase_orders').update(payload).eq('id',editPOId):await db.from('purchase_orders').insert(payload);
+  if(error){toast('บันทึกไม่สำเร็จ: '+error.message,'error');return;}
+  closeModal('po-modal');toast('บันทึกสำเร็จ','success');loadPO();
+}
+async function deletePO(id){const {error}=await db.from('purchase_orders').delete().eq('id',id);if(error){toast('ลบไม่สำเร็จ','error');return;}toast('ลบแล้ว','success');loadPO();}
+
+// ========== ROLES ==========
+async function loadRoles(){
+  const {data}=await db.from('user_roles').select('*').order('created_at',{ascending:false});
+  allRoles=data||[];renderRolesTable();
+}
+function renderRolesTable(){
+  const tb=document.getElementById('roles-tb');
+  if(!allRoles.length){tb.innerHTML='<tr><td colspan="4"><div class="empty"><div class="ei">👤</div><p>ยังไม่มีผู้ใช้</p></div></td></tr>';return;}
+  tb.innerHTML=allRoles.map(r=>`<tr><td>${r.email||'-'}</td><td>${r.display_name||'-'}</td><td><span class="badge ${ROLE_BADGES[r.role]||'b-gray'}">${ROLE_LABELS[r.role]||r.role}</span></td><td style="white-space:nowrap"><button class="btn btn-sm btn-outline" onclick="openRoleModal('${r.id}')">✏️</button> <button class="btn btn-sm btn-danger" onclick="openConf('ลบสิทธิ์','ลบ ${(r.email||'').replace(/'/g,'')}?',()=>deleteRole('${r.id}'))">🗑️</button></td></tr>`).join('');
+}
+function openRoleModal(id){
+  editRoleId=id||null;
+  document.getElementById('role-modal-title').textContent=id?'แก้ไขสิทธิ์':'เพิ่มผู้ใช้';
+  if(id){const r=allRoles.find(x=>x.id===id);if(!r)return;document.getElementById('rm-email').value=r.email||'';document.getElementById('rm-name').value=r.display_name||'';document.getElementById('rm-role').value=r.role||'sales';}
+  else{document.getElementById('rm-email').value='';document.getElementById('rm-name').value='';document.getElementById('rm-role').value='sales';}
+  document.getElementById('role-modal').style.display='flex';
+}
+async function saveRole(){
+  const email=document.getElementById('rm-email').value.trim();
+  if(!email){toast('กรุณากรอกอีเมล','error');return;}
+  const payload={email,display_name:document.getElementById('rm-name').value.trim(),role:document.getElementById('rm-role').value};
+  const {error}=editRoleId?await db.from('user_roles').update(payload).eq('id',editRoleId):await db.from('user_roles').insert(payload);
+  if(error){toast('บันทึกไม่สำเร็จ: '+error.message,'error');return;}
+  closeModal('role-modal');toast('บันทึกสำเร็จ','success');loadRoles();
+}
+async function deleteRole(id){const {error}=await db.from('user_roles').delete().eq('id',id);if(error){toast('ลบไม่สำเร็จ','error');return;}toast('ลบแล้ว','success');loadRoles();}
+
+// ========== AUTO NUMBER GENERATORS ==========
+async function genQNumber(){
+  const yr=new Date().getFullYear()+543;
+  const prefix='SP'+yr;
+  const {data}=await db.from('quotations').select('number').like('number',prefix+'%').order('number',{ascending:false}).limit(1);
+  const last=(data?.[0]?.number||'').replace(prefix,'');
+  const seq=(parseInt(last)||0)+1;
+  return prefix+String(seq).padStart(3,'0');
+}
+async function genPONumber(){
+  const yr=new Date().getFullYear()+543;
+  const prefix='PO'+yr;
+  const {data}=await db.from('purchase_orders').select('number').like('number',prefix+'%').order('number',{ascending:false}).limit(1);
+  const last=(data?.[0]?.number||'').replace(prefix,'');
+  const seq=(parseInt(last)||0)+1;
+  return prefix+String(seq).padStart(3,'0');
+}
+async function genSONumber(){
+  const yr=new Date().getFullYear()+543;
+  const prefix='SO'+yr;
+  const {data}=await db.from('sale_orders').select('number').like('number',prefix+'%').order('number',{ascending:false}).limit(1);
+  const last=(data?.[0]?.number||'').replace(prefix,'');
+  const seq=(parseInt(last)||0)+1;
+  return prefix+String(seq).padStart(3,'0');
+}
+
+// ========== PRINT ==========
+const CO_NAME='บริษัท วันฟอร์ออล แพคเกจจิ้ง จำกัด';
+const CO_ADDR='555/17 บางเพรียง บางบ่อ สมุทรปราการ 10560';
+const CO_TEL='097-154-8638';
+const CO_TAX='0115566014924';
+const CO_LINE='@004isack';
+const CO_EMAIL='sales@oneforallpackaging.com';
+
+function closePrint(){document.getElementById('print-overlay').classList.remove('open');}
+
+function buildCompanyHeader(){
+  return`<div class="print-hdr"><div class="print-hdr-left"><h1>${CO_NAME}</h1><p>${CO_ADDR}<br>โทร ${CO_TEL} &nbsp;|&nbsp; Line ${CO_LINE}<br>${CO_EMAIL} &nbsp;|&nbsp; เลขภาษี ${CO_TAX}</p></div><div class="print-docinfo" id="pi-docinfo"></div></div>`;
+}
+
+function buildItemsTable(items){
+  const rows=(items||[]).map((it,i)=>`<tr><td>${i+1}. ${it.name||it.product_name||''}</td><td>${fmt(it.qty||1)}</td><td>${fmt(it.price||it.unit_price||0)}</td><td>${fmt((it.qty||1)*(it.price||it.unit_price||0))}</td></tr>`).join('');
+  return`<table class="print-items-tbl"><thead><tr><th>รายการ</th><th>จำนวน</th><th>ราคา/หน่วย</th><th>จำนวนเงิน</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function buildTotals(sub,vat,total){
+  return`<div class="print-totals-wrap"><table class="print-totals-tbl"><tr><td>ราคาก่อนภาษี</td><td>฿${fmt(sub)}</td></tr><tr><td>VAT 7%</td><td>฿${fmt(vat)}</td></tr><tr class="print-grand-row"><td>รวมทั้งสิ้น</td><td>฿${fmt(total)}</td></tr></table></div>`;
+}
+
+function printQ(id){
+  const q=allQ.find(x=>x.id===id);if(!q)return;
+  const sub=q.subtotal||(q.items||[]).reduce((a,it)=>a+(it.qty||1)*(it.price||0),0);
+  const vat=q.vat||sub*0.07;
+  const total=q.total||sub+vat;
+  const validity=q.validity_days||30;
+  const html=buildCompanyHeader()+`
+  <div id="pi-docinfo" style="text-align:right;margin-top:-80px">
+    <h2 style="font-size:14px;font-weight:700;color:#5a6a7a;letter-spacing:1px">ใบเสนอราคา</h2>
+    <div class="pnum">${q.number||'-'}</div>
+    <div class="pdate">วันที่ ${q.date||'-'}</div>
+  </div>
+  <div class="print-custbox">
+    <h4>เสนอราคาแก่</h4>
+    <div class="pcname">${q.customer||'-'}</div>
+    <div class="pcdet">${q.contact_name?'ผู้ติดต่อ: '+q.contact_name:''}${q.contact_phone?' &nbsp;โทร '+q.contact_phone:''}</div>
+  </div>
+  ${buildItemsTable(q.items)}
+  ${buildTotals(sub,vat,total)}
+  ${q.note?`<div class="print-note-box">📝 ${q.note}</div>`:''}
+  <div class="print-sign-row">
+    <div class="print-sign"><div class="sign-space"></div><div class="sign-line">ผู้มีอำนาจลงนาม / Authorized Signature<br>${CO_NAME}</div></div>
+    <div class="print-sign"><div class="sign-space"></div><div class="sign-line">ผู้รับมอบอำนาจ / Customer Acceptance</div></div>
+  </div>
+  <div class="print-validity-note">ใบเสนอราคานี้มีอายุ ${validity} วัน นับจากวันที่ออกเอกสาร</div>`;
+  document.getElementById('print-body').innerHTML=html;
+  document.getElementById('print-overlay').classList.add('open');
+}
+
+function printSO(id){
+  const so=allSO.find(x=>x.id===id);if(!so)return;
+  const sub=so.subtotal||(so.items||[]).reduce((a,it)=>a+(it.qty||1)*(it.price||0),0);
+  const vat=so.vat||sub*0.07;
+  const total=so.total||sub+vat;
+  const html=buildCompanyHeader()+`
+  <div style="text-align:right;margin-top:-80px">
+    <h2 style="font-size:14px;font-weight:700;color:#5a6a7a;letter-spacing:1px">ใบสั่งขาย</h2>
+    <div class="pnum">${so.number||'-'}</div>
+    <div class="pdate">วันที่ ${so.date||'-'}</div>
+  </div>
+  <div class="print-custbox">
+    <h4>ลูกค้า</h4>
+    <div class="pcname">${so.customer||'-'}</div>
+    <div class="pcdet">${so.contact_name?'ผู้ติดต่อ: '+so.contact_name:''}${so.contact_phone?' &nbsp;โทร '+so.contact_phone:''}</div>
+    ${so.delivery_date?`<div class="pcdet" style="margin-top:6px;color:#1565c0;font-weight:600">📦 กำหนดส่ง: ${so.delivery_date}</div>`:''}
+  </div>
+  ${buildItemsTable(so.items)}
+  ${buildTotals(sub,vat,total)}
+  ${so.note?`<div class="print-note-box">📝 ${so.note}</div>`:''}
+  <div class="print-sign-row">
+    <div class="print-sign"><div class="sign-space"></div><div class="sign-line">ผู้อนุมัติ / Approved By<br>${CO_NAME}</div></div>
+    <div class="print-sign"><div class="sign-space"></div><div class="sign-line">ผู้รับสินค้า / Received By</div></div>
+  </div>`;
+  document.getElementById('print-body').innerHTML=html;
+  document.getElementById('print-overlay').classList.add('open');
+}
+
+// ========== SALE ORDERS ==========
+async function loadSO(){
+  const {data}=await db.from('sale_orders').select('*').order('created_at',{ascending:false});
+  allSO=data||[];renderSOTable();populateSOCustDatalist();
+}
+function renderSOTable(){
+  const search=(document.getElementById('sof-search')?.value||'').toLowerCase();
+  const stat=document.getElementById('sof-status')?.value||'';
+  let rows=allSO.filter(s=>{
+    if(stat&&s.status!==stat)return false;
+    if(search&&!(s.customer||'').toLowerCase().includes(search)&&!(s.number||'').toLowerCase().includes(search))return false;
+    return true;
+  });
+  const tb=document.getElementById('so-tb');
+  if(!rows.length){tb.innerHTML='<tr><td colspan="7"><div class="empty"><div class="ei">📋</div><p>ยังไม่มีใบสั่งขาย</p></div></td></tr>';return;}
+  tb.innerHTML=rows.map(s=>{
+    const num=s.number||'-';
+    return`<tr><td><b>${num}</b></td><td>${s.customer||'-'}</td><td>${(s.items||[]).map(it=>it.name||'').filter(Boolean).join(', ').slice(0,40)||'-'}</td><td>฿${fmt(s.total||0)}</td><td><span class="badge ${SO_BADGE[s.status]||'b-gray'}">${SO_STATUS[s.status]||s.status}</span></td><td>${s.date||'-'}</td><td style="white-space:nowrap"><button class="btn btn-sm btn-outline" onclick="printSO('${s.id}')" title="พิมพ์/PDF">🖨️</button> <button class="btn btn-sm btn-outline" onclick="openSOModal('${s.id}')">✏️</button> <button class="btn btn-sm btn-danger" onclick="openConf('ลบใบสั่งขาย','ลบ ${num.replace(/'/g,'')}?',()=>deleteSO('${s.id}'))">🗑️</button></td></tr>`;
+  }).join('');
+}
+function filterSO(){renderSOTable();}
+function populateSOCustDatalist(){
+  const dl=document.getElementById('so-cust-list');if(!dl)return;
+  const names=new Set([...allSO.map(s=>s.customer),...allQ.map(q=>q.customer),...allC.map(c=>c.company_name)].filter(Boolean));
+  dl.innerHTML=[...names].map(n=>`<option value="${n}">`).join('');
+}
+function openSOModal(id){
+  editSOId=id||null;
+  document.getElementById('so-modal-title').textContent=id?'แก้ไขใบสั่งขาย':'สร้างใบสั่งขาย (SO)';
+  const qsel=document.getElementById('som-quote');
+  qsel.innerHTML='<option value="">-- ไม่เชื่อม --</option>'+allQ.filter(q=>q.status!=='cancelled').map(q=>`<option value="${q.id}">${q.number||q.id} - ${q.customer||''}</option>`).join('');
+  if(id){
+    const s=allSO.find(x=>x.id===id);if(!s)return;
+    document.getElementById('som-num').value=s.number||'';
+    document.getElementById('som-date').value=s.date||'';
+    document.getElementById('som-cust').value=s.customer||'';
+    document.getElementById('som-contact').value=s.contact_name||'';
+    document.getElementById('som-phone').value=s.contact_phone||'';
+    document.getElementById('som-status').value=s.status||'pending';
+    document.getElementById('som-delivery').value=s.delivery_date||'';
+    document.getElementById('som-quote').value=s.quote_id||'';
+    document.getElementById('som-note').value=s.note||'';
+    soIIdx=0;document.getElementById('so-items-wrap').innerHTML='';
+    (s.items||[]).forEach(it=>addSOItem(it));
+  } else {
+    document.getElementById('som-num').value='กำลังสร้าง...';
+    genSONumber().then(n=>document.getElementById('som-num').value=n);
+    document.getElementById('som-date').value=new Date().toISOString().split('T')[0];
+    document.getElementById('som-cust').value='';document.getElementById('som-contact').value='';
+    document.getElementById('som-phone').value='';document.getElementById('som-status').value='pending';
+    document.getElementById('som-delivery').value='';document.getElementById('som-quote').value='';
+    document.getElementById('som-note').value='';
+    soIIdx=0;document.getElementById('so-items-wrap').innerHTML='';addSOItem();
+  }
+  calcSOTotals();
+  populateSOCustDatalist();
+  document.getElementById('so-modal').style.display='flex';
+}
+function addSOItem(it){
+  const idx=soIIdx++;const div=document.createElement('div');div.className='item-row';div.id='soirow-'+idx;
+  div.innerHTML=`<input type="text" placeholder="ชื่อสินค้า" class="it-name" value="${(it?.name||it?.product_name||'').replace(/"/g,'&quot;')}" oninput="calcSOTotals()"><input type="number" min="1" class="it-qty" value="${it?.qty||1}" oninput="calcSOTotals()"><input type="number" min="0" step="0.01" class="it-price" value="${it?.price||it?.unit_price||0}" oninput="calcSOTotals()"><button class="btn btn-sm btn-danger" onclick="document.getElementById('soirow-${idx}').remove();calcSOTotals()">✕</button>`;
+  document.getElementById('so-items-wrap').appendChild(div);calcSOTotals();
+}
+function calcSOTotals(){
+  let sub=0;document.querySelectorAll('#so-items-wrap .item-row').forEach(r=>{sub+=(parseFloat(r.querySelector('.it-qty')?.value||0))*(parseFloat(r.querySelector('.it-price')?.value||0));});
+  const vat=sub*0.07;
+  document.getElementById('so-sub-disp').textContent='฿'+fmt(sub);
+  document.getElementById('so-vat-disp').textContent='฿'+fmt(vat);
+  document.getElementById('so-tot-disp').textContent='฿'+fmt(sub+vat);
+}
+async function saveSO(){
+  const items=[...document.querySelectorAll('#so-items-wrap .item-row')].map(r=>({name:r.querySelector('.it-name').value,qty:parseFloat(r.querySelector('.it-qty').value)||1,price:parseFloat(r.querySelector('.it-price').value)||0,total:(parseFloat(r.querySelector('.it-qty').value)||1)*(parseFloat(r.querySelector('.it-price').value)||0)})).filter(it=>it.name.trim());
+  const sub=items.reduce((a,it)=>a+it.total,0);
+  const payload={number:document.getElementById('som-num').value.trim(),date:document.getElementById('som-date').value,customer:document.getElementById('som-cust').value.trim(),contact_name:document.getElementById('som-contact').value.trim(),contact_phone:document.getElementById('som-phone').value.trim(),status:document.getElementById('som-status').value,delivery_date:document.getElementById('som-delivery').value||null,quote_id:document.getElementById('som-quote').value||null,note:document.getElementById('som-note').value.trim(),items,subtotal:sub,vat:sub*0.07,total:sub*1.07};
+  if(!payload.customer){toast('กรุณากรอกชื่อลูกค้า','error');return;}
+  const {error}=editSOId?await db.from('sale_orders').update(payload).eq('id',editSOId):await db.from('sale_orders').insert(payload);
+  if(error){toast('บันทึกไม่สำเร็จ: '+error.message,'error');return;}
+  closeModal('so-modal');toast('บันทึกสำเร็จ','success');loadSO();
+}
+async function deleteSO(id){const {error}=await db.from('sale_orders').delete().eq('id',id);if(error){toast('ลบไม่สำเร็จ','error');return;}toast('ลบแล้ว','success');loadSO();}
+</script>
+</body>
+</html>
