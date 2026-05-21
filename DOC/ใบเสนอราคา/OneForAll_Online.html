@@ -194,6 +194,39 @@ label{font-size:13px;font-weight:600;color:var(--text2)}
 @media(max-width:900px){.stats-grid{grid-template-columns:repeat(2,1fr)}.charts-grid{grid-template-columns:1fr}.month-summary-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:600px){.main-content{margin-left:0;padding:18px 14px}.stats-grid{grid-template-columns:1fr 1fr}.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}}
 ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:#c0cdd8;border-radius:3px}
+
+/* PRINT OVERLAY */
+.print-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:700;align-items:center;justify-content:center}
+.print-overlay.open{display:flex}
+.print-doc{background:#fff;width:820px;max-width:98vw;max-height:95vh;overflow-y:auto;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.print-actions{display:flex;gap:10px;justify-content:flex-end;padding:14px 20px;border-bottom:1px solid var(--border);background:#f7f9fc;border-radius:12px 12px 0 0}
+.print-body{padding:40px 50px;font-family:'Sarabun','Segoe UI',sans-serif;color:#1a2533}
+.print-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px;padding-bottom:18px;border-bottom:2px solid #0d2137}
+.print-hdr-left h1{font-size:16px;font-weight:800;color:#0d2137;margin-bottom:3px}
+.print-hdr-left p{font-size:11px;color:#5a6a7a;line-height:1.7}
+.print-docinfo{text-align:right}
+.print-docinfo h2{font-size:14px;font-weight:700;color:#5a6a7a;letter-spacing:1px;text-transform:uppercase}
+.print-docinfo .pnum{font-size:20px;font-weight:800;color:#0d2137;margin-top:4px}
+.print-docinfo .pdate{font-size:12px;color:#5a6a7a;margin-top:3px}
+.print-custbox{background:#f0f4f8;border-radius:10px;padding:16px 20px;margin-bottom:22px}
+.print-custbox h4{font-size:10px;font-weight:700;color:#5a6a7a;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.print-custbox .pcname{font-size:15px;font-weight:700;color:#0d2137}
+.print-custbox .pcdet{font-size:12px;color:#5a6a7a;margin-top:3px}
+.print-items-tbl{width:100%;border-collapse:collapse;margin-bottom:14px}
+.print-items-tbl th{background:#0d2137;color:#fff;padding:9px 14px;font-size:12px;font-weight:700;text-align:left}
+.print-items-tbl th:nth-child(n+2),.print-items-tbl td:nth-child(n+2){text-align:right}
+.print-items-tbl td{padding:9px 14px;font-size:13px;border-bottom:1px solid #e0e7ef}
+.print-totals-wrap{display:flex;justify-content:flex-end;margin-bottom:20px}
+.print-totals-tbl{width:260px;border-collapse:collapse}
+.print-totals-tbl td{padding:5px 12px;font-size:13px}
+.print-totals-tbl td:last-child{text-align:right;font-weight:600}
+.print-grand-row td{background:#0d2137;color:#fff!important;font-size:14px;font-weight:700;padding:8px 12px}
+.print-note-box{background:#fff8e1;border-radius:8px;padding:12px 16px;font-size:12px;color:#7a5a00;margin-bottom:18px}
+.print-sign-row{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:28px;padding-top:18px;border-top:1px solid #e0e7ef}
+.sign-space{height:50px}
+.sign-line{border-top:1px solid #888;padding-top:7px;font-size:12px;color:#5a6a7a;text-align:center}
+.print-validity-note{font-size:11px;color:#5a6a7a;text-align:center;margin-top:14px}
+@media print{body>*:not(#print-area-root){display:none}#print-area-root{display:block}.print-actions{display:none!important}}
 </style>
 </head>
 <body>
@@ -239,6 +272,7 @@ label{font-size:13px;font-weight:600;color:var(--text2)}
           <div class="nav-item" onclick="go('monthly')"><span class="ico">📈</span>ยอดขายรายเดือน</div>
           <div class="nav-item" onclick="go('customers')"><span class="ico">🏆</span>ลูกค้าซื้อบ่อย</div>
           <div class="nav-item" onclick="go('quotations')"><span class="ico">📄</span>ใบเสนอราคา</div>
+          <div class="nav-item" onclick="go('sale-orders')"><span class="ico">📋</span>ใบสั่งขาย (SO)</div>
         </div>
         <div class="nav-section">
           <div class="nav-label">ข้อมูล</div>
@@ -420,6 +454,29 @@ label{font-size:13px;font-weight:600;color:var(--text2)}
         </div>
       </div>
 
+      <!-- SALE ORDERS -->
+      <div class="section" id="sec-sale-orders">
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
+          <div><div class="page-title">ใบสั่งขาย (SO)</div><div class="page-subtitle">ติดตามและจัดการใบสั่งขายจากลูกค้า</div></div>
+          <button class="btn btn-blue" onclick="openSOModal()">+ สร้าง SO ใหม่</button>
+        </div>
+        <div class="card">
+          <div class="toolbar">
+            <input type="text" id="sof-search" placeholder="🔍 ค้นหา SO, ลูกค้า..." oninput="filterSO()">
+            <select id="sof-status" onchange="filterSO()">
+              <option value="">ทุกสถานะ</option>
+              <option value="pending">รอดำเนินการ</option>
+              <option value="processing">กำลังผลิต</option>
+              <option value="shipped">จัดส่งแล้ว</option>
+              <option value="completed">เสร็จสิ้น</option>
+              <option value="cancelled">ยกเลิก</option>
+            </select>
+          </div>
+          <table><thead><tr><th>เลข SO</th><th>ลูกค้า</th><th>สินค้า</th><th>มูลค่า</th><th>สถานะ</th><th>วันที่</th><th>จัดการ</th></tr></thead>
+          <tbody id="so-tb"></tbody></table>
+        </div>
+      </div>
+
       <!-- ROLES MANAGEMENT -->
       <div class="section" id="sec-roles">
         <div class="page-header">
@@ -466,7 +523,7 @@ label{font-size:13px;font-weight:600;color:var(--text2)}
   <div class="modal">
     <h2 id="q-modal-title">สร้างใบเสนอราคาใหม่</h2>
     <div class="form-row">
-      <div class="fg"><label>เลขที่</label><input type="text" id="qm-num" placeholder="SP2569001"></div>
+      <div class="fg"><label>เลขที่ (ออโต้)</label><input type="text" id="qm-num" placeholder="กำลังสร้าง..." readonly style="background:#f0f4f8;cursor:default;color:var(--navy);font-weight:600"></div>
       <div class="fg"><label>วันที่</label><input type="date" id="qm-date"></div>
       <div class="fg full"><label>ลูกค้า / บริษัท</label><input type="text" id="qm-cust" placeholder="บริษัท..." list="cust-list"><datalist id="cust-list"></datalist></div>
       <div class="fg"><label>ผู้ติดต่อ</label><input type="text" id="qm-contact" placeholder="ชื่อ"></div>
@@ -574,7 +631,7 @@ label{font-size:13px;font-weight:600;color:var(--text2)}
   <div class="modal">
     <h2 id="po-modal-title">สร้างใบสั่งซื้อ (PO)</h2>
     <div class="form-row">
-      <div class="fg"><label>เลข PO</label><input type="text" id="pom-num" placeholder="PO2569001"></div>
+      <div class="fg"><label>เลข PO (ออโต้)</label><input type="text" id="pom-num" placeholder="กำลังสร้าง..." readonly style="background:#f0f4f8;cursor:default;color:var(--navy);font-weight:600"></div>
       <div class="fg"><label>วันที่สั่ง</label><input type="date" id="pom-date"></div>
       <div class="fg full"><label>ซัพพลายเออร์</label>
         <select id="pom-supplier">
@@ -665,6 +722,62 @@ label{font-size:13px;font-weight:600;color:var(--text2)}
 
 <div class="toast" id="toast"></div>
 
+<!-- PRINT OVERLAY -->
+<div class="print-overlay" id="print-overlay">
+  <div class="print-doc" id="print-doc">
+    <div class="print-actions">
+      <button class="btn btn-outline btn-sm" onclick="closePrint()">✕ ปิด</button>
+      <button class="btn btn-blue btn-sm" onclick="window.print()">🖨️ พิมพ์ / บันทึก PDF</button>
+    </div>
+    <div class="print-body" id="print-body"></div>
+  </div>
+</div>
+
+<!-- MODAL: SALE ORDER -->
+<div class="modal-overlay" id="so-modal">
+  <div class="modal">
+    <h2 id="so-modal-title">สร้างใบสั่งขาย (SO)</h2>
+    <div class="form-row">
+      <div class="fg"><label>เลข SO (ออโต้)</label><input type="text" id="som-num" placeholder="กำลังสร้าง..." readonly style="background:#f0f4f8;cursor:default;color:var(--navy);font-weight:600"></div>
+      <div class="fg"><label>วันที่</label><input type="date" id="som-date"></div>
+      <div class="fg full"><label>ลูกค้า / บริษัท</label><input type="text" id="som-cust" placeholder="บริษัท..." list="so-cust-list"><datalist id="so-cust-list"></datalist></div>
+      <div class="fg"><label>ผู้ติดต่อ</label><input type="text" id="som-contact" placeholder="ชื่อ"></div>
+      <div class="fg"><label>โทรศัพท์</label><input type="text" id="som-phone"></div>
+      <div class="fg"><label>สถานะ</label>
+        <select id="som-status">
+          <option value="pending">รอดำเนินการ</option>
+          <option value="processing">กำลังผลิต</option>
+          <option value="shipped">จัดส่งแล้ว</option>
+          <option value="completed">เสร็จสิ้น</option>
+          <option value="cancelled">ยกเลิก</option>
+        </select>
+      </div>
+      <div class="fg"><label>วันส่งสินค้าที่นัด</label><input type="date" id="som-delivery"></div>
+      <div class="fg"><label>เชื่อมใบเสนอราคา</label>
+        <select id="som-quote"><option value="">-- ไม่เชื่อม --</option></select>
+      </div>
+    </div>
+    <div class="items-sec">
+      <h4>รายการสินค้า</h4>
+      <div class="items-hdr"><span>รายการ</span><span>จำนวน</span><span>ราคา/หน่วย</span><span></span></div>
+      <div id="so-items-wrap"></div>
+      <button class="btn btn-outline btn-sm" onclick="addSOItem()" style="margin-top:8px">+ เพิ่มรายการ</button>
+      <div class="total-box">
+        <div class="total-row"><span>ราคาก่อนภาษี</span><span id="so-sub-disp">฿0</span></div>
+        <div class="total-row"><span>VAT 7%</span><span id="so-vat-disp">฿0</span></div>
+        <div class="total-row total-grand"><span>รวมทั้งสิ้น</span><span id="so-tot-disp">฿0</span></div>
+      </div>
+    </div>
+    <div class="form-row" style="margin-top:14px">
+      <div class="fg full"><label>หมายเหตุ</label><textarea id="som-note" placeholder="เงื่อนไข, การชำระเงิน..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('so-modal')">ยกเลิก</button>
+      <button class="btn btn-blue" onclick="saveSO()">💾 บันทึก</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ========== SUPABASE INIT ==========
 const SUPA_URL = 'https://kxzghbxgrkvwnfpahkxk.supabase.co';
@@ -673,11 +786,12 @@ const { createClient } = supabase;
 const db = createClient(SUPA_URL, SUPA_KEY);
 
 // ========== STATE ==========
-let allQ=[], allP=[], allC=[], currentUser=null;
+let allQ=[], allP=[], allC=[], allSO=[], currentUser=null;
 let editId=null, editCol=null, confirmCb=null;
 let curYear=new Date().getFullYear();
 let chMon=null, chStat=null, chMonFull=null, chTop=null, chPie=null;
 let iIdx=0;
+let editSOId=null, soIIdx=0;
 const isTab = new URLSearchParams(location.search).get('tab') === 'signup';
 
 const TM=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
@@ -748,6 +862,8 @@ const ROLE_LABELS = {director:'👑 กรรมการ', purchasing:'🛒 จ
 const ROLE_BADGES = {director:'b-gold', purchasing:'b-blue', sales:'b-green', viewer:'b-gray'};
 const PO_STATUS = {pending:'รอดำเนินการ', confirmed:'ยืนยันแล้ว', received:'รับสินค้าแล้ว', paid:'ชำระแล้ว', cancelled:'ยกเลิก'};
 const PO_BADGE = {pending:'b-gray', confirmed:'b-blue', received:'b-green', paid:'b-gold', cancelled:'b-red'};
+const SO_STATUS = {pending:'รอดำเนินการ', processing:'กำลังผลิต', shipped:'จัดส่งแล้ว', completed:'เสร็จสิ้น', cancelled:'ยกเลิก'};
+const SO_BADGE = {pending:'b-gray', processing:'b-blue', shipped:'b-gold', completed:'b-green', cancelled:'b-red'};
 
 async function loadMyRole(){
   const {data} = await db.from('user_roles').select('role').eq('user_id', currentUser.id).single();
@@ -770,7 +886,7 @@ async function initApp(){
   curYear=now.getFullYear();
   document.getElementById('yr-disp').textContent=curYear+543;
   await loadMyRole();
-  await Promise.all([loadQ(),loadP(),loadC()]);
+  await Promise.all([loadQ(),loadP(),loadC(),loadSO()]);
   if(['director','purchasing'].includes(myRole)) await Promise.all([loadS(),loadPO()]);
   if(myRole==='director') loadRoles();
   renderDashboard();
@@ -824,6 +940,7 @@ function go(name){
   if(name==='dashboard')renderDashboard();
   if(name==='suppliers')renderSTable();
   if(name==='purchase-orders')renderPOTable();
+  if(name==='sale-orders')renderSOTable();
   if(name==='roles')renderRolesTable();
 }
 
@@ -957,7 +1074,7 @@ function renderQTable(){
   if(!rows.length){tb.innerHTML='<tr><td colspan="7"><div class="empty"><div class="ei">📄</div><p>ยังไม่มีข้อมูล</p></div></td></tr>';return;}
   tb.innerHTML=rows.map(q=>{
     const num=q.number||'-';const cust=q.customer||'-';
-    return`<tr><td><b>${num}</b></td><td>${cust}</td><td>${(q.items||[]).map(it=>it.name||it.product_name||'').filter(Boolean).join(', ').slice(0,40)||'-'}</td><td>฿${fmt(q.total||0)}</td><td><span class="badge ${SB[q.status]||'b-gray'}">${SL[q.status]||q.status}</span></td><td>${q.date||'-'}</td><td style="white-space:nowrap"><button class="btn btn-sm btn-outline" onclick="openQModal('${q.id}')">✏️</button> <button class="btn btn-sm btn-danger" onclick="openConf('ลบใบเสนอราคา','ลบ ${num.replace(/'/g,'')}?',()=>deleteQ('${q.id}'))">🗑️</button></td></tr>`;
+    return`<tr><td><b>${num}</b></td><td>${cust}</td><td>${(q.items||[]).map(it=>it.name||it.product_name||'').filter(Boolean).join(', ').slice(0,40)||'-'}</td><td>฿${fmt(q.total||0)}</td><td><span class="badge ${SB[q.status]||'b-gray'}">${SL[q.status]||q.status}</span></td><td>${q.date||'-'}</td><td style="white-space:nowrap"><button class="btn btn-sm btn-outline" onclick="printQ('${q.id}')" title="พิมพ์/PDF">🖨️</button> <button class="btn btn-sm btn-outline" onclick="openQModal('${q.id}')">✏️</button> <button class="btn btn-sm btn-danger" onclick="openConf('ลบใบเสนอราคา','ลบ ${num.replace(/'/g,'')}?',()=>deleteQ('${q.id}'))">🗑️</button></td></tr>`;
   }).join('');
 }
 function filterQ(){renderQTable();}
@@ -988,7 +1105,8 @@ function openQModal(id){
     iIdx=0;document.getElementById('items-wrap').innerHTML='';
     (q.items||[]).forEach(it=>addItem(it));
   } else {
-    document.getElementById('qm-num').value='';
+    document.getElementById('qm-num').value='กำลังสร้าง...';
+    genQNumber().then(n=>document.getElementById('qm-num').value=n);
     document.getElementById('qm-date').value=new Date().toISOString().split('T')[0];
     document.getElementById('qm-cust').value='';document.getElementById('qm-contact').value='';
     document.getElementById('qm-phone').value='';document.getElementById('qm-status').value='draft';
@@ -1127,7 +1245,7 @@ function openPOModal(id){
   const qsel=document.getElementById('pom-quote');
   qsel.innerHTML='<option value="">-- ไม่เชื่อม --</option>'+allQ.filter(q=>q.status!=='cancelled').map(q=>`<option value="${q.id}">${q.number||q.id} - ${q.customer||''}</option>`).join('');
   if(id){const p=allPO.find(x=>x.id===id);if(!p)return;document.getElementById('pom-num').value=p.number||'';document.getElementById('pom-date').value=p.order_date||'';document.getElementById('pom-supplier').value=p.supplier_id||'';document.getElementById('pom-expected').value=p.expected_date||'';document.getElementById('pom-status').value=p.status||'pending';document.getElementById('pom-quote').value=p.quote_id||'';document.getElementById('pom-note').value=p.note||'';poIIdx=0;document.getElementById('po-items-wrap').innerHTML='';(p.items||[]).forEach(it=>addPOItem(it));}
-  else{['pom-num','pom-expected','pom-note'].forEach(i=>document.getElementById(i).value='');document.getElementById('pom-date').value=new Date().toISOString().split('T')[0];document.getElementById('pom-supplier').value='';document.getElementById('pom-status').value='pending';document.getElementById('pom-quote').value='';poIIdx=0;document.getElementById('po-items-wrap').innerHTML='';addPOItem();}
+  else{document.getElementById('pom-num').value='กำลังสร้าง...';genPONumber().then(n=>document.getElementById('pom-num').value=n);['pom-expected','pom-note'].forEach(i=>document.getElementById(i).value='');document.getElementById('pom-date').value=new Date().toISOString().split('T')[0];document.getElementById('pom-supplier').value='';document.getElementById('pom-status').value='pending';document.getElementById('pom-quote').value='';poIIdx=0;document.getElementById('po-items-wrap').innerHTML='';addPOItem();}
   calcPOTotals();document.getElementById('po-modal').style.display='flex';
 }
 function addPOItem(it){
@@ -1177,6 +1295,193 @@ async function saveRole(){
   closeModal('role-modal');toast('บันทึกสำเร็จ','success');loadRoles();
 }
 async function deleteRole(id){const {error}=await db.from('user_roles').delete().eq('id',id);if(error){toast('ลบไม่สำเร็จ','error');return;}toast('ลบแล้ว','success');loadRoles();}
+
+// ========== AUTO NUMBER GENERATORS ==========
+async function genQNumber(){
+  const yr=new Date().getFullYear()+543;
+  const prefix='SP'+yr;
+  const {data}=await db.from('quotations').select('number').like('number',prefix+'%').order('number',{ascending:false}).limit(1);
+  const last=(data?.[0]?.number||'').replace(prefix,'');
+  const seq=(parseInt(last)||0)+1;
+  return prefix+String(seq).padStart(3,'0');
+}
+async function genPONumber(){
+  const yr=new Date().getFullYear()+543;
+  const prefix='PO'+yr;
+  const {data}=await db.from('purchase_orders').select('number').like('number',prefix+'%').order('number',{ascending:false}).limit(1);
+  const last=(data?.[0]?.number||'').replace(prefix,'');
+  const seq=(parseInt(last)||0)+1;
+  return prefix+String(seq).padStart(3,'0');
+}
+async function genSONumber(){
+  const yr=new Date().getFullYear()+543;
+  const prefix='SO'+yr;
+  const {data}=await db.from('sale_orders').select('number').like('number',prefix+'%').order('number',{ascending:false}).limit(1);
+  const last=(data?.[0]?.number||'').replace(prefix,'');
+  const seq=(parseInt(last)||0)+1;
+  return prefix+String(seq).padStart(3,'0');
+}
+
+// ========== PRINT ==========
+const CO_NAME='บริษัท วันฟอร์ออล แพคเกจจิ้ง จำกัด';
+const CO_ADDR='555/17 บางเพรียง บางบ่อ สมุทรปราการ 10560';
+const CO_TEL='097-154-8638';
+const CO_TAX='0115566014924';
+const CO_LINE='@004isack';
+const CO_EMAIL='sales@oneforallpackaging.com';
+
+function closePrint(){document.getElementById('print-overlay').classList.remove('open');}
+
+function buildCompanyHeader(){
+  return`<div class="print-hdr"><div class="print-hdr-left"><h1>${CO_NAME}</h1><p>${CO_ADDR}<br>โทร ${CO_TEL} &nbsp;|&nbsp; Line ${CO_LINE}<br>${CO_EMAIL} &nbsp;|&nbsp; เลขภาษี ${CO_TAX}</p></div><div class="print-docinfo" id="pi-docinfo"></div></div>`;
+}
+
+function buildItemsTable(items){
+  const rows=(items||[]).map((it,i)=>`<tr><td>${i+1}. ${it.name||it.product_name||''}</td><td>${fmt(it.qty||1)}</td><td>${fmt(it.price||it.unit_price||0)}</td><td>${fmt((it.qty||1)*(it.price||it.unit_price||0))}</td></tr>`).join('');
+  return`<table class="print-items-tbl"><thead><tr><th>รายการ</th><th>จำนวน</th><th>ราคา/หน่วย</th><th>จำนวนเงิน</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function buildTotals(sub,vat,total){
+  return`<div class="print-totals-wrap"><table class="print-totals-tbl"><tr><td>ราคาก่อนภาษี</td><td>฿${fmt(sub)}</td></tr><tr><td>VAT 7%</td><td>฿${fmt(vat)}</td></tr><tr class="print-grand-row"><td>รวมทั้งสิ้น</td><td>฿${fmt(total)}</td></tr></table></div>`;
+}
+
+function printQ(id){
+  const q=allQ.find(x=>x.id===id);if(!q)return;
+  const sub=q.subtotal||(q.items||[]).reduce((a,it)=>a+(it.qty||1)*(it.price||0),0);
+  const vat=q.vat||sub*0.07;
+  const total=q.total||sub+vat;
+  const validity=q.validity_days||30;
+  const html=buildCompanyHeader()+`
+  <div id="pi-docinfo" style="text-align:right;margin-top:-80px">
+    <h2 style="font-size:14px;font-weight:700;color:#5a6a7a;letter-spacing:1px">ใบเสนอราคา</h2>
+    <div class="pnum">${q.number||'-'}</div>
+    <div class="pdate">วันที่ ${q.date||'-'}</div>
+  </div>
+  <div class="print-custbox">
+    <h4>เสนอราคาแก่</h4>
+    <div class="pcname">${q.customer||'-'}</div>
+    <div class="pcdet">${q.contact_name?'ผู้ติดต่อ: '+q.contact_name:''}${q.contact_phone?' &nbsp;โทร '+q.contact_phone:''}</div>
+  </div>
+  ${buildItemsTable(q.items)}
+  ${buildTotals(sub,vat,total)}
+  ${q.note?`<div class="print-note-box">📝 ${q.note}</div>`:''}
+  <div class="print-sign-row">
+    <div class="print-sign"><div class="sign-space"></div><div class="sign-line">ผู้มีอำนาจลงนาม / Authorized Signature<br>${CO_NAME}</div></div>
+    <div class="print-sign"><div class="sign-space"></div><div class="sign-line">ผู้รับมอบอำนาจ / Customer Acceptance</div></div>
+  </div>
+  <div class="print-validity-note">ใบเสนอราคานี้มีอายุ ${validity} วัน นับจากวันที่ออกเอกสาร</div>`;
+  document.getElementById('print-body').innerHTML=html;
+  document.getElementById('print-overlay').classList.add('open');
+}
+
+function printSO(id){
+  const so=allSO.find(x=>x.id===id);if(!so)return;
+  const sub=so.subtotal||(so.items||[]).reduce((a,it)=>a+(it.qty||1)*(it.price||0),0);
+  const vat=so.vat||sub*0.07;
+  const total=so.total||sub+vat;
+  const html=buildCompanyHeader()+`
+  <div style="text-align:right;margin-top:-80px">
+    <h2 style="font-size:14px;font-weight:700;color:#5a6a7a;letter-spacing:1px">ใบสั่งขาย</h2>
+    <div class="pnum">${so.number||'-'}</div>
+    <div class="pdate">วันที่ ${so.date||'-'}</div>
+  </div>
+  <div class="print-custbox">
+    <h4>ลูกค้า</h4>
+    <div class="pcname">${so.customer||'-'}</div>
+    <div class="pcdet">${so.contact_name?'ผู้ติดต่อ: '+so.contact_name:''}${so.contact_phone?' &nbsp;โทร '+so.contact_phone:''}</div>
+    ${so.delivery_date?`<div class="pcdet" style="margin-top:6px;color:#1565c0;font-weight:600">📦 กำหนดส่ง: ${so.delivery_date}</div>`:''}
+  </div>
+  ${buildItemsTable(so.items)}
+  ${buildTotals(sub,vat,total)}
+  ${so.note?`<div class="print-note-box">📝 ${so.note}</div>`:''}
+  <div class="print-sign-row">
+    <div class="print-sign"><div class="sign-space"></div><div class="sign-line">ผู้อนุมัติ / Approved By<br>${CO_NAME}</div></div>
+    <div class="print-sign"><div class="sign-space"></div><div class="sign-line">ผู้รับสินค้า / Received By</div></div>
+  </div>`;
+  document.getElementById('print-body').innerHTML=html;
+  document.getElementById('print-overlay').classList.add('open');
+}
+
+// ========== SALE ORDERS ==========
+async function loadSO(){
+  const {data}=await db.from('sale_orders').select('*').order('created_at',{ascending:false});
+  allSO=data||[];renderSOTable();populateSOCustDatalist();
+}
+function renderSOTable(){
+  const search=(document.getElementById('sof-search')?.value||'').toLowerCase();
+  const stat=document.getElementById('sof-status')?.value||'';
+  let rows=allSO.filter(s=>{
+    if(stat&&s.status!==stat)return false;
+    if(search&&!(s.customer||'').toLowerCase().includes(search)&&!(s.number||'').toLowerCase().includes(search))return false;
+    return true;
+  });
+  const tb=document.getElementById('so-tb');
+  if(!rows.length){tb.innerHTML='<tr><td colspan="7"><div class="empty"><div class="ei">📋</div><p>ยังไม่มีใบสั่งขาย</p></div></td></tr>';return;}
+  tb.innerHTML=rows.map(s=>{
+    const num=s.number||'-';
+    return`<tr><td><b>${num}</b></td><td>${s.customer||'-'}</td><td>${(s.items||[]).map(it=>it.name||'').filter(Boolean).join(', ').slice(0,40)||'-'}</td><td>฿${fmt(s.total||0)}</td><td><span class="badge ${SO_BADGE[s.status]||'b-gray'}">${SO_STATUS[s.status]||s.status}</span></td><td>${s.date||'-'}</td><td style="white-space:nowrap"><button class="btn btn-sm btn-outline" onclick="printSO('${s.id}')" title="พิมพ์/PDF">🖨️</button> <button class="btn btn-sm btn-outline" onclick="openSOModal('${s.id}')">✏️</button> <button class="btn btn-sm btn-danger" onclick="openConf('ลบใบสั่งขาย','ลบ ${num.replace(/'/g,'')}?',()=>deleteSO('${s.id}'))">🗑️</button></td></tr>`;
+  }).join('');
+}
+function filterSO(){renderSOTable();}
+function populateSOCustDatalist(){
+  const dl=document.getElementById('so-cust-list');if(!dl)return;
+  const names=new Set([...allSO.map(s=>s.customer),...allQ.map(q=>q.customer),...allC.map(c=>c.company_name)].filter(Boolean));
+  dl.innerHTML=[...names].map(n=>`<option value="${n}">`).join('');
+}
+function openSOModal(id){
+  editSOId=id||null;
+  document.getElementById('so-modal-title').textContent=id?'แก้ไขใบสั่งขาย':'สร้างใบสั่งขาย (SO)';
+  const qsel=document.getElementById('som-quote');
+  qsel.innerHTML='<option value="">-- ไม่เชื่อม --</option>'+allQ.filter(q=>q.status!=='cancelled').map(q=>`<option value="${q.id}">${q.number||q.id} - ${q.customer||''}</option>`).join('');
+  if(id){
+    const s=allSO.find(x=>x.id===id);if(!s)return;
+    document.getElementById('som-num').value=s.number||'';
+    document.getElementById('som-date').value=s.date||'';
+    document.getElementById('som-cust').value=s.customer||'';
+    document.getElementById('som-contact').value=s.contact_name||'';
+    document.getElementById('som-phone').value=s.contact_phone||'';
+    document.getElementById('som-status').value=s.status||'pending';
+    document.getElementById('som-delivery').value=s.delivery_date||'';
+    document.getElementById('som-quote').value=s.quote_id||'';
+    document.getElementById('som-note').value=s.note||'';
+    soIIdx=0;document.getElementById('so-items-wrap').innerHTML='';
+    (s.items||[]).forEach(it=>addSOItem(it));
+  } else {
+    document.getElementById('som-num').value='กำลังสร้าง...';
+    genSONumber().then(n=>document.getElementById('som-num').value=n);
+    document.getElementById('som-date').value=new Date().toISOString().split('T')[0];
+    document.getElementById('som-cust').value='';document.getElementById('som-contact').value='';
+    document.getElementById('som-phone').value='';document.getElementById('som-status').value='pending';
+    document.getElementById('som-delivery').value='';document.getElementById('som-quote').value='';
+    document.getElementById('som-note').value='';
+    soIIdx=0;document.getElementById('so-items-wrap').innerHTML='';addSOItem();
+  }
+  calcSOTotals();
+  populateSOCustDatalist();
+  document.getElementById('so-modal').style.display='flex';
+}
+function addSOItem(it){
+  const idx=soIIdx++;const div=document.createElement('div');div.className='item-row';div.id='soirow-'+idx;
+  div.innerHTML=`<input type="text" placeholder="ชื่อสินค้า" class="it-name" value="${(it?.name||it?.product_name||'').replace(/"/g,'&quot;')}" oninput="calcSOTotals()"><input type="number" min="1" class="it-qty" value="${it?.qty||1}" oninput="calcSOTotals()"><input type="number" min="0" step="0.01" class="it-price" value="${it?.price||it?.unit_price||0}" oninput="calcSOTotals()"><button class="btn btn-sm btn-danger" onclick="document.getElementById('soirow-${idx}').remove();calcSOTotals()">✕</button>`;
+  document.getElementById('so-items-wrap').appendChild(div);calcSOTotals();
+}
+function calcSOTotals(){
+  let sub=0;document.querySelectorAll('#so-items-wrap .item-row').forEach(r=>{sub+=(parseFloat(r.querySelector('.it-qty')?.value||0))*(parseFloat(r.querySelector('.it-price')?.value||0));});
+  const vat=sub*0.07;
+  document.getElementById('so-sub-disp').textContent='฿'+fmt(sub);
+  document.getElementById('so-vat-disp').textContent='฿'+fmt(vat);
+  document.getElementById('so-tot-disp').textContent='฿'+fmt(sub+vat);
+}
+async function saveSO(){
+  const items=[...document.querySelectorAll('#so-items-wrap .item-row')].map(r=>({name:r.querySelector('.it-name').value,qty:parseFloat(r.querySelector('.it-qty').value)||1,price:parseFloat(r.querySelector('.it-price').value)||0,total:(parseFloat(r.querySelector('.it-qty').value)||1)*(parseFloat(r.querySelector('.it-price').value)||0)})).filter(it=>it.name.trim());
+  const sub=items.reduce((a,it)=>a+it.total,0);
+  const payload={number:document.getElementById('som-num').value.trim(),date:document.getElementById('som-date').value,customer:document.getElementById('som-cust').value.trim(),contact_name:document.getElementById('som-contact').value.trim(),contact_phone:document.getElementById('som-phone').value.trim(),status:document.getElementById('som-status').value,delivery_date:document.getElementById('som-delivery').value||null,quote_id:document.getElementById('som-quote').value||null,note:document.getElementById('som-note').value.trim(),items,subtotal:sub,vat:sub*0.07,total:sub*1.07};
+  if(!payload.customer){toast('กรุณากรอกชื่อลูกค้า','error');return;}
+  const {error}=editSOId?await db.from('sale_orders').update(payload).eq('id',editSOId):await db.from('sale_orders').insert(payload);
+  if(error){toast('บันทึกไม่สำเร็จ: '+error.message,'error');return;}
+  closeModal('so-modal');toast('บันทึกสำเร็จ','success');loadSO();
+}
+async function deleteSO(id){const {error}=await db.from('sale_orders').delete().eq('id',id);if(error){toast('ลบไม่สำเร็จ','error');return;}toast('ลบแล้ว','success');loadSO();}
 </script>
 </body>
 </html>
