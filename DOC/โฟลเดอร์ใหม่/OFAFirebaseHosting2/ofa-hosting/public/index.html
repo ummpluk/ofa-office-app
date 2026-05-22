@@ -242,6 +242,19 @@ label{font-size:13px;font-weight:600;color:var(--text2)}
   .signer-sel{display:none!important}
 }
 
+/* TAX INVOICE 3-COPY */
+.tiv-copy-badge{display:inline-block;background:#b71c1c;color:#fff;font-size:10.5px;font-weight:700;padding:3px 16px;border-radius:4px;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+.tax-inv-copy{padding:40px 50px;border-bottom:3px dashed #bbb}
+.tax-inv-copy:last-child{border-bottom:none}
+@media print{
+  .print-body{padding:0!important}
+  .tax-inv-copy{padding:10mm 14mm!important;break-after:page;page-break-after:always}
+  .tax-inv-copy:last-child{break-after:auto;page-break-after:auto}
+  .print-hdr-logo{height:52px!important}
+  .print-hdr-left h1{font-size:12px!important}
+  .tiv-copy-badge{font-size:9.5px!important}
+}
+
 /* ACCOUNTING */
 .acc-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
 .kpi-card{background:#fff;border-radius:var(--r);padding:18px 20px;box-shadow:var(--sh)}
@@ -1689,6 +1702,61 @@ function printSO(id){
   document.getElementById('print-overlay').classList.add('open');
 }
 
+function printTaxInvoice(id){
+  const so=allSO.find(x=>x.id===id);if(!so)return;
+  const cust=allC.find(c=>c.company_name===so.customer)||{};
+  const sub=so.subtotal||(so.items||[]).reduce((a,it)=>a+(it.qty||1)*(it.price||it.unit_price||0),0);
+  const vat=Math.round(sub*0.07*100)/100;
+  const total=Math.round((sub+vat)*100)/100;
+  const taxNum=(so.number||'').replace(/^SO/,'TIV');
+  const copyLabels=['ต้นฉบับ (สำหรับผู้ซื้อ)','สำเนา 1 (สำหรับผู้ขาย)','สำเนา 2 (สำหรับการบัญชี)'];
+  const buildOneCopy=(label)=>{
+    const hdr=buildCompanyHeader('ใบกำกับภาษี',taxNum,so.date);
+    const rows=(so.items||[]).map((it,i)=>{
+      const amt=(it.qty||1)*(it.price||it.unit_price||0);
+      return`<tr><td>${i+1}. ${it.name||it.product_name||''}</td><td>${fmt(it.qty||1)}</td><td>${it.unit||''}</td><td>${fmt(it.price||it.unit_price||0)}</td><td>${fmt(amt)}</td><td>${fmt(amt)}</td></tr>`;
+    }).join('');
+    const itemsTbl=`<table class="print-items-tbl"><thead><tr><th>รายการ/Description</th><th>จำนวน</th><th>หน่วย</th><th>ราคา/หน่วย</th><th>จำนวนเงิน</th><th>มูลค่าสินค้า</th></tr></thead><tbody>${rows}</tbody></table>`;
+    return`<div class="tax-inv-copy">
+      <div class="tiv-copy-badge">${label}</div>
+      ${hdr}
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px">
+        <div class="print-custbox" style="margin-bottom:0">
+          <h4>ผู้ขาย / Seller</h4>
+          <div class="pcname">${CO_NAME}</div>
+          <div class="pcdet">${CO_ADDR}</div>
+          <div class="pcdet">โทร ${CO_TEL} | ${CO_EMAIL}</div>
+          <div class="pcdet" style="font-weight:700;color:#0d2137">เลขประจำตัวผู้เสียภาษี: ${CO_TAX}</div>
+        </div>
+        <div class="print-custbox" style="margin-bottom:0;border-left-color:#e53935">
+          <h4>ผู้ซื้อ / Buyer</h4>
+          <div class="pcname">${so.customer||'-'}</div>
+          ${cust.address?`<div class="pcdet">${cust.address.replace(/
+/g,'<br>')}</div>`:''}
+          <div class="pcdet">${so.contact_name?'ผู้ติดต่อ: '+so.contact_name:''}${so.contact_phone?' &nbsp;โทร '+so.contact_phone:''}</div>
+          <div class="pcdet" style="font-weight:700;color:#0d2137">เลขประจำตัวผู้เสียภาษี: ${cust.tax_id||'-'}</div>
+        </div>
+      </div>
+      ${itemsTbl}
+      <div class="print-totals-wrap"><table class="print-totals-tbl">
+        <tr><td>มูลค่าสินค้าก่อนภาษี</td><td>฿${fmt(sub)}</td></tr>
+        <tr><td>ภาษีมูลค่าเพิ่ม 7%</td><td>฿${fmt(vat)}</td></tr>
+        <tr class="print-grand-row"><td>รวมทั้งสิ้น (รวม VAT)</td><td>฿${fmt(total)}</td></tr>
+      </table></div>
+      ${so.note?`<div class="print-note-box">📝 ${so.note}</div>`:''}
+      <div class="print-sign-row">
+        <div class="print-sign"><div class="sign-space"></div><div class="sign-line">ลายมือชื่อผู้ซื้อ / Buyer Signature</div></div>
+        <div class="print-sign"><div class="sign-space"></div><div class="sign-line">ลายมือชื่อผู้ขาย / Seller Signature<br><span style="font-size:10.5px;font-weight:600;color:#0d2137">${CO_NAME}</span></div></div>
+      </div>
+      <div class="print-validity-note" style="font-size:9.5px">เอกสารฉบับนี้ออกโดยผู้ประกอบการจดทะเบียนภาษีมูลค่าเพิ่ม เลขที่ ${CO_TAX} ตาม พ.ร.บ. ภาษีมูลค่าเพิ่ม พ.ศ. 2535 &nbsp;|&nbsp; อ้างอิงใบสั่งขาย: ${so.number||'-'}</div>
+    </div>`;
+  };
+  const html=copyLabels.map(buildOneCopy).join('');
+  _printDocNum=taxNum||'ใบกำกับภาษี';
+  document.getElementById('print-body').innerHTML=html;
+  document.getElementById('print-overlay').classList.add('open');
+}
+
 // ========== SALE ORDERS ==========
 async function loadSO(){
   const {data}=await db.from('sale_orders').select('*').order('created_at',{ascending:false});
@@ -1706,7 +1774,7 @@ function renderSOTable(){
   if(!rows.length){tb.innerHTML='<tr><td colspan="7"><div class="empty"><div class="ei">📋</div><p>ยังไม่มีใบสั่งขาย</p></div></td></tr>';return;}
   tb.innerHTML=rows.map(s=>{
     const num=s.number||'-';
-    return`<tr><td><b>${num}</b></td><td>${s.customer||'-'}</td><td>${(s.items||[]).map(it=>it.name||'').filter(Boolean).join(', ').slice(0,40)||'-'}</td><td>฿${fmt(s.total||0)}</td><td><span class="badge ${SO_BADGE[s.status]||'b-gray'}">${SO_STATUS[s.status]||s.status}</span></td><td>${s.date||'-'}</td><td style="white-space:nowrap"><button class="btn btn-sm btn-outline" onclick="printSO('${s.id}')" title="พิมพ์/PDF">🖨️</button> <button class="btn btn-sm btn-outline" onclick="openSOModal('${s.id}')">✏️</button> <button class="btn btn-sm btn-danger" onclick="openConf('ลบใบสั่งขาย','ลบ ${num.replace(/'/g,'')}?',()=>deleteSO('${s.id}'))">🗑️</button></td></tr>`;
+    return`<tr><td><b>${num}</b></td><td>${s.customer||'-'}</td><td>${(s.items||[]).map(it=>it.name||'').filter(Boolean).join(', ').slice(0,40)||'-'}</td><td>฿${fmt(s.total||0)}</td><td><span class="badge ${SO_BADGE[s.status]||'b-gray'}">${SO_STATUS[s.status]||s.status}</span></td><td>${s.date||'-'}</td><td style="white-space:nowrap"><button class="btn btn-sm btn-outline" onclick="printSO('${s.id}')" title="พิมพ์ใบสั่งขาย">🖨️</button> <button class="btn btn-sm" style="background:#e53935;color:#fff;border:none" onclick="printTaxInvoice('${s.id}')" title="ออกใบกำกับภาษี">🧾</button> <button class="btn btn-sm btn-outline" onclick="openSOModal('${s.id}')">✏️</button> <button class="btn btn-sm btn-danger" onclick="openConf('ลบใบสั่งขาย','ลบ ${num.replace(/'/g,'')}?',()=>deleteSO('${s.id}'))">🗑️</button></td></tr>`;
   }).join('');
 }
 function filterSO(){renderSOTable();}
