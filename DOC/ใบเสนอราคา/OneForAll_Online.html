@@ -241,6 +241,17 @@ label{font-size:13px;font-weight:600;color:var(--text2)}
   .print-items-tbl td:first-child{white-space:normal;word-break:break-word}
   .signer-sel{display:none!important}
 }
+
+/* ACCOUNTING */
+.acc-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.kpi-card{background:#fff;border-radius:var(--r);padding:18px 20px;box-shadow:var(--sh)}
+.kpi-card .kpi-label{font-size:12px;color:var(--text2);margin-bottom:6px}
+.kpi-card .kpi-val{font-size:22px;font-weight:700;color:var(--navy)}
+.kpi-card .kpi-sub{font-size:12px;color:var(--text2);margin-top:4px}
+.fin-row{display:flex;justify-content:space-between;padding:7px 16px;border-bottom:1px solid var(--border);font-size:14px}
+.fin-row.total{font-weight:700;background:var(--bg);border-radius:0 0 var(--r) var(--r)}
+.fin-section-head{padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text2);background:#f7f9fc;border-bottom:1px solid var(--border)}
+
 </style>
 </head>
 <body>
@@ -301,6 +312,19 @@ label{font-size:13px;font-weight:600;color:var(--text2)}
         <div class="nav-section" id="nav-admin" style="display:none">
           <div class="nav-label">จัดการ</div>
           <div class="nav-item" onclick="go('roles')"><span class="ico">🔐</span>สิทธิ์ผู้ใช้</div>
+        </div>
+        <div class="nav-section" id="nav-accounting" style="display:none">
+          <div class="nav-label">บัญชี</div>
+          <div class="nav-item" onclick="go('coa')"><span class="ico">📒</span>ผังบัญชี</div>
+          <div class="nav-item" onclick="go('ar')"><span class="ico">💵</span>ลูกหนี้ (AR)</div>
+          <div class="nav-item" onclick="go('ap')"><span class="ico">💸</span>เจ้าหนี้ (AP)</div>
+          <div class="nav-item" onclick="go('income-expense')"><span class="ico">📊</span>รายได้/ค่าใช้จ่าย</div>
+          <div class="nav-item" onclick="go('vat')"><span class="ico">🧾</span>รายงาน VAT</div>
+          <div class="nav-item" onclick="go('financial')"><span class="ico">📈</span>งบการเงิน</div>
+          <div class="nav-item" onclick="go('bank')"><span class="ico">🏦</span>เงินสด/ธนาคาร</div>
+          <div class="nav-item" onclick="go('journal')"><span class="ico">📔</span>สมุดรายวัน</div>
+          <div class="nav-item" onclick="go('fixed-assets')"><span class="ico">🏗️</span>สินทรัพย์ถาวร</div>
+          <div class="nav-item" onclick="go('payroll')"><span class="ico">👷</span>เงินเดือน</div>
         </div>
       </div>
       <div class="sidebar-footer">
@@ -528,6 +552,142 @@ label{font-size:13px;font-weight:600;color:var(--text2)}
         </div>
       </div>
 
+
+      <!-- ===== MODULE 1: COA ===== -->
+      <div class="section" id="sec-coa">
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
+          <div><div class="page-title">📒 ผังบัญชี</div><div class="page-subtitle">Chart of Accounts</div></div>
+          <button class="btn btn-blue" onclick="openCOAModal()">+ เพิ่มบัญชี</button>
+        </div>
+        <div class="card">
+          <div class="toolbar">
+            <input type="text" id="coaf-search" placeholder="🔍 ค้นหาบัญชี..." oninput="filterCOA()">
+            <select id="coaf-type" onchange="filterCOA()"><option value="">ทุกประเภท</option><option value="asset">สินทรัพย์</option><option value="liability">หนี้สิน</option><option value="equity">ส่วนทุน</option><option value="revenue">รายได้</option><option value="expense">ค่าใช้จ่าย</option></select>
+          </div>
+          <table><thead><tr><th>รหัสบัญชี</th><th>ชื่อบัญชี</th><th>ประเภท</th><th>จัดการ</th></tr></thead><tbody id="coa-tb"></tbody></table>
+        </div>
+      </div>
+      <!-- ===== MODULE 2: AR ===== -->
+      <div class="section" id="sec-ar">
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
+          <div><div class="page-title">💵 ลูกหนี้การค้า (AR)</div><div class="page-subtitle">Accounts Receivable</div></div>
+          <button class="btn btn-blue" onclick="openARModal()">+ สร้างใบแจ้งหนี้</button>
+        </div>
+        <div class="acc-kpi" id="ar-kpi"></div>
+        <div class="card">
+          <div class="toolbar">
+            <input type="text" id="arf-search" placeholder="🔍 ค้นหา..." oninput="filterAR()">
+            <select id="arf-status" onchange="filterAR()"><option value="">ทุกสถานะ</option><option value="draft">ร่าง</option><option value="sent">ส่งแล้ว</option><option value="partial">ชำระบางส่วน</option><option value="paid">ชำระแล้ว</option><option value="overdue">เกินกำหนด</option></select>
+          </div>
+          <table><thead><tr><th>เลขที่</th><th>ลูกค้า</th><th>อ้างอิง</th><th>ยอดรวม</th><th>ชำระแล้ว</th><th>คงค้าง</th><th>ครบกำหนด</th><th>สถานะ</th><th>จัดการ</th></tr></thead><tbody id="ar-tb"></tbody></table>
+        </div>
+      </div>
+      <!-- ===== MODULE 3: AP ===== -->
+      <div class="section" id="sec-ap">
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
+          <div><div class="page-title">💸 เจ้าหนี้การค้า (AP)</div><div class="page-subtitle">Accounts Payable</div></div>
+          <button class="btn btn-blue" onclick="openAPModal()">+ สร้างใบวางบิล</button>
+        </div>
+        <div class="acc-kpi" id="ap-kpi"></div>
+        <div class="card">
+          <div class="toolbar">
+            <input type="text" id="apf-search" placeholder="🔍 ค้นหา..." oninput="filterAP()">
+            <select id="apf-status" onchange="filterAP()"><option value="">ทุกสถานะ</option><option value="pending">รอชำระ</option><option value="partial">ชำระบางส่วน</option><option value="paid">ชำระแล้ว</option><option value="overdue">เกินกำหนด</option></select>
+          </div>
+          <table><thead><tr><th>เลขที่</th><th>ซัพพลาย</th><th>อ้างอิง PO</th><th>ยอดรวม</th><th>ชำระแล้ว</th><th>คงค้าง</th><th>ครบกำหนด</th><th>สถานะ</th><th>จัดการ</th></tr></thead><tbody id="ap-tb"></tbody></table>
+        </div>
+      </div>
+      <!-- ===== MODULE 4: INCOME/EXPENSE ===== -->
+      <div class="section" id="sec-income-expense">
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
+          <div><div class="page-title">📊 รายได้ / ค่าใช้จ่าย</div><div class="page-subtitle">บันทึกรายรับ-รายจ่าย</div></div>
+          <button class="btn btn-blue" onclick="openTxnModal()">+ บันทึกรายการ</button>
+        </div>
+        <div class="acc-kpi" id="txn-kpi"></div>
+        <div class="card">
+          <div class="toolbar">
+            <input type="text" id="txnf-search" placeholder="🔍 ค้นหา..." oninput="filterTxn()">
+            <select id="txnf-type" onchange="filterTxn()"><option value="">ทุกประเภท</option><option value="income">รายได้</option><option value="expense">ค่าใช้จ่าย</option></select>
+            <select id="txnf-month" onchange="filterTxn()"><option value="">ทุกเดือน</option></select>
+          </div>
+          <table><thead><tr><th>วันที่</th><th>ประเภท</th><th>หมวดหมู่</th><th>รายละเอียด</th><th>รหัสบัญชี</th><th>จำนวนเงิน</th><th>VAT</th><th>จัดการ</th></tr></thead><tbody id="txn-tb"></tbody></table>
+        </div>
+      </div>
+      <!-- ===== MODULE 5: VAT ===== -->
+      <div class="section" id="sec-vat">
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
+          <div><div class="page-title">🧾 รายงาน VAT</div><div class="page-subtitle">ภาษีมูลค่าเพิ่มขาเข้า-ขาออก</div></div>
+          <div class="year-sel"><button class="yr-btn" onclick="chgVatMonth(-1)">‹</button><div class="yr-val" id="vat-period-disp" style="min-width:90px"></div><button class="yr-btn" onclick="chgVatMonth(1)">›</button></div>
+        </div>
+        <div class="acc-kpi" id="vat-kpi"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div class="card"><div class="card-header"><h3>VAT ขาออก (Output)</h3></div><table><thead><tr><th>วันที่</th><th>ลูกค้า</th><th>เลขที่</th><th>ก่อน VAT</th><th>VAT 7%</th></tr></thead><tbody id="vat-out-tb"></tbody></table></div>
+          <div class="card"><div class="card-header"><h3>VAT ขาเข้า (Input)</h3></div><table><thead><tr><th>วันที่</th><th>ซัพพลาย</th><th>เลขที่</th><th>ก่อน VAT</th><th>VAT 7%</th></tr></thead><tbody id="vat-in-tb"></tbody></table></div>
+        </div>
+      </div>
+      <!-- ===== MODULE 6: FINANCIAL ===== -->
+      <div class="section" id="sec-financial">
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
+          <div><div class="page-title">📈 งบการเงิน</div><div class="page-subtitle">P&amp;L และงบดุล</div></div>
+          <div class="year-sel"><button class="yr-btn" onclick="chgFinYear(-1)">‹</button><div class="yr-val" id="fin-year-disp"></div><button class="yr-btn" onclick="chgFinYear(1)">›</button></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div><div class="card-header" style="background:#fff;border-radius:var(--r) var(--r) 0 0;padding:16px 20px;border-bottom:1px solid var(--border)"><h3>📋 งบกำไรขาดทุน (P&amp;L)</h3></div><div id="fin-pl"></div></div>
+          <div><div class="card-header" style="background:#fff;border-radius:var(--r) var(--r) 0 0;padding:16px 20px;border-bottom:1px solid var(--border)"><h3>⚖️ งบดุล (Balance Sheet)</h3></div><div id="fin-bs"></div></div>
+        </div>
+      </div>
+      <!-- ===== MODULE 7: BANK ===== -->
+      <div class="section" id="sec-bank">
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
+          <div><div class="page-title">🏦 เงินสด / ธนาคาร</div><div class="page-subtitle">บัญชีธนาคารและรายการเดินบัญชี</div></div>
+          <div style="display:flex;gap:8px"><button class="btn btn-outline" onclick="openBankAccModal()">+ บัญชีใหม่</button><button class="btn btn-blue" onclick="openBankTxnModal()">+ รายการ</button></div>
+        </div>
+        <div id="bank-accounts-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px"></div>
+        <div class="card">
+          <div class="card-header"><div><h3>รายการเดินบัญชี</h3></div><select id="bankf-acc" onchange="filterBankTxn()" style="padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;background:#fff;font-family:inherit"><option value="">ทุกบัญชี</option></select></div>
+          <table><thead><tr><th>วันที่</th><th>บัญชี</th><th>รายละเอียด</th><th>ประเภท</th><th>จำนวนเงิน</th><th>ยอดคงเหลือ</th><th>จัดการ</th></tr></thead><tbody id="bank-txn-tb"></tbody></table>
+        </div>
+      </div>
+      <!-- ===== MODULE 8: JOURNAL ===== -->
+      <div class="section" id="sec-journal">
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
+          <div><div class="page-title">📔 สมุดรายวัน</div><div class="page-subtitle">General Journal</div></div>
+          <button class="btn btn-blue" onclick="openJournalModal()">+ บันทึกรายการ</button>
+        </div>
+        <div class="card">
+          <div class="toolbar">
+            <input type="text" id="jrnf-search" placeholder="🔍 ค้นหา..." oninput="filterJournal()">
+            <select id="jrnf-month" onchange="filterJournal()"><option value="">ทุกเดือน</option></select>
+          </div>
+          <table><thead><tr><th>วันที่</th><th>เลขที่อ้างอิง</th><th>คำอธิบาย</th><th>บัญชีเดบิต</th><th>บัญชีเครดิต</th><th>จำนวนเงิน</th><th>จัดการ</th></tr></thead><tbody id="journal-tb"></tbody></table>
+        </div>
+      </div>
+      <!-- ===== MODULE 9: FIXED ASSETS ===== -->
+      <div class="section" id="sec-fixed-assets">
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
+          <div><div class="page-title">🏗️ สินทรัพย์ถาวร</div><div class="page-subtitle">Fixed Assets — ค่าเสื่อมราคา</div></div>
+          <button class="btn btn-blue" onclick="openAssetModal()">+ เพิ่มสินทรัพย์</button>
+        </div>
+        <div class="acc-kpi" id="asset-kpi"></div>
+        <div class="card">
+          <div class="toolbar"><input type="text" id="assetf-search" placeholder="🔍 ค้นหาสินทรัพย์..." oninput="filterAssets()"></div>
+          <table><thead><tr><th>รหัส</th><th>ชื่อสินทรัพย์</th><th>หมวดหมู่</th><th>ราคาทุน</th><th>ค่าเสื่อมสะสม</th><th>มูลค่าสุทธิ</th><th>วันที่ซื้อ</th><th>อายุ(ปี)</th><th>จัดการ</th></tr></thead><tbody id="asset-tb"></tbody></table>
+        </div>
+      </div>
+      <!-- ===== MODULE 10: PAYROLL ===== -->
+      <div class="section" id="sec-payroll">
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
+          <div><div class="page-title">👷 เงินเดือน</div><div class="page-subtitle">Payroll</div></div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="year-sel"><button class="yr-btn" onclick="chgPayrollMonth(-1)">‹</button><div class="yr-val" id="payroll-period-disp" style="min-width:90px"></div><button class="yr-btn" onclick="chgPayrollMonth(1)">›</button></div>
+            <button class="btn btn-blue" onclick="openPayrollModal()">+ บันทึกเงินเดือน</button>
+          </div>
+        </div>
+        <div class="acc-kpi" id="payroll-kpi"></div>
+        <div class="card">
+          <table><thead><tr><th>พนักงาน</th><th>ตำแหน่ง</th><th>เงินเดือนพื้นฐาน</th><th>เบี้ยเลี้ยง</th><th>หัก SS 5%</th><th>หักภาษี</th><th>สุทธิ</th><th>สถานะ</th><th>จัดการ</th></tr></thead><tbody id="payroll-tb"></tbody></table>
+        </div>
+      </div>
     </main>
   </div>
 </div>
@@ -914,6 +1074,8 @@ function applyRoleUI(){
   const isDirector = myRole === 'director';
   document.getElementById('nav-restricted').style.display = canSeeRestricted ? '' : 'none';
   document.getElementById('nav-admin').style.display = isDirector ? '' : 'none';
+  const navAcc = document.getElementById('nav-accounting');
+  if(navAcc) navAcc.style.display = canSeeRestricted ? '' : 'none';
   // Profit column in quotation table visibility handled in render
 }
 
@@ -926,6 +1088,7 @@ async function initApp(){
   await loadMyRole();
   await Promise.all([loadQ(),loadP(),loadC(),loadSO(),loadRoles()]);
   if(['director','purchasing'].includes(myRole)) await Promise.all([loadS(),loadPO()]);
+  if(['director','purchasing'].includes(myRole)) await loadAccounting();
   renderDashboard();
   setupRealtimeQ();
 }
@@ -966,6 +1129,9 @@ function go(name){
   if(name==='roles' && myRole!=='director'){
     toast('เฉพาะกรรมการเท่านั้น','error'); return;
   }
+  if(ACC_PAGES.includes(name) && !['director','purchasing'].includes(myRole)){
+    toast('คุณไม่มีสิทธิ์เข้าถึงระบบบัญชี','error'); return;
+  }
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('sec-'+name).classList.add('active');
@@ -979,6 +1145,16 @@ function go(name){
   if(name==='purchase-orders')renderPOTable();
   if(name==='sale-orders')renderSOTable();
   if(name==='roles')renderRolesTable();
+  if(name==='coa')renderCOA();
+  if(name==='ar'){renderAR();}
+  if(name==='ap'){renderAP();}
+  if(name==='income-expense')renderTxn();
+  if(name==='vat')renderVAT();
+  if(name==='financial')renderFinancial();
+  if(name==='bank'){renderBankAccGrid();renderBankTxn();}
+  if(name==='journal')renderJournal();
+  if(name==='fixed-assets')renderAssets();
+  if(name==='payroll')renderPayroll();
 }
 
 // ========== DASHBOARD ==========
@@ -1591,6 +1767,353 @@ async function saveSO(){
   closeModal('so-modal');toast('บันทึกสำเร็จ','success');loadSO();
 }
 async function deleteSO(id){const {error}=await db.from('sale_orders').delete().eq('id',id);if(error){toast('ลบไม่สำเร็จ','error');return;}toast('ลบแล้ว','success');loadSO();}
+
+// ========== ACCOUNTING STATE ==========
+let allCOA=[], allAR=[], allAP=[], allTxn=[], allBankAcc=[], allBankTxn=[], allJournal=[], allAssets=[], allPayroll=[];
+let editCOAId=null, editARId=null, editAPId=null, editTxnId=null, editBankAccId=null, editBankTxnId=null, editJournalId=null, editAssetId=null, editPayrollId=null;
+let vatMonth=null, finYear=null, payrollPeriod=null;
+const ACC_PAGES=['coa','ar','ap','income-expense','vat','financial','bank','journal','fixed-assets','payroll'];
+const COA_TYPE_LABEL={asset:'สินทรัพย์',liability:'หนี้สิน',equity:'ส่วนทุน',revenue:'รายได้',expense:'ค่าใช้จ่าย'};
+const AR_STATUS={draft:'ร่าง',sent:'ส่งแล้ว',partial:'ชำระบางส่วน',paid:'ชำระแล้ว',overdue:'เกินกำหนด'};
+const AR_BADGE={draft:'b-gray',sent:'b-blue',partial:'b-gold',paid:'b-green',overdue:'b-red'};
+const AP_STATUS={pending:'รอชำระ',partial:'ชำระบางส่วน',paid:'ชำระแล้ว',overdue:'เกินกำหนด'};
+const AP_BADGE={pending:'b-gray',partial:'b-gold',paid:'b-green',overdue:'b-red'};
+
+// ========== LOAD ACCOUNTING ==========
+async function loadAccounting(){
+  await Promise.all([loadCOA(),loadAR(),loadAP(),loadTxn(),loadBankAcc(),loadBankTxn(),loadJournal(),loadAssets(),loadPayroll()]);
+}
+async function loadCOA(){const{data}=await db.from('chart_of_accounts').select('*').order('code');allCOA=data||[];renderCOA();}
+async function loadAR(){const{data}=await db.from('accounts_receivable').select('*').order('date',{ascending:false});allAR=data||[];renderAR();}
+async function loadAP(){const{data}=await db.from('accounts_payable').select('*').order('date',{ascending:false});allAP=data||[];renderAP();}
+async function loadTxn(){const{data}=await db.from('transactions').select('*').order('date',{ascending:false});allTxn=data||[];renderTxn();}
+async function loadBankAcc(){const{data}=await db.from('bank_accounts').select('*').order('created_at');allBankAcc=data||[];renderBankAccGrid();}
+async function loadBankTxn(){const{data}=await db.from('bank_transactions').select('*').order('date',{ascending:false});allBankTxn=data||[];renderBankTxn();}
+async function loadJournal(){const{data}=await db.from('journal_entries').select('*').order('date',{ascending:false});allJournal=data||[];renderJournal();}
+async function loadAssets(){const{data}=await db.from('fixed_assets').select('*').order('purchase_date',{ascending:false});allAssets=data||[];renderAssets();}
+async function loadPayroll(){const{data}=await db.from('payroll').select('*').order('year',{ascending:false});allPayroll=data||[];renderPayroll();}
+
+// ========== COA ==========
+function renderCOA(){
+  const s=document.getElementById('coaf-search')?.value.toLowerCase()||'';
+  const t=document.getElementById('coaf-type')?.value||'';
+  const tb=document.getElementById('coa-tb');if(!tb)return;
+  const rows=allCOA.filter(r=>(!s||(r.code+r.name).toLowerCase().includes(s))&&(!t||r.type===t));
+  tb.innerHTML=rows.length?rows.map(r=>`<tr><td><b>${r.code}</b></td><td>${r.name}</td><td><span class="badge b-blue">${COA_TYPE_LABEL[r.type]||r.type}</span></td><td><button class="btn-icon" onclick="editCOA('${r.id}')">✏️</button><button class="btn-icon" onclick="delCOA('${r.id}')">🗑️</button></td></tr>`).join('')
+    :'<tr><td colspan="4" class="empty"><div class="ei">📒</div><p>ยังไม่มีผังบัญชี</p></td></tr>';
+}
+function filterCOA(){renderCOA();}
+function openCOAModal(id){
+  editCOAId=id||null;
+  document.getElementById('coa-modal-title').textContent=id?'แก้ไขบัญชี':'เพิ่มบัญชีใหม่';
+  if(id){const r=allCOA.find(x=>x.id===id);document.getElementById('coam-code').value=r.code;document.getElementById('coam-name').value=r.name;document.getElementById('coam-type').value=r.type;}
+  else{document.getElementById('coam-code').value='';document.getElementById('coam-name').value='';document.getElementById('coam-type').value='asset';}
+  openModal('coam-modal');
+}
+function editCOA(id){openCOAModal(id);}
+async function saveCOA(){
+  const code=document.getElementById('coam-code').value.trim();
+  const name=document.getElementById('coam-name').value.trim();
+  const type=document.getElementById('coam-type').value;
+  if(!code||!name){toast('กรุณากรอกรหัสและชื่อบัญชี','error');return;}
+  const payload={code,name,type,user_id:currentUser.id};
+  const{error}=editCOAId?await db.from('chart_of_accounts').update(payload).eq('id',editCOAId):await db.from('chart_of_accounts').insert(payload);
+  if(error){toast('บันทึกไม่สำเร็จ: '+error.message,'error');return;}
+  closeModal('coam-modal');toast('บันทึกสำเร็จ','success');loadCOA();
+}
+async function delCOA(id){openConf('ลบบัญชี','บัญชีนี้จะถูกลบถาวร',async()=>{await db.from('chart_of_accounts').delete().eq('id',id);toast('ลบแล้ว','success');loadCOA();});}
+
+// ========== AR ==========
+function renderAR(){
+  const s=document.getElementById('arf-search')?.value.toLowerCase()||'';
+  const st=document.getElementById('arf-status')?.value||'';
+  const tb=document.getElementById('ar-tb');if(!tb)return;
+  const rows=allAR.filter(r=>(!s||(r.number+r.customer).toLowerCase().includes(s))&&(!st||r.status===st));
+  const kpi=document.getElementById('ar-kpi');
+  if(kpi){const tot=allAR.reduce((a,r)=>a+(r.total||0),0);const paid=allAR.reduce((a,r)=>a+(r.paid||0),0);const ov=allAR.filter(r=>r.status==='overdue').length;
+    kpi.innerHTML=`<div class="kpi-card"><div class="kpi-label">ยอดรวม AR</div><div class="kpi-val">฿${fmt(tot)}</div></div><div class="kpi-card"><div class="kpi-label">ชำระแล้ว</div><div class="kpi-val" style="color:var(--green)">฿${fmt(paid)}</div></div><div class="kpi-card"><div class="kpi-label">คงค้าง</div><div class="kpi-val" style="color:var(--red)">฿${fmt(tot-paid)}</div></div><div class="kpi-card"><div class="kpi-label">เกินกำหนด</div><div class="kpi-val" style="color:var(--red)">${ov} รายการ</div></div>`;}
+  tb.innerHTML=rows.length?rows.map(r=>{const due=r.total-r.paid;return`<tr><td><b>${r.number}</b></td><td>${r.customer}</td><td>${r.reference||'-'}</td><td>฿${fmt(r.total)}</td><td>฿${fmt(r.paid||0)}</td><td style="color:var(--red)">฿${fmt(due)}</td><td>${r.due_date||'-'}</td><td><span class="badge ${AR_BADGE[r.status]||'b-gray'}">${AR_STATUS[r.status]||r.status}</span></td><td><button class="btn-icon" onclick="editAR('${r.id}')">✏️</button><button class="btn-icon" onclick="delAR('${r.id}')">🗑️</button></td></tr>`}).join('')
+    :'<tr><td colspan="9" class="empty"><div class="ei">💵</div><p>ยังไม่มีรายการ AR</p></td></tr>';
+}
+function filterAR(){renderAR();}
+function openARModal(id){
+  editARId=id||null;
+  document.getElementById('ar-modal-title').textContent=id?'แก้ไขใบแจ้งหนี้':'สร้างใบแจ้งหนี้ (AR)';
+  const d=id?allAR.find(x=>x.id===id):null;
+  document.getElementById('arm-num').value=d?d.number:genRef('INV');
+  document.getElementById('arm-date').value=d?d.date:new Date().toISOString().slice(0,10);
+  document.getElementById('arm-customer').value=d?d.customer:'';
+  document.getElementById('arm-credit-days').value=d?d.credit_days:30;
+  document.getElementById('arm-subtotal').value=d?d.subtotal:'';
+  document.getElementById('arm-vat').value=d?d.vat:'';
+  document.getElementById('arm-total').value=d?d.total:'';
+  document.getElementById('arm-paid').value=d?d.paid:0;
+  document.getElementById('arm-status').value=d?d.status:'draft';
+  document.getElementById('arm-note').value=d?d.note||'':'';
+  // populate ref
+  const sel=document.getElementById('arm-ref');sel.innerHTML='<option value="">-- ไม่มี --</option>';
+  allQ.forEach(q=>sel.insertAdjacentHTML('beforeend',`<option value="Q:${q.id}">${q.number}</option>`));
+  allSO.forEach(s=>sel.insertAdjacentHTML('beforeend',`<option value="SO:${s.id}">${s.number}</option>`));
+  if(d?.reference)sel.value=d.reference;
+  // populate customer datalist
+  const dl=document.getElementById('ar-cust-list');dl.innerHTML='';
+  [...new Set(allC.map(c=>c.name))].forEach(n=>dl.insertAdjacentHTML('beforeend',`<option value="${n}">`));
+  openModal('ar-modal');
+}
+function editAR(id){openARModal(id);}
+function calcARTotal(){const sub=parseFloat(document.getElementById('arm-subtotal').value)||0;const vat=sub*0.07;document.getElementById('arm-vat').value=vat.toFixed(2);document.getElementById('arm-total').value=(sub+vat).toFixed(2);}
+function calcARStatus(){}
+async function saveAR(){
+  const sub=parseFloat(document.getElementById('arm-subtotal').value)||0;
+  const vat=sub*0.07;const total=sub+vat;
+  const paid=parseFloat(document.getElementById('arm-paid').value)||0;
+  const payload={number:document.getElementById('arm-num').value.trim(),date:document.getElementById('arm-date').value,customer:document.getElementById('arm-customer').value.trim(),credit_days:parseInt(document.getElementById('arm-credit-days').value)||30,reference:document.getElementById('arm-ref').value||null,subtotal:sub,vat,total,paid,status:document.getElementById('arm-status').value,note:document.getElementById('arm-note').value.trim(),user_id:currentUser.id};
+  if(!payload.customer){toast('กรุณากรอกลูกค้า','error');return;}
+  const{error}=editARId?await db.from('accounts_receivable').update(payload).eq('id',editARId):await db.from('accounts_receivable').insert(payload);
+  if(error){toast('บันทึกไม่สำเร็จ: '+error.message,'error');return;}
+  closeModal('ar-modal');toast('บันทึกสำเร็จ','success');loadAR();
+}
+async function delAR(id){openConf('ลบใบแจ้งหนี้','รายการนี้จะถูกลบถาวร',async()=>{await db.from('accounts_receivable').delete().eq('id',id);toast('ลบแล้ว','success');loadAR();});}
+
+// ========== AP ==========
+function renderAP(){
+  const s=document.getElementById('apf-search')?.value.toLowerCase()||'';
+  const st=document.getElementById('apf-status')?.value||'';
+  const tb=document.getElementById('ap-tb');if(!tb)return;
+  const rows=allAP.filter(r=>(!s||(r.number+(r.supplier||'')).toLowerCase().includes(s))&&(!st||r.status===st));
+  const kpi=document.getElementById('ap-kpi');
+  if(kpi){const tot=allAP.reduce((a,r)=>a+(r.total||0),0);const paid=allAP.reduce((a,r)=>a+(r.paid||0),0);
+    kpi.innerHTML=`<div class="kpi-card"><div class="kpi-label">ยอดรวม AP</div><div class="kpi-val">฿${fmt(tot)}</div></div><div class="kpi-card"><div class="kpi-label">ชำระแล้ว</div><div class="kpi-val" style="color:var(--green)">฿${fmt(paid)}</div></div><div class="kpi-card"><div class="kpi-label">คงค้าง</div><div class="kpi-val" style="color:var(--red)">฿${fmt(tot-paid)}</div></div><div class="kpi-card"><div class="kpi-label">รายการทั้งหมด</div><div class="kpi-val">${allAP.length}</div></div>`;}
+  tb.innerHTML=rows.length?rows.map(r=>`<tr><td><b>${r.number}</b></td><td>${r.supplier||'-'}</td><td>${r.reference||'-'}</td><td>฿${fmt(r.total)}</td><td>฿${fmt(r.paid||0)}</td><td style="color:var(--red)">฿${fmt(r.total-r.paid)}</td><td>${r.due_date||'-'}</td><td><span class="badge ${AP_BADGE[r.status]||'b-gray'}">${AP_STATUS[r.status]||r.status}</span></td><td><button class="btn-icon" onclick="editAP('${r.id}')">✏️</button><button class="btn-icon" onclick="delAP('${r.id}')">🗑️</button></td></tr>`).join('')
+    :'<tr><td colspan="9" class="empty"><div class="ei">💸</div><p>ยังไม่มีรายการ AP</p></td></tr>';
+}
+function filterAP(){renderAP();}
+function openAPModal(id){
+  editAPId=id||null;
+  document.getElementById('ap-modal-title').textContent=id?'แก้ไขใบวางบิล':'สร้างใบวางบิล (AP)';
+  const d=id?allAP.find(x=>x.id===id):null;
+  document.getElementById('apm-num').value=d?d.number:genRef('BILL');
+  document.getElementById('apm-date').value=d?d.date:new Date().toISOString().slice(0,10);
+  document.getElementById('apm-credit-days').value=d?d.credit_days:30;
+  document.getElementById('apm-subtotal').value=d?d.subtotal:'';
+  document.getElementById('apm-vat').value=d?d.vat:'';
+  document.getElementById('apm-total').value=d?d.total:'';
+  document.getElementById('apm-paid').value=d?d.paid:0;
+  document.getElementById('apm-status').value=d?d.status:'pending';
+  document.getElementById('apm-note').value=d?d.note||'':'';
+  const sup=document.getElementById('apm-supplier');sup.innerHTML='<option value="">-- เลือกซัพพลาย --</option>';
+  allS.forEach(s=>sup.insertAdjacentHTML('beforeend',`<option value="${s.name}"${d?.supplier===s.name?' selected':''}>${s.name}</option>`));
+  const ref=document.getElementById('apm-ref');ref.innerHTML='<option value="">-- ไม่มี --</option>';
+  allPO.forEach(p=>ref.insertAdjacentHTML('beforeend',`<option value="${p.id}"${d?.reference===p.id?' selected':''}>${p.number}</option>`));
+  openModal('ap-modal');
+}
+function editAP(id){openAPModal(id);}
+function calcAPTotal(){const sub=parseFloat(document.getElementById('apm-subtotal').value)||0;const vat=sub*0.07;document.getElementById('apm-vat').value=vat.toFixed(2);document.getElementById('apm-total').value=(sub+vat).toFixed(2);}
+async function saveAP(){
+  const sub=parseFloat(document.getElementById('apm-subtotal').value)||0;const vat=sub*0.07;const total=sub+vat;
+  const payload={number:document.getElementById('apm-num').value.trim(),date:document.getElementById('apm-date').value,supplier:document.getElementById('apm-supplier').value,credit_days:parseInt(document.getElementById('apm-credit-days').value)||30,reference:document.getElementById('apm-ref').value||null,subtotal:sub,vat,total,paid:parseFloat(document.getElementById('apm-paid').value)||0,status:document.getElementById('apm-status').value,note:document.getElementById('apm-note').value.trim(),user_id:currentUser.id};
+  const{error}=editAPId?await db.from('accounts_payable').update(payload).eq('id',editAPId):await db.from('accounts_payable').insert(payload);
+  if(error){toast('บันทึกไม่สำเร็จ: '+error.message,'error');return;}
+  closeModal('ap-modal');toast('บันทึกสำเร็จ','success');loadAP();
+}
+async function delAP(id){openConf('ลบใบวางบิล','รายการนี้จะถูกลบถาวร',async()=>{await db.from('accounts_payable').delete().eq('id',id);toast('ลบแล้ว','success');loadAP();});}
+
+// ========== TRANSACTIONS ==========
+function renderTxn(){
+  const s=document.getElementById('txnf-search')?.value.toLowerCase()||'';
+  const t=document.getElementById('txnf-type')?.value||'';
+  const m=document.getElementById('txnf-month')?.value||'';
+  const tb=document.getElementById('txn-tb');if(!tb)return;
+  const rows=allTxn.filter(r=>(!s||(r.description+r.category).toLowerCase().includes(s))&&(!t||r.type===t)&&(!m||r.date?.startsWith(m)));
+  const kpi=document.getElementById('txn-kpi');
+  if(kpi){const inc=allTxn.filter(r=>r.type==='income').reduce((a,r)=>a+(r.amount||0),0);const exp=allTxn.filter(r=>r.type==='expense').reduce((a,r)=>a+(r.amount||0),0);
+    kpi.innerHTML=`<div class="kpi-card"><div class="kpi-label">รายได้รวม</div><div class="kpi-val" style="color:var(--green)">฿${fmt(inc)}</div></div><div class="kpi-card"><div class="kpi-label">ค่าใช้จ่ายรวม</div><div class="kpi-val" style="color:var(--red)">฿${fmt(exp)}</div></div><div class="kpi-card"><div class="kpi-label">กำไรสุทธิ</div><div class="kpi-val" style="color:${inc-exp>=0?'var(--green)':'var(--red)'}">฿${fmt(inc-exp)}</div></div><div class="kpi-card"><div class="kpi-label">รายการทั้งหมด</div><div class="kpi-val">${allTxn.length}</div></div>`;}
+  // populate month filter
+  const mSel=document.getElementById('txnf-month');if(mSel&&mSel.options.length===1){const months=new Set(allTxn.map(r=>r.date?.slice(0,7)).filter(Boolean));[...months].sort().reverse().forEach(m=>mSel.insertAdjacentHTML('beforeend',`<option value="${m}">${m}</option>`));}
+  tb.innerHTML=rows.length?rows.map(r=>`<tr><td>${r.date}</td><td><span class="badge ${r.type==='income'?'b-green':'b-red'}">${r.type==='income'?'รายได้':'ค่าใช้จ่าย'}</span></td><td>${r.category||'-'}</td><td>${r.description||'-'}</td><td>${r.account_code||'-'}</td><td>฿${fmt(r.amount)}</td><td>${r.has_vat?'฿'+fmt((r.amount||0)*0.07):'-'}</td><td><button class="btn-icon" onclick="editTxn('${r.id}')">✏️</button><button class="btn-icon" onclick="delTxn('${r.id}')">🗑️</button></td></tr>`).join('')
+    :'<tr><td colspan="8" class="empty"><div class="ei">📊</div><p>ยังไม่มีรายการ</p></td></tr>';
+}
+function filterTxn(){renderTxn();}
+function openTxnModal(id){
+  editTxnId=id||null;
+  document.getElementById('txn-modal-title').textContent=id?'แก้ไขรายการ':'บันทึกรายได้/ค่าใช้จ่าย';
+  const d=id?allTxn.find(x=>x.id===id):null;
+  document.getElementById('txnm-type').value=d?d.type:'income';
+  document.getElementById('txnm-date').value=d?d.date:new Date().toISOString().slice(0,10);
+  document.getElementById('txnm-category').value=d?d.category||'':'';
+  document.getElementById('txnm-desc').value=d?d.description||'':'';
+  document.getElementById('txnm-amount').value=d?d.amount:'';
+  document.getElementById('txnm-has-vat').value=d?d.has_vat?'1':'0':'0';
+  document.getElementById('txnm-note').value=d?d.note||'':'';
+  const sel=document.getElementById('txnm-account');sel.innerHTML='<option value="">-- เลือกบัญชี --</option>';
+  allCOA.forEach(c=>sel.insertAdjacentHTML('beforeend',`<option value="${c.code}"${d?.account_code===c.code?' selected':''}>${c.code} - ${c.name}</option>`));
+  openModal('txn-modal');
+}
+function editTxn(id){openTxnModal(id);}
+async function saveTxn(){
+  const payload={type:document.getElementById('txnm-type').value,date:document.getElementById('txnm-date').value,category:document.getElementById('txnm-category').value.trim(),description:document.getElementById('txnm-desc').value.trim(),account_code:document.getElementById('txnm-account').value||null,amount:parseFloat(document.getElementById('txnm-amount').value)||0,has_vat:document.getElementById('txnm-has-vat').value==='1',note:document.getElementById('txnm-note').value.trim(),user_id:currentUser.id};
+  const{error}=editTxnId?await db.from('transactions').update(payload).eq('id',editTxnId):await db.from('transactions').insert(payload);
+  if(error){toast('บันทึกไม่สำเร็จ: '+error.message,'error');return;}
+  closeModal('txn-modal');toast('บันทึกสำเร็จ','success');loadTxn();
+}
+async function delTxn(id){openConf('ลบรายการ','รายการนี้จะถูกลบถาวร',async()=>{await db.from('transactions').delete().eq('id',id);toast('ลบแล้ว','success');loadTxn();});}
+
+// ========== VAT ==========
+function renderVAT(){
+  const now=new Date();if(!vatMonth)vatMonth=now.getFullYear()*100+now.getMonth()+1;
+  const yr=Math.floor(vatMonth/100);const mo=vatMonth%100;
+  const prefix=`${yr}-${String(mo).padStart(2,'0')}`;
+  document.getElementById('vat-period-disp').textContent=`${TM[mo-1]} ${yr+543}`;
+  const outRows=allAR.filter(r=>r.date?.startsWith(prefix));
+  const inRows=allAP.filter(r=>r.date?.startsWith(prefix));
+  const outVat=outRows.reduce((a,r)=>a+(r.vat||0),0);const inVat=inRows.reduce((a,r)=>a+(r.vat||0),0);
+  const kpi=document.getElementById('vat-kpi');
+  if(kpi)kpi.innerHTML=`<div class="kpi-card"><div class="kpi-label">VAT ขาออก</div><div class="kpi-val">฿${fmt(outVat)}</div></div><div class="kpi-card"><div class="kpi-label">VAT ขาเข้า</div><div class="kpi-val">฿${fmt(inVat)}</div></div><div class="kpi-card"><div class="kpi-label">VAT สุทธิ (ต้องจ่าย)</div><div class="kpi-val" style="color:var(--red)">฿${fmt(outVat-inVat)}</div></div><div class="kpi-card"><div class="kpi-label">เดือน</div><div class="kpi-val">${TM[mo-1]} ${yr+543}</div></div>`;
+  const outTb=document.getElementById('vat-out-tb');if(outTb)outTb.innerHTML=outRows.length?outRows.map(r=>`<tr><td>${r.date}</td><td>${r.customer}</td><td>${r.number}</td><td>฿${fmt(r.subtotal)}</td><td>฿${fmt(r.vat||0)}</td></tr>`).join(''):'<tr><td colspan="5" class="empty">ไม่มีรายการ</td></tr>';
+  const inTb=document.getElementById('vat-in-tb');if(inTb)inTb.innerHTML=inRows.length?inRows.map(r=>`<tr><td>${r.date}</td><td>${r.supplier||'-'}</td><td>${r.number}</td><td>฿${fmt(r.subtotal)}</td><td>฿${fmt(r.vat||0)}</td></tr>`).join(''):'<tr><td colspan="5" class="empty">ไม่มีรายการ</td></tr>';
+}
+function chgVatMonth(d){if(!vatMonth){const n=new Date();vatMonth=n.getFullYear()*100+n.getMonth()+1;}let yr=Math.floor(vatMonth/100);let mo=vatMonth%100;mo+=d;if(mo>12){mo=1;yr++;}if(mo<1){mo=12;yr--;}vatMonth=yr*100+mo;renderVAT();}
+
+// ========== FINANCIAL ==========
+function renderFinancial(){
+  const now=new Date();if(!finYear)finYear=now.getFullYear();
+  document.getElementById('fin-year-disp').textContent=finYear+543;
+  const prefix=String(finYear);
+  const txns=allTxn.filter(r=>r.date?.startsWith(prefix));
+  const inc=txns.filter(r=>r.type==='income').reduce((a,r)=>a+(r.amount||0),0);
+  const exp=txns.filter(r=>r.type==='expense').reduce((a,r)=>a+(r.amount||0),0);
+  const arTot=allAR.reduce((a,r)=>a+(r.total||0),0);const arPaid=allAR.reduce((a,r)=>a+(r.paid||0),0);
+  const apTot=allAP.reduce((a,r)=>a+(r.total||0),0);const apPaid=allAP.reduce((a,r)=>a+(r.paid||0),0);
+  const assetTot=allAssets.reduce((a,r)=>a+(r.cost||0),0);
+  const finPL=document.getElementById('fin-pl');
+  if(finPL)finPL.innerHTML=`<div class="fin-section-head">รายได้</div><div class="fin-row"><span>รายได้จากการขาย (Q Approved)</span><span>฿${fmt(allQ.filter(q=>q.status==='approved').reduce((a,q)=>a+(q.total||0),0))}</span></div><div class="fin-row"><span>รายได้อื่น</span><span>฿${fmt(inc)}</span></div><div class="fin-section-head">ค่าใช้จ่าย</div><div class="fin-row"><span>ค่าใช้จ่ายรวม</span><span>฿${fmt(exp)}</span></div><div class="fin-row total"><span>กำไรสุทธิ</span><span style="color:${inc-exp>=0?'var(--green)':'var(--red)'}">฿${fmt(inc-exp)}</span></div>`;
+  const finBS=document.getElementById('fin-bs');
+  if(finBS)finBS.innerHTML=`<div class="fin-section-head">สินทรัพย์</div><div class="fin-row"><span>ลูกหนี้การค้า (AR)</span><span>฿${fmt(arTot-arPaid)}</span></div><div class="fin-row"><span>สินทรัพย์ถาวร</span><span>฿${fmt(assetTot)}</span></div><div class="fin-section-head">หนี้สิน</div><div class="fin-row"><span>เจ้าหนี้การค้า (AP)</span><span>฿${fmt(apTot-apPaid)}</span></div><div class="fin-row total"><span>ส่วนทุนสุทธิ</span><span>฿${fmt(arTot-arPaid+assetTot-(apTot-apPaid))}</span></div>`;
+}
+function chgFinYear(d){if(!finYear)finYear=new Date().getFullYear();finYear+=d;renderFinancial();}
+
+// ========== BANK ==========
+function renderBankAccGrid(){
+  const g=document.getElementById('bank-accounts-grid');if(!g)return;
+  const sel=document.getElementById('bankf-acc');if(sel){sel.innerHTML='<option value="">ทุกบัญชี</option>';allBankAcc.forEach(a=>sel.insertAdjacentHTML('beforeend',`<option value="${a.id}">${a.name}</option>`));}
+  const btxnSel=document.getElementById('btxnm-account');if(btxnSel){btxnSel.innerHTML='<option value="">-- เลือกบัญชี --</option>';allBankAcc.forEach(a=>btxnSel.insertAdjacentHTML('beforeend',`<option value="${a.id}">${a.name}</option>`));}
+  g.innerHTML=allBankAcc.length?allBankAcc.map(a=>{const txns=allBankTxn.filter(t=>t.account_id===a.id);const bal=txns.reduce((s,t)=>s+(t.type==='deposit'?t.amount:-t.amount),a.opening_balance||0);return`<div class="card" style="padding:20px"><div style="font-size:13px;color:var(--text2)">${a.bank_name||''} ${a.account_number||''}</div><div style="font-weight:700;font-size:16px;margin:6px 0">${a.name}</div><div style="font-size:22px;font-weight:700;color:var(--navy)">฿${fmt(bal)}</div><div style="margin-top:12px;display:flex;gap:8px"><button class="btn btn-outline" style="font-size:12px;padding:5px 10px" onclick="editBankAcc('${a.id}')">✏️ แก้ไข</button><button class="btn btn-outline" style="font-size:12px;padding:5px 10px;color:var(--red)" onclick="delBankAcc('${a.id}')">🗑️</button></div></div>`}).join('')
+    :'<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text2)">ยังไม่มีบัญชีธนาคาร กด "+ บัญชีใหม่" เพื่อเพิ่ม</div>';
+}
+function renderBankTxn(){
+  const acc=document.getElementById('bankf-acc')?.value||'';
+  const tb=document.getElementById('bank-txn-tb');if(!tb)return;
+  const rows=allBankTxn.filter(t=>!acc||t.account_id===acc);
+  tb.innerHTML=rows.length?rows.map(r=>{const a=allBankAcc.find(x=>x.id===r.account_id);return`<tr><td>${r.date}</td><td>${a?a.name:'-'}</td><td>${r.description||'-'}</td><td><span class="badge ${r.type==='deposit'?'b-green':'b-red'}">${r.type==='deposit'?'รับเงิน':'จ่ายเงิน'}</span></td><td style="color:${r.type==='deposit'?'var(--green)':'var(--red)'}">฿${fmt(r.amount)}</td><td>฿${fmt(r.balance||0)}</td><td><button class="btn-icon" onclick="delBankTxn('${r.id}')">🗑️</button></td></tr>`}).join('')
+    :'<tr><td colspan="7" class="empty"><div class="ei">🏦</div><p>ยังไม่มีรายการ</p></td></tr>';
+}
+function filterBankTxn(){renderBankTxn();}
+function openBankAccModal(id){editBankAccId=id||null;const d=id?allBankAcc.find(x=>x.id===id):null;document.getElementById('bank-acc-modal-title').textContent=id?'แก้ไขบัญชี':'เพิ่มบัญชีธนาคาร';document.getElementById('bankam-name').value=d?d.name:'';document.getElementById('bankam-bank').value=d?d.bank_name||'':'';document.getElementById('bankam-number').value=d?d.account_number||'':'';document.getElementById('bankam-balance').value=d?d.opening_balance||0:0;document.getElementById('bankam-type').value=d?d.type||'current':'current';openModal('bank-acc-modal');}
+function editBankAcc(id){openBankAccModal(id);}
+async function saveBankAcc(){const payload={name:document.getElementById('bankam-name').value.trim(),bank_name:document.getElementById('bankam-bank').value.trim(),account_number:document.getElementById('bankam-number').value.trim(),opening_balance:parseFloat(document.getElementById('bankam-balance').value)||0,type:document.getElementById('bankam-type').value,user_id:currentUser.id};if(!payload.name){toast('กรุณากรอกชื่อบัญชี','error');return;}const{error}=editBankAccId?await db.from('bank_accounts').update(payload).eq('id',editBankAccId):await db.from('bank_accounts').insert(payload);if(error){toast('บันทึกไม่สำเร็จ: '+error.message,'error');return;}closeModal('bank-acc-modal');toast('บันทึกสำเร็จ','success');loadBankAcc();}
+async function delBankAcc(id){openConf('ลบบัญชีธนาคาร','บัญชีนี้จะถูกลบถาวร',async()=>{await db.from('bank_accounts').delete().eq('id',id);toast('ลบแล้ว','success');loadBankAcc();});}
+function openBankTxnModal(){editBankTxnId=null;document.getElementById('bank-txn-modal-title').textContent='บันทึกรายการเดินบัญชี';document.getElementById('btxnm-date').value=new Date().toISOString().slice(0,10);document.getElementById('btxnm-desc').value='';document.getElementById('btxnm-amount').value='';document.getElementById('btxnm-ref').value='';document.getElementById('btxnm-type').value='deposit';openModal('bank-txn-modal');}
+async function saveBankTxn(){const accId=document.getElementById('btxnm-account').value;if(!accId){toast('กรุณาเลือกบัญชี','error');return;}const payload={account_id:accId,type:document.getElementById('btxnm-type').value,date:document.getElementById('btxnm-date').value,description:document.getElementById('btxnm-desc').value.trim(),amount:parseFloat(document.getElementById('btxnm-amount').value)||0,reference:document.getElementById('btxnm-ref').value.trim()||null,balance:0,user_id:currentUser.id};const{error}=await db.from('bank_transactions').insert(payload);if(error){toast('บันทึกไม่สำเร็จ: '+error.message,'error');return;}closeModal('bank-txn-modal');toast('บันทึกสำเร็จ','success');loadBankTxn();}
+async function delBankTxn(id){openConf('ลบรายการ','รายการนี้จะถูกลบถาวร',async()=>{await db.from('bank_transactions').delete().eq('id',id);toast('ลบแล้ว','success');loadBankTxn();});}
+
+// ========== JOURNAL ==========
+function renderJournal(){
+  const s=document.getElementById('jrnf-search')?.value.toLowerCase()||'';
+  const m=document.getElementById('jrnf-month')?.value||'';
+  const tb=document.getElementById('journal-tb');if(!tb)return;
+  const rows=allJournal.filter(r=>(!s||(r.description+r.ref_number).toLowerCase().includes(s))&&(!m||r.date?.startsWith(m)));
+  const mSel=document.getElementById('jrnf-month');if(mSel&&mSel.options.length===1){const months=new Set(allJournal.map(r=>r.date?.slice(0,7)).filter(Boolean));[...months].sort().reverse().forEach(m=>mSel.insertAdjacentHTML('beforeend',`<option value="${m}">${m}</option>`));}
+  tb.innerHTML=rows.length?rows.map(r=>{const dr=allCOA.find(c=>c.id===r.debit_account_id);const cr=allCOA.find(c=>c.id===r.credit_account_id);return`<tr><td>${r.date}</td><td>${r.ref_number||'-'}</td><td>${r.description||'-'}</td><td>${dr?dr.code+' '+dr.name:'-'}</td><td>${cr?cr.code+' '+cr.name:'-'}</td><td>฿${fmt(r.amount)}</td><td><button class="btn-icon" onclick="delJournal('${r.id}')">🗑️</button></td></tr>`}).join('')
+    :'<tr><td colspan="7" class="empty"><div class="ei">📔</div><p>ยังไม่มีรายการ</p></td></tr>';
+}
+function filterJournal(){renderJournal();}
+function openJournalModal(){
+  editJournalId=null;
+  document.getElementById('journal-modal-title').textContent='บันทึกสมุดรายวัน';
+  document.getElementById('jrnm-date').value=new Date().toISOString().slice(0,10);
+  document.getElementById('jrnm-ref').value='';document.getElementById('jrnm-desc').value='';document.getElementById('jrnm-amount').value='';document.getElementById('jrnm-note').value='';
+  const dr=document.getElementById('jrnm-debit');const cr=document.getElementById('jrnm-credit');
+  dr.innerHTML='<option value="">-- เลือกบัญชี --</option>';cr.innerHTML='<option value="">-- เลือกบัญชี --</option>';
+  allCOA.forEach(c=>{dr.insertAdjacentHTML('beforeend',`<option value="${c.id}">${c.code} - ${c.name}</option>`);cr.insertAdjacentHTML('beforeend',`<option value="${c.id}">${c.code} - ${c.name}</option>`);});
+  openModal('journal-modal');
+}
+async function saveJournal(){
+  const payload={date:document.getElementById('jrnm-date').value,ref_number:document.getElementById('jrnm-ref').value.trim(),description:document.getElementById('jrnm-desc').value.trim(),debit_account_id:document.getElementById('jrnm-debit').value||null,credit_account_id:document.getElementById('jrnm-credit').value||null,amount:parseFloat(document.getElementById('jrnm-amount').value)||0,note:document.getElementById('jrnm-note').value.trim(),user_id:currentUser.id};
+  const{error}=await db.from('journal_entries').insert(payload);
+  if(error){toast('บันทึกไม่สำเร็จ: '+error.message,'error');return;}
+  closeModal('journal-modal');toast('บันทึกสำเร็จ','success');loadJournal();
+}
+async function delJournal(id){openConf('ลบรายการ','รายการนี้จะถูกลบถาวร',async()=>{await db.from('journal_entries').delete().eq('id',id);toast('ลบแล้ว','success');loadJournal();});}
+
+// ========== FIXED ASSETS ==========
+function renderAssets(){
+  const s=document.getElementById('assetf-search')?.value.toLowerCase()||'';
+  const tb=document.getElementById('asset-tb');if(!tb)return;
+  const rows=allAssets.filter(r=>(!s||(r.name+r.code).toLowerCase().includes(s)));
+  const kpi=document.getElementById('asset-kpi');
+  if(kpi){const tot=allAssets.reduce((a,r)=>a+(r.cost||0),0);const dep=allAssets.reduce((a,r)=>a+calcDepreciation(r),0);
+    kpi.innerHTML=`<div class="kpi-card"><div class="kpi-label">ราคาทุนรวม</div><div class="kpi-val">฿${fmt(tot)}</div></div><div class="kpi-card"><div class="kpi-label">ค่าเสื่อมสะสม</div><div class="kpi-val" style="color:var(--red)">฿${fmt(dep)}</div></div><div class="kpi-card"><div class="kpi-label">มูลค่าสุทธิ</div><div class="kpi-val" style="color:var(--green)">฿${fmt(tot-dep)}</div></div><div class="kpi-card"><div class="kpi-label">จำนวนสินทรัพย์</div><div class="kpi-val">${allAssets.length}</div></div>`;}
+  tb.innerHTML=rows.length?rows.map(r=>{const dep=calcDepreciation(r);const cat={land:'ที่ดิน',building:'อาคาร',machinery:'เครื่องจักร',vehicle:'ยานพาหนะ',equipment:'อุปกรณ์',other:'อื่นๆ'};return`<tr><td>${r.code}</td><td>${r.name}</td><td>${cat[r.category]||r.category}</td><td>฿${fmt(r.cost)}</td><td>฿${fmt(dep)}</td><td>฿${fmt(r.cost-dep)}</td><td>${r.purchase_date||'-'}</td><td>${r.useful_life||'-'}</td><td><button class="btn-icon" onclick="editAsset('${r.id}')">✏️</button><button class="btn-icon" onclick="delAsset('${r.id}')">🗑️</button></td></tr>`}).join('')
+    :'<tr><td colspan="9" class="empty"><div class="ei">🏗️</div><p>ยังไม่มีสินทรัพย์ถาวร</p></td></tr>';
+}
+function calcDepreciation(r){if(!r.purchase_date||!r.cost)return 0;const yrs=(new Date()-new Date(r.purchase_date))/(365.25*24*3600*1000);const life=r.useful_life||5;const salvage=r.salvage_value||0;const annual=(r.cost-salvage)/life;return Math.min(annual*yrs,r.cost-salvage);}
+function filterAssets(){renderAssets();}
+function openAssetModal(id){
+  editAssetId=id||null;
+  document.getElementById('asset-modal-title').textContent=id?'แก้ไขสินทรัพย์':'เพิ่มสินทรัพย์ถาวร';
+  const d=id?allAssets.find(x=>x.id===id):null;
+  document.getElementById('assetm-code').value=d?d.code:'';document.getElementById('assetm-name').value=d?d.name:'';document.getElementById('assetm-category').value=d?d.category:'machinery';document.getElementById('assetm-date').value=d?d.purchase_date:'';document.getElementById('assetm-cost').value=d?d.cost:'';document.getElementById('assetm-salvage').value=d?d.salvage_value||0:0;document.getElementById('assetm-life').value=d?d.useful_life||5:5;document.getElementById('assetm-note').value=d?d.note||'':'';
+  openModal('asset-modal');
+}
+function editAsset(id){openAssetModal(id);}
+async function saveAsset(){
+  const payload={code:document.getElementById('assetm-code').value.trim(),name:document.getElementById('assetm-name').value.trim(),category:document.getElementById('assetm-category').value,purchase_date:document.getElementById('assetm-date').value,cost:parseFloat(document.getElementById('assetm-cost').value)||0,salvage_value:parseFloat(document.getElementById('assetm-salvage').value)||0,useful_life:parseInt(document.getElementById('assetm-life').value)||5,note:document.getElementById('assetm-note').value.trim(),user_id:currentUser.id};
+  if(!payload.name){toast('กรุณากรอกชื่อสินทรัพย์','error');return;}
+  const{error}=editAssetId?await db.from('fixed_assets').update(payload).eq('id',editAssetId):await db.from('fixed_assets').insert(payload);
+  if(error){toast('บันทึกไม่สำเร็จ: '+error.message,'error');return;}
+  closeModal('asset-modal');toast('บันทึกสำเร็จ','success');loadAssets();
+}
+async function delAsset(id){openConf('ลบสินทรัพย์','สินทรัพย์นี้จะถูกลบถาวร',async()=>{await db.from('fixed_assets').delete().eq('id',id);toast('ลบแล้ว','success');loadAssets();});}
+
+// ========== PAYROLL ==========
+function renderPayroll(){
+  const tb=document.getElementById('payroll-tb');if(!tb)return;
+  const now=new Date();if(!payrollPeriod)payrollPeriod={year:now.getFullYear(),month:now.getMonth()+1};
+  document.getElementById('payroll-period-disp').textContent=`${TM[payrollPeriod.month-1]} ${payrollPeriod.year+543}`;
+  const rows=allPayroll.filter(r=>r.year===payrollPeriod.year&&r.month===payrollPeriod.month);
+  const kpi=document.getElementById('payroll-kpi');
+  if(kpi){const tot=rows.reduce((a,r)=>a+(r.net||0),0);const ss=rows.reduce((a,r)=>a+(r.social_security||0),0);kpi.innerHTML=`<div class="kpi-card"><div class="kpi-label">ยอดจ่ายรวม</div><div class="kpi-val">฿${fmt(tot)}</div></div><div class="kpi-card"><div class="kpi-label">ประกันสังคมรวม</div><div class="kpi-val">฿${fmt(ss)}</div></div><div class="kpi-card"><div class="kpi-label">จำนวนพนักงาน</div><div class="kpi-val">${rows.length} คน</div></div><div class="kpi-card"><div class="kpi-label">จ่ายแล้ว</div><div class="kpi-val" style="color:var(--green)">${rows.filter(r=>r.status==='paid').length} คน</div></div>`;}
+  // populate employee datalist
+  const dl=document.getElementById('payroll-emp-list');if(dl){dl.innerHTML='';[...new Set(allPayroll.map(r=>r.employee_name))].forEach(n=>dl.insertAdjacentHTML('beforeend',`<option value="${n}">`));}
+  tb.innerHTML=rows.length?rows.map(r=>`<tr><td>${r.employee_name}</td><td>${r.position||'-'}</td><td>฿${fmt(r.basic_salary)}</td><td>฿${fmt(r.allowance||0)}</td><td>฿${fmt(r.social_security||0)}</td><td>฿${fmt(r.tax||0)}</td><td><b>฿${fmt(r.net)}</b></td><td><span class="badge ${r.status==='paid'?'b-green':'b-gray'}">${r.status==='paid'?'จ่ายแล้ว':'ร่าง'}</span></td><td><button class="btn-icon" onclick="editPayrollRecord('${r.id}')">✏️</button><button class="btn-icon" onclick="delPayroll('${r.id}')">🗑️</button></td></tr>`).join('')
+    :'<tr><td colspan="9" class="empty"><div class="ei">👷</div><p>ยังไม่มีรายการเงินเดือน</p></td></tr>';
+}
+function chgPayrollMonth(d){if(!payrollPeriod){const n=new Date();payrollPeriod={year:n.getFullYear(),month:n.getMonth()+1};}payrollPeriod.month+=d;if(payrollPeriod.month>12){payrollPeriod.month=1;payrollPeriod.year++;}if(payrollPeriod.month<1){payrollPeriod.month=12;payrollPeriod.year--;}renderPayroll();}
+function calcPayroll(){const basic=parseFloat(document.getElementById('prm-basic').value)||0;const ss=Math.min(basic*0.05,750);const allowance=parseFloat(document.getElementById('prm-allowance').value)||0;const deduction=parseFloat(document.getElementById('prm-deduction').value)||0;const tax=parseFloat(document.getElementById('prm-tax').value)||0;document.getElementById('prm-ss').value=ss.toFixed(2);document.getElementById('prm-net').value=(basic+allowance-ss-tax-deduction).toFixed(2);}
+function openPayrollModal(){
+  editPayrollId=null;
+  document.getElementById('payroll-modal-title').textContent='บันทึกเงินเดือน';
+  const now=new Date();
+  document.getElementById('prm-name').value='';document.getElementById('prm-position').value='';document.getElementById('prm-month').value=String(now.getMonth()+1);document.getElementById('prm-year').value=now.getFullYear()+543;document.getElementById('prm-basic').value='';document.getElementById('prm-allowance').value=0;document.getElementById('prm-deduction').value=0;document.getElementById('prm-ss').value='';document.getElementById('prm-tax').value=0;document.getElementById('prm-net').value='';document.getElementById('prm-status').value='draft';
+  openModal('payroll-modal');
+}
+function editPayrollRecord(id){
+  editPayrollId=id;
+  const r=allPayroll.find(x=>x.id===id);if(!r)return;
+  document.getElementById('payroll-modal-title').textContent='แก้ไขเงินเดือน';
+  document.getElementById('prm-name').value=r.employee_name;document.getElementById('prm-position').value=r.position||'';document.getElementById('prm-month').value=r.month;document.getElementById('prm-year').value=r.year+543;document.getElementById('prm-basic').value=r.basic_salary;document.getElementById('prm-allowance').value=r.allowance||0;document.getElementById('prm-deduction').value=r.deduction||0;document.getElementById('prm-ss').value=r.social_security||0;document.getElementById('prm-tax').value=r.tax||0;document.getElementById('prm-net').value=r.net||0;document.getElementById('prm-status').value=r.status||'draft';
+  openModal('payroll-modal');
+}
+async function savePayroll(){
+  const basic=parseFloat(document.getElementById('prm-basic').value)||0;const allowance=parseFloat(document.getElementById('prm-allowance').value)||0;const deduction=parseFloat(document.getElementById('prm-deduction').value)||0;const ss=Math.min(basic*0.05,750);const tax=parseFloat(document.getElementById('prm-tax').value)||0;const net=basic+allowance-ss-tax-deduction;const yearBE=parseInt(document.getElementById('prm-year').value)||0;
+  const payload={employee_name:document.getElementById('prm-name').value.trim(),position:document.getElementById('prm-position').value.trim(),month:parseInt(document.getElementById('prm-month').value),year:yearBE>2500?yearBE-543:yearBE,basic_salary:basic,allowance,deduction,social_security:ss,tax,net,status:document.getElementById('prm-status').value,user_id:currentUser.id};
+  if(!payload.employee_name){toast('กรุณากรอกชื่อพนักงาน','error');return;}
+  const{error}=editPayrollId?await db.from('payroll').update(payload).eq('id',editPayrollId):await db.from('payroll').insert(payload);
+  if(error){toast('บันทึกไม่สำเร็จ: '+error.message,'error');return;}
+  closeModal('payroll-modal');toast('บันทึกสำเร็จ','success');loadPayroll();
+}
+async function delPayroll(id){openConf('ลบรายการเงินเดือน','รายการนี้จะถูกลบถาวร',async()=>{await db.from('payroll').delete().eq('id',id);toast('ลบแล้ว','success');loadPayroll();});}
+
 </script>
 <datalist id="unit-list">
   <option value="ใบ"><option value="ชิ้น"><option value="กก."><option value="ลูก">
@@ -1598,5 +2121,160 @@ async function deleteSO(id){const {error}=await db.from('sale_orders').delete().
   <option value="เมตร"><option value="ลิตร"><option value="โหล"><option value="ห่อ">
   <option value="ปีก"><option value="อัน"><option value="คู่"><option value="ชุด">
 </datalist>
+
+<!-- ===== ACCOUNTING MODALS ===== -->
+<!-- COA -->
+<div class="modal-overlay" id="coam-modal">
+  <div class="modal" style="max-width:460px">
+    <h2 id="coa-modal-title">เพิ่มบัญชีใหม่</h2>
+    <div class="form-row">
+      <div class="fg"><label>รหัสบัญชี</label><input type="text" id="coam-code" placeholder="เช่น 1101"></div>
+      <div class="fg"><label>ประเภทบัญชี</label><select id="coam-type"><option value="asset">สินทรัพย์</option><option value="liability">หนี้สิน</option><option value="equity">ส่วนทุน</option><option value="revenue">รายได้</option><option value="expense">ค่าใช้จ่าย</option></select></div>
+      <div class="fg full"><label>ชื่อบัญชี</label><input type="text" id="coam-name" placeholder="เช่น เงินสด, ลูกหนี้การค้า"></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('coam-modal')">ยกเลิก</button><button class="btn btn-blue" onclick="saveCOA()">💾 บันทึก</button></div>
+  </div>
+</div>
+<!-- AR -->
+<div class="modal-overlay" id="ar-modal">
+  <div class="modal">
+    <h2 id="ar-modal-title">สร้างใบแจ้งหนี้ (AR)</h2>
+    <div class="form-row">
+      <div class="fg"><label>เลขที่</label><input type="text" id="arm-num" placeholder="INV-2569-001"></div>
+      <div class="fg"><label>วันที่</label><input type="date" id="arm-date"></div>
+      <div class="fg full"><label>ลูกค้า</label><input type="text" id="arm-customer" list="ar-cust-list"><datalist id="ar-cust-list"></datalist></div>
+      <div class="fg"><label>ครบกำหนด (วัน)</label><input type="number" id="arm-credit-days" value="30" min="0"></div>
+      <div class="fg"><label>อ้างอิง Q/SO</label><select id="arm-ref"><option value="">-- ไม่มี --</option></select></div>
+      <div class="fg"><label>ยอดก่อน VAT (฿)</label><input type="number" id="arm-subtotal" step="0.01" oninput="calcARTotal()"></div>
+      <div class="fg"><label>VAT 7% (฿)</label><input type="number" id="arm-vat" step="0.01" readonly style="background:#f0f4f8"></div>
+      <div class="fg"><label>ยอดรวม (฿)</label><input type="number" id="arm-total" step="0.01" readonly style="background:#f0f4f8;font-weight:700"></div>
+      <div class="fg"><label>ชำระแล้ว (฿)</label><input type="number" id="arm-paid" value="0" step="0.01" oninput="calcARStatus()"></div>
+      <div class="fg"><label>สถานะ</label><select id="arm-status"><option value="draft">ร่าง</option><option value="sent">ส่งแล้ว</option><option value="partial">ชำระบางส่วน</option><option value="paid">ชำระแล้ว</option><option value="overdue">เกินกำหนด</option></select></div>
+      <div class="fg full"><label>หมายเหตุ</label><textarea id="arm-note" rows="2"></textarea></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('ar-modal')">ยกเลิก</button><button class="btn btn-blue" onclick="saveAR()">💾 บันทึก</button></div>
+  </div>
+</div>
+<!-- AP -->
+<div class="modal-overlay" id="ap-modal">
+  <div class="modal">
+    <h2 id="ap-modal-title">สร้างใบวางบิล (AP)</h2>
+    <div class="form-row">
+      <div class="fg"><label>เลขที่</label><input type="text" id="apm-num" placeholder="BILL-2569-001"></div>
+      <div class="fg"><label>วันที่</label><input type="date" id="apm-date"></div>
+      <div class="fg full"><label>ซัพพลายเออร์</label><select id="apm-supplier"><option value="">-- เลือกซัพพลาย --</option></select></div>
+      <div class="fg"><label>เครดิต (วัน)</label><input type="number" id="apm-credit-days" value="30" min="0"></div>
+      <div class="fg"><label>อ้างอิง PO</label><select id="apm-ref"><option value="">-- ไม่มี --</option></select></div>
+      <div class="fg"><label>ยอดก่อน VAT (฿)</label><input type="number" id="apm-subtotal" step="0.01" oninput="calcAPTotal()"></div>
+      <div class="fg"><label>VAT 7% (฿)</label><input type="number" id="apm-vat" step="0.01" readonly style="background:#f0f4f8"></div>
+      <div class="fg"><label>ยอดรวม (฿)</label><input type="number" id="apm-total" step="0.01" readonly style="background:#f0f4f8;font-weight:700"></div>
+      <div class="fg"><label>ชำระแล้ว (฿)</label><input type="number" id="apm-paid" value="0" step="0.01"></div>
+      <div class="fg"><label>สถานะ</label><select id="apm-status"><option value="pending">รอชำระ</option><option value="partial">ชำระบางส่วน</option><option value="paid">ชำระแล้ว</option><option value="overdue">เกินกำหนด</option></select></div>
+      <div class="fg full"><label>หมายเหตุ</label><textarea id="apm-note" rows="2"></textarea></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('ap-modal')">ยกเลิก</button><button class="btn btn-blue" onclick="saveAP()">💾 บันทึก</button></div>
+  </div>
+</div>
+<!-- INCOME/EXPENSE TXN -->
+<div class="modal-overlay" id="txn-modal">
+  <div class="modal" style="max-width:500px">
+    <h2 id="txn-modal-title">บันทึกรายได้/ค่าใช้จ่าย</h2>
+    <div class="form-row">
+      <div class="fg"><label>ประเภท</label><select id="txnm-type"><option value="income">รายได้</option><option value="expense">ค่าใช้จ่าย</option></select></div>
+      <div class="fg"><label>วันที่</label><input type="date" id="txnm-date"></div>
+      <div class="fg"><label>หมวดหมู่</label><input type="text" id="txnm-category" placeholder="เช่น ค่าเช่า"></div>
+      <div class="fg"><label>รหัสบัญชี</label><select id="txnm-account"><option value="">-- เลือกบัญชี --</option></select></div>
+      <div class="fg full"><label>รายละเอียด</label><input type="text" id="txnm-desc" placeholder="รายละเอียดรายการ"></div>
+      <div class="fg"><label>จำนวนเงิน (฿)</label><input type="number" id="txnm-amount" step="0.01" min="0"></div>
+      <div class="fg"><label>มี VAT?</label><select id="txnm-has-vat"><option value="0">ไม่มี VAT</option><option value="1">มี VAT 7%</option></select></div>
+      <div class="fg full"><label>หมายเหตุ</label><textarea id="txnm-note" rows="2"></textarea></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('txn-modal')">ยกเลิก</button><button class="btn btn-blue" onclick="saveTxn()">💾 บันทึก</button></div>
+  </div>
+</div>
+<!-- BANK ACCOUNT -->
+<div class="modal-overlay" id="bank-acc-modal">
+  <div class="modal" style="max-width:460px">
+    <h2 id="bank-acc-modal-title">บัญชีธนาคาร</h2>
+    <div class="form-row">
+      <div class="fg full"><label>ชื่อบัญชี</label><input type="text" id="bankam-name" placeholder="เช่น กระแสรายวัน SCB"></div>
+      <div class="fg"><label>ธนาคาร</label><input type="text" id="bankam-bank" placeholder="เช่น SCB, KBank"></div>
+      <div class="fg"><label>เลขบัญชี</label><input type="text" id="bankam-number" placeholder="XXX-X-XXXXX-X"></div>
+      <div class="fg"><label>ยอดเริ่มต้น (฿)</label><input type="number" id="bankam-balance" value="0" step="0.01"></div>
+      <div class="fg"><label>ประเภท</label><select id="bankam-type"><option value="current">กระแสรายวัน</option><option value="savings">ออมทรัพย์</option><option value="cash">เงินสด</option></select></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('bank-acc-modal')">ยกเลิก</button><button class="btn btn-blue" onclick="saveBankAcc()">💾 บันทึก</button></div>
+  </div>
+</div>
+<!-- BANK TXN -->
+<div class="modal-overlay" id="bank-txn-modal">
+  <div class="modal" style="max-width:480px">
+    <h2 id="bank-txn-modal-title">บันทึกรายการเดินบัญชี</h2>
+    <div class="form-row">
+      <div class="fg full"><label>บัญชีธนาคาร</label><select id="btxnm-account"><option value="">-- เลือกบัญชี --</option></select></div>
+      <div class="fg"><label>ประเภท</label><select id="btxnm-type"><option value="deposit">รับเงิน</option><option value="withdrawal">จ่ายเงิน</option></select></div>
+      <div class="fg"><label>วันที่</label><input type="date" id="btxnm-date"></div>
+      <div class="fg full"><label>รายละเอียด</label><input type="text" id="btxnm-desc" placeholder="รายละเอียดรายการ"></div>
+      <div class="fg"><label>จำนวนเงิน (฿)</label><input type="number" id="btxnm-amount" step="0.01" min="0"></div>
+      <div class="fg"><label>อ้างอิง</label><input type="text" id="btxnm-ref" placeholder="เลขที่เช็ค..."></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('bank-txn-modal')">ยกเลิก</button><button class="btn btn-blue" onclick="saveBankTxn()">💾 บันทึก</button></div>
+  </div>
+</div>
+<!-- JOURNAL -->
+<div class="modal-overlay" id="journal-modal">
+  <div class="modal">
+    <h2 id="journal-modal-title">บันทึกสมุดรายวัน</h2>
+    <div class="form-row">
+      <div class="fg"><label>วันที่</label><input type="date" id="jrnm-date"></div>
+      <div class="fg"><label>เลขที่อ้างอิง</label><input type="text" id="jrnm-ref" placeholder="JV-001"></div>
+      <div class="fg full"><label>คำอธิบาย</label><input type="text" id="jrnm-desc" placeholder="รายละเอียดรายการ"></div>
+      <div class="fg"><label>บัญชีเดบิต (Dr.)</label><select id="jrnm-debit"><option value="">-- เลือกบัญชี --</option></select></div>
+      <div class="fg"><label>บัญชีเครดิต (Cr.)</label><select id="jrnm-credit"><option value="">-- เลือกบัญชี --</option></select></div>
+      <div class="fg"><label>จำนวนเงิน (฿)</label><input type="number" id="jrnm-amount" step="0.01" min="0"></div>
+      <div class="fg full"><label>หมายเหตุ</label><textarea id="jrnm-note" rows="2"></textarea></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('journal-modal')">ยกเลิก</button><button class="btn btn-blue" onclick="saveJournal()">💾 บันทึก</button></div>
+  </div>
+</div>
+<!-- FIXED ASSET -->
+<div class="modal-overlay" id="asset-modal">
+  <div class="modal">
+    <h2 id="asset-modal-title">เพิ่มสินทรัพย์ถาวร</h2>
+    <div class="form-row">
+      <div class="fg"><label>รหัสสินทรัพย์</label><input type="text" id="assetm-code" placeholder="FA-001"></div>
+      <div class="fg"><label>หมวดหมู่</label><select id="assetm-category"><option value="land">ที่ดิน</option><option value="building">อาคาร</option><option value="machinery">เครื่องจักร</option><option value="vehicle">ยานพาหนะ</option><option value="equipment">อุปกรณ์สำนักงาน</option><option value="other">อื่นๆ</option></select></div>
+      <div class="fg full"><label>ชื่อสินทรัพย์</label><input type="text" id="assetm-name" placeholder="ชื่อสินทรัพย์"></div>
+      <div class="fg"><label>วันที่ซื้อ</label><input type="date" id="assetm-date"></div>
+      <div class="fg"><label>ราคาทุน (฿)</label><input type="number" id="assetm-cost" step="0.01" min="0"></div>
+      <div class="fg"><label>มูลค่าซาก (฿)</label><input type="number" id="assetm-salvage" value="0" step="0.01" min="0"></div>
+      <div class="fg"><label>อายุการใช้งาน (ปี)</label><input type="number" id="assetm-life" value="5" min="1"></div>
+      <div class="fg"><label>วิธีคิดค่าเสื่อม</label><select id="assetm-method"><option value="straight-line">เส้นตรง</option></select></div>
+      <div class="fg full"><label>หมายเหตุ</label><textarea id="assetm-note" rows="2"></textarea></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('asset-modal')">ยกเลิก</button><button class="btn btn-blue" onclick="saveAsset()">💾 บันทึก</button></div>
+  </div>
+</div>
+<!-- PAYROLL -->
+<div class="modal-overlay" id="payroll-modal">
+  <div class="modal">
+    <h2 id="payroll-modal-title">บันทึกเงินเดือน</h2>
+    <div class="form-row">
+      <div class="fg full"><label>พนักงาน</label><input type="text" id="prm-name" list="payroll-emp-list"><datalist id="payroll-emp-list"></datalist></div>
+      <div class="fg"><label>ตำแหน่ง</label><input type="text" id="prm-position" placeholder="ตำแหน่ง"></div>
+      <div class="fg"><label>เดือน</label><select id="prm-month"><option value="1">มกราคม</option><option value="2">กุมภาพันธ์</option><option value="3">มีนาคม</option><option value="4">เมษายน</option><option value="5">พฤษภาคม</option><option value="6">มิถุนายน</option><option value="7">กรกฎาคม</option><option value="8">สิงหาคม</option><option value="9">กันยายน</option><option value="10">ตุลาคม</option><option value="11">พฤศจิกายน</option><option value="12">ธันวาคม</option></select></div>
+      <div class="fg"><label>ปี (พ.ศ.)</label><input type="number" id="prm-year" placeholder="2569"></div>
+      <div class="fg"><label>เงินเดือนพื้นฐาน (฿)</label><input type="number" id="prm-basic" step="0.01" oninput="calcPayroll()"></div>
+      <div class="fg"><label>เบี้ยเลี้ยง/โบนัส (฿)</label><input type="number" id="prm-allowance" value="0" step="0.01" oninput="calcPayroll()"></div>
+      <div class="fg"><label>หักอื่นๆ (฿)</label><input type="number" id="prm-deduction" value="0" step="0.01" oninput="calcPayroll()"></div>
+      <div class="fg"><label>ประกันสังคม 5% (฿)</label><input type="number" id="prm-ss" step="0.01" readonly style="background:#f0f4f8"></div>
+      <div class="fg"><label>ภาษีหัก ณ ที่จ่าย (฿)</label><input type="number" id="prm-tax" value="0" step="0.01" oninput="calcPayroll()"></div>
+      <div class="fg"><label>เงินเดือนสุทธิ (฿)</label><input type="number" id="prm-net" step="0.01" readonly style="background:#f0f4f8;font-weight:700;color:var(--navy)"></div>
+      <div class="fg"><label>สถานะ</label><select id="prm-status"><option value="draft">ร่าง</option><option value="paid">จ่ายแล้ว</option></select></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('payroll-modal')">ยกเลิก</button><button class="btn btn-blue" onclick="savePayroll()">💾 บันทึก</button></div>
+  </div>
+</div>
+
 </body>
 </html>

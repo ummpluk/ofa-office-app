@@ -1,9 +1,8 @@
 @echo off
-cd /d "C:\Users\ASUS\Desktop\ONEFORALL\DOC\โฟลเดอร์ใหม่\OFAFirebaseHosting2\ofa-hosting"
+cd /d "C:\Users\ASUS\Desktop\ONEFORALL"
 
-git add .
-git commit -m "update"
-git push
+echo Pushing accounting system to GitHub...
+git push origin main
 
 echo.
 echo Push complete! Check GitHub Actions:
