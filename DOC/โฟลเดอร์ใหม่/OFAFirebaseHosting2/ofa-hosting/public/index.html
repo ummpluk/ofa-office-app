@@ -1731,8 +1731,7 @@ function printTaxInvoice(id){
         <div class="print-custbox" style="margin-bottom:0;border-left-color:#e53935">
           <h4>ผู้ซื้อ / Buyer</h4>
           <div class="pcname">${so.customer||'-'}</div>
-          ${cust.address?`<div class="pcdet">${cust.address.replace(/
-/g,'<br>')}</div>`:''}
+          ${cust.address?`<div class="pcdet">${cust.address.replace(/\n/g,'<br>')}</div>`:''}
           <div class="pcdet">${so.contact_name?'ผู้ติดต่อ: '+so.contact_name:''}${so.contact_phone?' &nbsp;โทร '+so.contact_phone:''}</div>
           <div class="pcdet" style="font-weight:700;color:#0d2137">เลขประจำตัวผู้เสียภาษี: ${cust.tax_id||'-'}</div>
         </div>
