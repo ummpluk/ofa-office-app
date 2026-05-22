@@ -1,19 +1,19 @@
 # OFA REMINDER
 
-> อัปเดต: 2026-05-21 17:00
+> อัปเดต: 2026-05-22 09:00
 > แหล่งข้อมูล: `hermes cron list` + `project-notes.md`
 
 ## ⏳ รอดำเนินการ
 
 | Cron Job | รันครั้งถัดไป | สถานะ |
 |----------|---------------|-------|
-| OFA REMINDER (อัปเดต REMINDER.md) | 2026-05-22 08:00 | ⏳ ทุกชั่วโมง จ-ศ 8-17 |
+| OFA REMINDER (อัปเดต REMINDER.md) | 2026-05-22 10:00 | ⏳ ทุกชั่วโมง จ-ศ 8-17 |
 | FB Post: OFA Packaging | 2027-04-29 08:30 | ⏳ ทุก 29 เม.ย. ของทุกปี |
 
 ## 📋 ค้างอยู่
 
-- ⚠️ OFA REMINDER (`5f93cf8c0d61`): `deliver` ตั้งเป็น `none` — ไม่มีการส่งผลลัพธ์ไปยังปลายทาง (แก้ไข: `hermes cron edit 5f93cf8c0d61` แล้วเปลี่ยน delivery)
-  - Last run: 2026-05-21 16:02 ✅ (แต่ไม่ถูกส่งเพราะไม่มี delivery target)
+- ⚠️ OFA REMINDER (`5f93cf8c0d61`): `deliver` ตั้งเป็น `none` — ไม่มีการส่งผลลัพธ์ไปยังปลายทาง
+  - Last run: 2026-05-22 09:00 ✅ (แต่ไม่ถูกส่งเพราะไม่มี delivery target)
 - *(project-notes: ไม่มีงานค้าง)*
 
 ## ✅ งานเสร็จล่าสุด (Facebook)
