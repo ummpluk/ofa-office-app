@@ -241,6 +241,31 @@ label{font-size:13px;font-weight:600;color:var(--text2)}
   .print-items-tbl td:first-child{white-space:normal;word-break:break-word}
   .signer-sel{display:none!important}
 }
+/* ===== ACCOUNTING STYLES ===== */
+.acc-kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+.acc-kpi .stat-card{padding:16px 20px}
+.fin-block{background:#fff;border-radius:10px;overflow:hidden;margin-bottom:16px;box-shadow:var(--sh)}
+.fin-group-hdr{background:#e8f0fe;font-weight:700;color:var(--navy);padding:10px 20px;font-size:13.5px;letter-spacing:.3px}
+.fin-item-row{display:flex;justify-content:space-between;padding:8px 20px 8px 36px;font-size:13.5px;border-bottom:1px solid #f0f4f8;transition:background .1s}
+.fin-item-row:hover{background:#f7f9fc}
+.fin-subtotal-row{display:flex;justify-content:space-between;padding:9px 20px;font-weight:700;background:#f0f4f8;font-size:13.5px}
+.fin-grand-row{display:flex;justify-content:space-between;padding:12px 20px;font-weight:800;background:#0d2137;color:#fff;font-size:15px}
+.acc-status-paid{background:#e8f5e9;color:#2e7d32}
+.acc-status-partial{background:#fff8e1;color:#e65100}
+.acc-status-sent{background:#e3f2fd;color:#1565c0}
+.acc-status-draft{background:#f5f5f5;color:#616161}
+.acc-status-overdue{background:#ffebee;color:#c62828}
+.acc-status-pending{background:#f5f5f5;color:#616161}
+.acc-status-confirmed{background:#e3f2fd;color:#1565c0}
+.acc-status-received{background:#e8f5e9;color:#2e7d32}
+.acc-status-cancelled{background:#ffebee;color:#c62828}
+.acc-type-income{background:#e8f5e9;color:#2e7d32}
+.acc-type-expense{background:#ffebee;color:#c62828}
+.acc-badge-asset{background:#e3f2fd;color:#1565c0}
+.acc-badge-liability{background:#ffebee;color:#c62828}
+.acc-badge-equity{background:#fff8e1;color:#e65100}
+.acc-badge-revenue{background:#e8f5e9;color:#2e7d32}
+.acc-badge-expense{background:#f5f5f5;color:#616161}
 </style>
 </head>
 <body>
@@ -301,6 +326,19 @@ label{font-size:13px;font-weight:600;color:var(--text2)}
         <div class="nav-section" id="nav-admin" style="display:none">
           <div class="nav-label">จัดการ</div>
           <div class="nav-item" onclick="go('roles')"><span class="ico">🔐</span>สิทธิ์ผู้ใช้</div>
+        </div>
+        <div class="nav-section" id="nav-accounting" style="display:none">
+          <div class="nav-label">บัญชี</div>
+          <div class="nav-item" onclick="go('coa')"><span class="ico">📒</span>ผังบัญชี</div>
+          <div class="nav-item" onclick="go('ar')"><span class="ico">💵</span>ลูกหนี้ (AR)</div>
+          <div class="nav-item" onclick="go('ap')"><span class="ico">💸</span>เจ้าหนี้ (AP)</div>
+          <div class="nav-item" onclick="go('income-expense')"><span class="ico">📊</span>รายได้/ค่าใช้จ่าย</div>
+          <div class="nav-item" onclick="go('vat')"><span class="ico">🧾</span>รายงาน VAT</div>
+          <div class="nav-item" onclick="go('financial')"><span class="ico">📈</span>งบการเงิน</div>
+          <div class="nav-item" onclick="go('bank')"><span class="ico">🏦</span>เงินสด/ธนาคาร</div>
+          <div class="nav-item" onclick="go('journal')"><span class="ico">📔</span>สมุดรายวัน</div>
+          <div class="nav-item" onclick="go('fixed-assets')"><span class="ico">🏗️</span>สินทรัพย์ถาวร</div>
+          <div class="nav-item" onclick="go('payroll')"><span class="ico">👷</span>เงินเดือน</div>
         </div>
       </div>
       <div class="sidebar-footer">
@@ -528,6 +566,207 @@ label{font-size:13px;font-weight:600;color:var(--text2)}
         </div>
       </div>
 
+      <!-- ===== MODULE 1: CHART OF ACCOUNTS ===== -->
+      <div class="section" id="sec-coa">
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
+          <div><div class="page-title">📒 ผังบัญชี</div><div class="page-subtitle">Chart of Accounts — รหัสบัญชีทั้งหมด</div></div>
+          <button class="btn btn-blue" onclick="openCOAModal()">+ เพิ่มบัญชี</button>
+        </div>
+        <div class="card">
+          <div class="toolbar">
+            <input type="text" id="coaf-search" placeholder="🔍 ค้นหาบัญชี..." oninput="filterCOA()">
+            <select id="coaf-type" onchange="filterCOA()">
+              <option value="">ทุกประเภท</option>
+              <option value="asset">สินทรัพย์</option><option value="liability">หนี้สิน</option>
+              <option value="equity">ส่วนทุน</option><option value="revenue">รายได้</option><option value="expense">ค่าใช้จ่าย</option>
+            </select>
+          </div>
+          <table><thead><tr><th>รหัสบัญชี</th><th>ชื่อบัญชี</th><th>ประเภท</th><th>จัดการ</th></tr></thead>
+          <tbody id="coa-tb"></tbody></table>
+        </div>
+      </div>
+
+      <!-- ===== MODULE 2: AR (Accounts Receivable) ===== -->
+      <div class="section" id="sec-ar">
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
+          <div><div class="page-title">💵 ลูกหนี้การค้า (AR)</div><div class="page-subtitle">Accounts Receivable — ติดตามการชำระเงินจากลูกค้า</div></div>
+          <button class="btn btn-blue" onclick="openARModal()">+ สร้างใบแจ้งหนี้</button>
+        </div>
+        <div class="acc-kpi" id="ar-kpi"></div>
+        <div class="card">
+          <div class="toolbar">
+            <input type="text" id="arf-search" placeholder="🔍 ค้นหา..." oninput="filterAR()">
+            <select id="arf-status" onchange="filterAR()">
+              <option value="">ทุกสถานะ</option>
+              <option value="draft">ร่าง</option><option value="sent">ส่งแล้ว</option>
+              <option value="partial">ชำระบางส่วน</option><option value="paid">ชำระแล้ว</option><option value="overdue">เกินกำหนด</option>
+            </select>
+          </div>
+          <table><thead><tr><th>เลขที่</th><th>ลูกค้า</th><th>อ้างอิง Q/SO</th><th>ยอดรวม</th><th>ชำระแล้ว</th><th>คงค้าง</th><th>ครบกำหนด</th><th>สถานะ</th><th>จัดการ</th></tr></thead>
+          <tbody id="ar-tb"></tbody></table>
+        </div>
+      </div>
+
+      <!-- ===== MODULE 3: AP (Accounts Payable) ===== -->
+      <div class="section" id="sec-ap">
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
+          <div><div class="page-title">💸 เจ้าหนี้การค้า (AP)</div><div class="page-subtitle">Accounts Payable — ติดตามการชำระเงินให้ซัพพลาย</div></div>
+          <button class="btn btn-blue" onclick="openAPModal()">+ สร้างใบวางบิล</button>
+        </div>
+        <div class="acc-kpi" id="ap-kpi"></div>
+        <div class="card">
+          <div class="toolbar">
+            <input type="text" id="apf-search" placeholder="🔍 ค้นหา..." oninput="filterAP()">
+            <select id="apf-status" onchange="filterAP()">
+              <option value="">ทุกสถานะ</option>
+              <option value="pending">รอชำระ</option><option value="partial">ชำระบางส่วน</option>
+              <option value="paid">ชำระแล้ว</option><option value="overdue">เกินกำหนด</option>
+            </select>
+          </div>
+          <table><thead><tr><th>เลขที่</th><th>ซัพพลาย</th><th>อ้างอิง PO</th><th>ยอดรวม</th><th>ชำระแล้ว</th><th>คงค้าง</th><th>ครบกำหนด</th><th>สถานะ</th><th>จัดการ</th></tr></thead>
+          <tbody id="ap-tb"></tbody></table>
+        </div>
+      </div>
+
+      <!-- ===== MODULE 4: INCOME/EXPENSE ===== -->
+      <div class="section" id="sec-income-expense">
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
+          <div><div class="page-title">📊 รายได้ / ค่าใช้จ่าย</div><div class="page-subtitle">บันทึกรายรับ-รายจ่ายทั่วไป</div></div>
+          <button class="btn btn-blue" onclick="openTxnModal()">+ บันทึกรายการ</button>
+        </div>
+        <div class="acc-kpi" id="txn-kpi"></div>
+        <div class="card">
+          <div class="toolbar">
+            <input type="text" id="txnf-search" placeholder="🔍 ค้นหา..." oninput="filterTxn()">
+            <select id="txnf-type" onchange="filterTxn()">
+              <option value="">ทุกประเภท</option><option value="income">รายได้</option><option value="expense">ค่าใช้จ่าย</option>
+            </select>
+            <select id="txnf-month" onchange="filterTxn()"><option value="">ทุกเดือน</option></select>
+          </div>
+          <table><thead><tr><th>วันที่</th><th>ประเภท</th><th>หมวดหมู่</th><th>รายละเอียด</th><th>รหัสบัญชี</th><th>จำนวนเงิน</th><th>VAT</th><th>จัดการ</th></tr></thead>
+          <tbody id="txn-tb"></tbody></table>
+        </div>
+      </div>
+
+      <!-- ===== MODULE 5: VAT REPORT ===== -->
+      <div class="section" id="sec-vat">
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
+          <div><div class="page-title">🧾 รายงาน VAT</div><div class="page-subtitle">ภาษีมูลค่าเพิ่มขาเข้า-ขาออก</div></div>
+          <div class="year-sel">
+            <button class="yr-btn" onclick="chgVatMonth(-1)">‹</button>
+            <div class="yr-val" id="vat-period-disp" style="min-width:90px"></div>
+            <button class="yr-btn" onclick="chgVatMonth(1)">›</button>
+          </div>
+        </div>
+        <div class="acc-kpi" id="vat-kpi"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div class="card">
+            <div class="card-header"><h3>VAT ขาออก (Output VAT)</h3><p>จากใบแจ้งหนี้ลูกค้า</p></div>
+            <table><thead><tr><th>วันที่</th><th>ลูกค้า</th><th>เลขที่</th><th>ยอดก่อน VAT</th><th>VAT 7%</th></tr></thead>
+            <tbody id="vat-out-tb"></tbody></table>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>VAT ขาเข้า (Input VAT)</h3><p>จากใบวางบิลซัพพลาย</p></div>
+            <table><thead><tr><th>วันที่</th><th>ซัพพลาย</th><th>เลขที่</th><th>ยอดก่อน VAT</th><th>VAT 7%</th></tr></thead>
+            <tbody id="vat-in-tb"></tbody></table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== MODULE 6: FINANCIAL STATEMENTS ===== -->
+      <div class="section" id="sec-financial">
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
+          <div><div class="page-title">📈 งบการเงิน</div><div class="page-subtitle">P&L และงบดุล</div></div>
+          <div class="year-sel">
+            <button class="yr-btn" onclick="chgFinYear(-1)">‹</button>
+            <div class="yr-val" id="fin-year-disp"></div>
+            <button class="yr-btn" onclick="chgFinYear(1)">›</button>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div>
+            <div class="card-header" style="background:#fff;border-radius:var(--r) var(--r) 0 0;padding:16px 20px;border-bottom:1px solid var(--border)"><h3>📋 งบกำไรขาดทุน (P&L)</h3></div>
+            <div id="fin-pl"></div>
+          </div>
+          <div>
+            <div class="card-header" style="background:#fff;border-radius:var(--r) var(--r) 0 0;padding:16px 20px;border-bottom:1px solid var(--border)"><h3>⚖️ งบดุล (Balance Sheet)</h3></div>
+            <div id="fin-bs"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== MODULE 7: BANK/CASH ===== -->
+      <div class="section" id="sec-bank">
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
+          <div><div class="page-title">🏦 เงินสด / ธนาคาร</div><div class="page-subtitle">บัญชีธนาคารและรายการเดินบัญชี</div></div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-outline" onclick="openBankAccModal()">+ บัญชีใหม่</button>
+            <button class="btn btn-blue" onclick="openBankTxnModal()">+ รายการ</button>
+          </div>
+        </div>
+        <div id="bank-accounts-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px"></div>
+        <div class="card">
+          <div class="card-header">
+            <div><h3>รายการเดินบัญชี</h3></div>
+            <select id="bankf-acc" onchange="filterBankTxn()" style="padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;background:#fff;font-family:inherit">
+              <option value="">ทุกบัญชี</option>
+            </select>
+          </div>
+          <table><thead><tr><th>วันที่</th><th>บัญชี</th><th>รายละเอียด</th><th>ประเภท</th><th>จำนวนเงิน</th><th>ยอดคงเหลือ</th><th>จัดการ</th></tr></thead>
+          <tbody id="bank-txn-tb"></tbody></table>
+        </div>
+      </div>
+
+      <!-- ===== MODULE 8: JOURNAL/GENERAL LEDGER ===== -->
+      <div class="section" id="sec-journal">
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
+          <div><div class="page-title">📔 สมุดรายวัน</div><div class="page-subtitle">General Journal — บันทึกรายการทางบัญชี</div></div>
+          <button class="btn btn-blue" onclick="openJournalModal()">+ บันทึกรายการ</button>
+        </div>
+        <div class="card">
+          <div class="toolbar">
+            <input type="text" id="jrnf-search" placeholder="🔍 ค้นหา..." oninput="filterJournal()">
+            <select id="jrnf-month" onchange="filterJournal()"><option value="">ทุกเดือน</option></select>
+          </div>
+          <table><thead><tr><th>วันที่</th><th>เลขที่อ้างอิง</th><th>คำอธิบาย</th><th>บัญชีเดบิต</th><th>บัญชีเครดิต</th><th>จำนวนเงิน</th><th>จัดการ</th></tr></thead>
+          <tbody id="journal-tb"></tbody></table>
+        </div>
+      </div>
+
+      <!-- ===== MODULE 9: FIXED ASSETS ===== -->
+      <div class="section" id="sec-fixed-assets">
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
+          <div><div class="page-title">🏗️ สินทรัพย์ถาวร</div><div class="page-subtitle">Fixed Assets — ติดตามค่าเสื่อมราคา</div></div>
+          <button class="btn btn-blue" onclick="openAssetModal()">+ เพิ่มสินทรัพย์</button>
+        </div>
+        <div class="acc-kpi" id="asset-kpi"></div>
+        <div class="card">
+          <div class="toolbar"><input type="text" id="assetf-search" placeholder="🔍 ค้นหาสินทรัพย์..." oninput="filterAssets()"></div>
+          <table><thead><tr><th>รหัส</th><th>ชื่อสินทรัพย์</th><th>หมวดหมู่</th><th>ราคาทุน</th><th>ค่าเสื่อมสะสม</th><th>มูลค่าสุทธิ</th><th>วันที่ซื้อ</th><th>อายุ(ปี)</th><th>จัดการ</th></tr></thead>
+          <tbody id="asset-tb"></tbody></table>
+        </div>
+      </div>
+
+      <!-- ===== MODULE 10: PAYROLL ===== -->
+      <div class="section" id="sec-payroll">
+        <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
+          <div><div class="page-title">👷 เงินเดือน</div><div class="page-subtitle">Payroll — บันทึกการจ่ายเงินเดือนพนักงาน</div></div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="year-sel">
+              <button class="yr-btn" onclick="chgPayrollMonth(-1)">‹</button>
+              <div class="yr-val" id="payroll-period-disp" style="min-width:90px"></div>
+              <button class="yr-btn" onclick="chgPayrollMonth(1)">›</button>
+            </div>
+            <button class="btn btn-blue" onclick="openPayrollModal()">+ บันทึกเงินเดือน</button>
+          </div>
+        </div>
+        <div class="acc-kpi" id="payroll-kpi"></div>
+        <div class="card">
+          <table><thead><tr><th>พนักงาน</th><th>ตำแหน่ง</th><th>เงินเดือนพื้นฐาน</th><th>เบี้ยเลี้ยง</th><th>หัก SS 5%</th><th>หักภาษี</th><th>สุทธิ</th><th>สถานะ</th><th>จัดการ</th></tr></thead>
+          <tbody id="payroll-tb"></tbody></table>
+        </div>
+      </div>
+
     </main>
   </div>
 </div>
@@ -731,872 +970,230 @@ label{font-size:13px;font-weight:600;color:var(--text2)}
   </div>
 </div>
 
-<!-- CONFIRM -->
-<div class="confirm-overlay" id="conf-overlay">
-  <div class="confirm-box">
-    <div class="ci">🗑️</div>
-    <h3 id="conf-title">ยืนยันการลบ?</h3>
-    <p id="conf-msg">รายการนี้จะถูกลบถาวร</p>
-    <div class="confirm-btns">
-      <button class="btn btn-outline" onclick="closeConf()">ยกเลิก</button>
-      <button class="btn btn-danger" id="conf-ok">ลบ</button>
-    </div>
-  </div>
-</div>
+<!-- ===== ACCOUNTING MODALS ===== -->
 
-<div class="toast" id="toast"></div>
-
-<!-- PRINT OVERLAY -->
-<div class="print-overlay" id="print-overlay">
-  <div class="print-doc" id="print-doc">
-    <div class="print-actions">
-      <button class="btn btn-outline btn-sm" onclick="closePrint()">✕ ปิด</button>
-      <button class="btn btn-blue btn-sm" onclick="doPrint()">🖨️ พิมพ์ / บันทึก PDF</button>
-    </div>
-    <div class="print-body" id="print-body"></div>
-  </div>
-</div>
-
-<!-- MODAL: SALE ORDER -->
-<div class="modal-overlay" id="so-modal">
-  <div class="modal">
-    <h2 id="so-modal-title">สร้างใบสั่งขาย (SO)</h2>
+<!-- MODAL: COA -->
+<div class="modal-overlay" id="coam-modal">
+  <div class="modal" style="max-width:460px">
+    <h2 id="coa-modal-title">เพิ่มบัญชีใหม่</h2>
     <div class="form-row">
-      <div class="fg"><label>เลข SO (ออโต้)</label><input type="text" id="som-num" placeholder="กำลังสร้าง..." readonly style="background:#f0f4f8;cursor:default;color:var(--navy);font-weight:600"></div>
-      <div class="fg"><label>วันที่</label><input type="date" id="som-date"></div>
-      <div class="fg full"><label>ลูกค้า / บริษัท</label><select id="som-cust" onchange="onSOCustChange()"><option value="">-- เลือกลูกค้า --</option></select></div>
-      <div class="fg"><label>ผู้ติดต่อ</label><input type="text" id="som-contact" readonly style="background:#f0f4f8;cursor:default"></div>
-      <div class="fg"><label>โทรศัพท์</label><input type="text" id="som-phone" readonly style="background:#f0f4f8;cursor:default"></div>
-      <div class="fg"><label>สถานะ</label>
-        <select id="som-status">
-          <option value="pending">รอดำเนินการ</option>
-          <option value="processing">กำลังผลิต</option>
-          <option value="shipped">จัดส่งแล้ว</option>
-          <option value="completed">เสร็จสิ้น</option>
-          <option value="cancelled">ยกเลิก</option>
+      <div class="fg"><label>รหัสบัญชี</label><input type="text" id="coam-code" placeholder="เช่น 1101"></div>
+      <div class="fg"><label>ประเภทบัญชี</label>
+        <select id="coam-type">
+          <option value="asset">สินทรัพย์</option><option value="liability">หนี้สิน</option>
+          <option value="equity">ส่วนทุน</option><option value="revenue">รายได้</option><option value="expense">ค่าใช้จ่าย</option>
         </select>
       </div>
-      <div class="fg"><label>วันส่งสินค้าที่นัด</label><input type="date" id="som-delivery"></div>
-      <div class="fg"><label>เชื่อมใบเสนอราคา</label>
-        <select id="som-quote"><option value="">-- ไม่เชื่อม --</option></select>
-      </div>
-    </div>
-    <div class="items-sec">
-      <h4>รายการสินค้า</h4>
-      <div class="items-hdr"><span>รายการ</span><span>จำนวน</span><span>หน่วย</span><span>ราคา/หน่วย</span><span></span></div>
-      <div id="so-items-wrap"></div>
-      <button class="btn btn-outline btn-sm" onclick="addSOItem()" style="margin-top:8px">+ เพิ่มรายการ</button>
-      <div class="total-box">
-        <div class="total-row"><span>ราคาก่อนภาษี</span><span id="so-sub-disp">฿0</span></div>
-        <div class="total-row"><span>VAT 7%</span><span id="so-vat-disp">฿0</span></div>
-        <div class="total-row total-grand"><span>รวมทั้งสิ้น</span><span id="so-tot-disp">฿0</span></div>
-      </div>
-    </div>
-    <div class="form-row" style="margin-top:14px">
-      <div class="fg full"><label>หมายเหตุ</label><textarea id="som-note" placeholder="เงื่อนไข, การชำระเงิน..."></textarea></div>
+      <div class="fg full"><label>ชื่อบัญชี</label><input type="text" id="coam-name" placeholder="เช่น เงินสด, ลูกหนี้การค้า"></div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeModal('so-modal')">ยกเลิก</button>
-      <button class="btn btn-blue" onclick="saveSO()">💾 บันทึก</button>
+      <button class="btn btn-outline" onclick="closeModal('coam-modal')">ยกเลิก</button>
+      <button class="btn btn-blue" onclick="saveCOA()">💾 บันทึก</button>
     </div>
   </div>
 </div>
 
-<script>
-// ========== SUPABASE INIT ==========
-const SUPA_URL = 'https://kxzghbxgrkvwnfpahkxk.supabase.co';
-const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt4emdoYnhncmt2d25mcGFoa3hrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNDUwOTUsImV4cCI6MjA5NDcyMTA5NX0.GWVhTeJZWtE8XmYBs2XhD8ncLZ6wNh3WDSMBDZs9VPs';
-const { createClient } = supabase;
-const db = createClient(SUPA_URL, SUPA_KEY);
-
-// ========== STATE ==========
-let allQ=[], allP=[], allC=[], allSO=[], currentUser=null;
-let currentProfile=null;
-let editId=null, editCol=null, confirmCb=null;
-let curYear=new Date().getFullYear();
-let chMon=null, chStat=null, chMonFull=null, chTop=null, chPie=null;
-let iIdx=0;
-let editSOId=null, soIIdx=0;
-const isTab = new URLSearchParams(location.search).get('tab') === 'signup';
-
-const TM=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-const TMF=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
-const SL={draft:'ร่าง',sent:'ส่งแล้ว',approved:'ยืนยัน',cancelled:'ยกเลิก'};
-const SB={draft:'b-gray',sent:'b-blue',approved:'b-green',cancelled:'b-red'};
-
-// ========== AUTH ==========
-let authMode='login';
-function switchTab(m){
-  authMode=m;
-  document.getElementById('tab-login').className=m==='login'?'active':'';
-  document.getElementById('tab-signup').className=m==='signup'?'active':'';
-  document.getElementById('l-btn').textContent=m==='login'?'เข้าสู่ระบบ':'สมัครสมาชิก';
-  document.getElementById('login-err').textContent='';
-}
-async function doAuth(){
-  const e=document.getElementById('l-email').value.trim();
-  const p=document.getElementById('l-pass').value;
-  const err=document.getElementById('login-err');
-  err.textContent='';
-  if(!e||!p){err.textContent='กรุณากรอกอีเมลและรหัสผ่าน';return;}
-  const fn=authMode==='login'
-    ?db.auth.signInWithPassword({email:e,password:p})
-    :db.auth.signUp({email:e,password:p});
-  const {error}=await fn;
-  if(error){err.textContent=authMode==='login'?'อีเมลหรือรหัสผ่านไม่ถูกต้อง':'สมัครไม่สำเร็จ: '+error.message;}
-}
-document.getElementById('l-pass')?.addEventListener('keydown',e=>{if(e.key==='Enter')doAuth();});
-async function doLogout(){await db.auth.signOut();}
-
-// Fallback: hide loader after 8s if auth hasn't fired
-setTimeout(()=>{
-  const lo=document.getElementById('lo');
-  if(lo && lo.style.display!=='none'){
-    lo.style.display='none';
-    document.getElementById('login-page').style.display='flex';
-  }
-},8000);
-
-// Auth state
-db.auth.onAuthStateChange((event,session)=>{
-  document.getElementById('lo').style.display='none';
-  if(session?.user){
-    currentUser=session.user;
-    document.getElementById('login-page').style.display='none';
-    document.getElementById('app').style.display='block';
-    const em=session.user.email||'';
-    document.getElementById('u-av').textContent=em.charAt(0).toUpperCase();
-    document.getElementById('u-name').textContent=em.split('@')[0];
-    document.getElementById('u-email').textContent=em;
-    document.getElementById('u-debug').textContent='ID: '+session.user.id;
-    initApp();
-  }else{
-    currentUser=null;
-    document.getElementById('login-page').style.display='flex';
-    document.getElementById('app').style.display='none';
-  }
-});
-
-// ========== ROLE & STATE ==========
-let myRole = 'sales'; // default
-let allS=[], allPO=[], allRoles=[];
-let editSId=null, editPOId=null, editRoleId=null;
-let poIIdx=0;
-
-const ROLE_LABELS = {director:'👑 กรรมการ', purchasing:'🛒 จัดซื้อ', sales:'💼 ขาย', viewer:'👁 ทั่วไป'};
-const ROLE_BADGES = {director:'b-gold', purchasing:'b-blue', sales:'b-green', viewer:'b-gray'};
-const PO_STATUS = {pending:'รอดำเนินการ', confirmed:'ยืนยันแล้ว', received:'รับสินค้าแล้ว', paid:'ชำระแล้ว', cancelled:'ยกเลิก'};
-const PO_BADGE = {pending:'b-gray', confirmed:'b-blue', received:'b-green', paid:'b-gold', cancelled:'b-red'};
-const SO_STATUS = {pending:'รอดำเนินการ', processing:'กำลังผลิต', shipped:'จัดส่งแล้ว', completed:'เสร็จสิ้น', cancelled:'ยกเลิก'};
-const SO_BADGE = {pending:'b-gray', processing:'b-blue', shipped:'b-gold', completed:'b-green', cancelled:'b-red'};
-
-async function loadMyRole(){
-  // ลอง match ด้วย user_id ก่อน (สำหรับคนที่เคย link แล้ว)
-  let {data} = await db.from('user_roles').select('*').eq('user_id', currentUser.id).single();
-  if(!data){
-    // Fallback: match ด้วย email แล้ว link user_id ให้อัตโนมัติ
-    const res = await db.from('user_roles').select('*').eq('email', currentUser.email).single();
-    data = res.data;
-    if(data) db.from('user_roles').update({user_id: currentUser.id}).eq('id', data.id);
-  }
-  currentProfile = data || null;
-  myRole = data?.role || 'sales';
-  // แสดงชื่อจริงใน sidebar
-  if(data?.display_name){
-    document.getElementById('u-name').textContent = data.display_name;
-    document.getElementById('u-av').textContent = data.display_name.charAt(0).toUpperCase();
-  }
-  applyRoleUI();
-}
-
-function applyRoleUI(){
-  const canSeeRestricted = ['director','purchasing'].includes(myRole);
-  const isDirector = myRole === 'director';
-  document.getElementById('nav-restricted').style.display = canSeeRestricted ? '' : 'none';
-  document.getElementById('nav-admin').style.display = isDirector ? '' : 'none';
-  // Profit column in quotation table visibility handled in render
-}
-
-// ========== INIT ==========
-async function initApp(){
-  const now=new Date();
-  document.getElementById('dash-date').textContent=`วันที่ ${now.getDate()} ${TMF[now.getMonth()]} พ.ศ. ${now.getFullYear()+543}`;
-  curYear=now.getFullYear();
-  document.getElementById('yr-disp').textContent=curYear+543;
-  await loadMyRole();
-  await Promise.all([loadQ(),loadP(),loadC(),loadSO(),loadRoles()]);
-  if(['director','purchasing'].includes(myRole)) await Promise.all([loadS(),loadPO()]);
-  renderDashboard();
-  setupRealtimeQ();
-}
-
-// ========== LOAD DATA ==========
-async function loadQ(){
-  const {data}=await db.from('quotations').select('*').order('created_at',{ascending:false});
-  allQ=data||[];
-  renderQTable();
-  populateMonthFilter();
-  populateCustDatalist();
-}
-async function loadP(){
-  const {data}=await db.from('products').select('*').order('created_at',{ascending:false});
-  allP=data||[];
-  renderPTable();
-}
-async function loadC(){
-  const {data}=await db.from('contacts').select('*').order('created_at',{ascending:false});
-  allC=data||[];
-  renderCTable();
-  populateCustDatalist();
-}
-
-// Realtime subscription for quotations
-function setupRealtimeQ(){
-  db.channel('quotations-ch')
-    .on('postgres_changes',{event:'*',schema:'public',table:'quotations'},()=>loadQ())
-    .subscribe();
-}
-
-// ========== NAVIGATION ==========
-function go(name){
-  // Access control
-  if(['suppliers','purchase-orders'].includes(name) && !['director','purchasing'].includes(myRole)){
-    toast('คุณไม่มีสิทธิ์เข้าถึงส่วนนี้','error'); return;
-  }
-  if(name==='roles' && myRole!=='director'){
-    toast('เฉพาะกรรมการเท่านั้น','error'); return;
-  }
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.getElementById('sec-'+name).classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(n=>{
-    if(n.getAttribute('onclick')?.includes("'"+name+"'"))n.classList.add('active');
-  });
-  if(name==='monthly')renderMonthly();
-  if(name==='customers')renderCustomers();
-  if(name==='dashboard')renderDashboard();
-  if(name==='suppliers')renderSTable();
-  if(name==='purchase-orders')renderPOTable();
-  if(name==='sale-orders')renderSOTable();
-  if(name==='roles')renderRolesTable();
-}
-
-// ========== DASHBOARD ==========
-function renderDashboard(){
-  const now=new Date();
-  const ym=now.getFullYear()*100+now.getMonth();
-  const prevYm=now.getMonth()===0?(now.getFullYear()-1)*100+11:now.getFullYear()*100+now.getMonth()-1;
-  const thisM=allQ.filter(q=>ymOf(q)===ym);
-  const prevM=allQ.filter(q=>ymOf(q)===prevYm);
-  const apprSum=arr=>arr.filter(q=>q.status==='approved').reduce((a,q)=>a+(q.total||0),0);
-  const rev=apprSum(thisM), prevRev=apprSum(prevM);
-  document.getElementById('s-rev').textContent='฿'+fmt(rev);
-  document.getElementById('s-qc').textContent=thisM.length;
-  document.getElementById('s-ap').textContent=thisM.filter(q=>q.status==='approved').length;
-  document.getElementById('s-cu').textContent=new Set(allQ.map(q=>q.customer).filter(Boolean)).size;
-  const ce=document.getElementById('s-rev-c');
-  if(prevRev>0){const c=Math.round((rev-prevRev)/prevRev*100);ce.textContent=(c>=0?'▲ +':'▼ ')+c+'% จากเดือนก่อน';ce.className='stat-change '+(c>=0?'up':'dn');}
-  // Recent
-  const tb=document.getElementById('recent-tb');
-  const r=allQ.slice(0,5);
-  tb.innerHTML=r.length?r.map(q=>`<tr><td><b>${q.number||'-'}</b></td><td>${q.customer||'-'}</td><td>฿${fmt(q.total||0)}</td><td><span class="badge ${SB[q.status]||'b-gray'}">${SL[q.status]||q.status}</span></td><td>${q.date||'-'}</td></tr>`).join('')
-    :'<tr><td colspan="5" class="empty"><div class="ei">📄</div><p>ยังไม่มีข้อมูล</p></td></tr>';
-  renderMon6Chart(); renderStatusPie();
-}
-
-function ymOf(q){if(!q.date)return-1;const d=new Date(q.date);return d.getFullYear()*100+d.getMonth();}
-
-function renderMon6Chart(){
-  const now=new Date(); const labels=[],data=[];
-  for(let i=5;i>=0;i--){
-    const d=new Date(now.getFullYear(),now.getMonth()-i,1);
-    const ym=d.getFullYear()*100+d.getMonth();
-    labels.push(TM[d.getMonth()]+(i===0?' (นี้':''));
-    data.push(allQ.filter(q=>ymOf(q)===ym&&q.status==='approved').reduce((a,q)=>a+(q.total||0),0));
-  }
-  const ctx=document.getElementById('ch-monthly').getContext('2d');
-  if(chMon)chMon.destroy();
-  chMon=new Chart(ctx,{type:'bar',data:{labels,datasets:[{data,backgroundColor:'rgba(30,136,229,.75)',borderRadius:7,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{callback:v=>'฿'+fmt(v)}},x:{grid:{display:false}}}}});
-}
-
-function renderStatusPie(){
-  const c={draft:0,sent:0,approved:0,cancelled:0};
-  allQ.forEach(q=>{if(c[q.status]!==undefined)c[q.status]++;});
-  const ctx=document.getElementById('ch-status').getContext('2d');
-  if(chStat)chStat.destroy();
-  chStat=new Chart(ctx,{type:'doughnut',data:{labels:['ร่าง','ส่งแล้ว','ยืนยัน','ยกเลิก'],datasets:[{data:[c.draft,c.sent,c.approved,c.cancelled],backgroundColor:['#9e9e9e','#1e88e5','#43a047','#e53935'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:12}}}},cutout:'62%'}});
-}
-
-// ========== MONTHLY ==========
-function chgYear(d){curYear+=d;document.getElementById('yr-disp').textContent=curYear+543;renderMonthly();}
-
-function renderMonthly(){
-  const yq=allQ.filter(q=>q.date&&new Date(q.date).getFullYear()===curYear);
-  const mo=Array.from({length:12},(_,i)=>{
-    const mq=yq.filter(q=>new Date(q.date).getMonth()===i);
-    const ap=mq.filter(q=>q.status==='approved');
-    return{m:i,cnt:mq.length,ap:ap.length,tot:ap.reduce((a,q)=>a+(q.total||0),0)};
-  });
-  const totY=mo.reduce((a,m)=>a+m.tot,0);
-  const totCnt=mo.reduce((a,m)=>a+m.cnt,0);
-  const best=mo.reduce((a,m)=>m.tot>a.tot?m:a,mo[0]);
-  document.getElementById('mo-summary').innerHTML=`
-    <div class="month-stat"><div class="val">฿${fmt(totY)}</div><div class="lbl">ยอดรวมทั้งปี ${curYear+543}</div></div>
-    <div class="month-stat"><div class="val">${totCnt}</div><div class="lbl">ใบเสนอราคาทั้งหมด</div></div>
-    <div class="month-stat"><div class="val">${TMF[best.m]}</div><div class="lbl">เดือนที่ขายดีที่สุด</div></div>`;
-  document.getElementById('mo-ch-lbl').textContent=`ยอดที่ยืนยัน ปี พ.ศ. ${curYear+543}`;
-  const ctx=document.getElementById('ch-mo-full').getContext('2d');
-  if(chMonFull)chMonFull.destroy();
-  chMonFull=new Chart(ctx,{type:'bar',data:{labels:TM,datasets:[{data:mo.map(m=>m.tot),backgroundColor:mo.map(m=>m.tot>0?'rgba(30,136,229,.8)':'rgba(200,210,220,.4)'),borderRadius:7,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{callback:v=>'฿'+fmt(v)}},x:{grid:{display:false}}}}});
-  document.getElementById('mo-tb').innerHTML=mo.map((m,i)=>{
-    const prev=i>0?mo[i-1].tot:null;
-    const ch=prev!==null&&prev>0?Math.round((m.tot-prev)/prev*100):null;
-    const chStr=ch!==null?`<span style="color:${ch>=0?'var(--green)':'var(--red)'}">${ch>=0?'▲ +':'▼ '}${ch}%</span>`:'-';
-    return`<tr><td>${TMF[m.m]}</td><td>${m.cnt}</td><td>${m.ap}</td><td>฿${fmt(m.tot)}</td><td>${chStr}</td></tr>`;
-  }).join('');
-}
-
-// ========== HELPERS ==========
-function fmt(n){return Number(n||0).toLocaleString('th-TH',{minimumFractionDigits:0,maximumFractionDigits:2});}
-function toast(msg,type='info'){
-  const t=document.getElementById('toast');
-  t.textContent=msg;
-  t.className='toast show'+(type==='error'?' error':type==='success'?' success':'');
-  clearTimeout(window._toastT);
-  window._toastT=setTimeout(()=>t.classList.remove('show'),3000);
-}
-function closeModal(id){document.getElementById(id).style.display='none';}
-function openConf(title,msg,cb){
-  document.getElementById('conf-title').textContent=title;
-  document.getElementById('conf-msg').textContent=msg;
-  document.getElementById('conf-ok').onclick=()=>{closeConf();cb();};
-  document.getElementById('conf-overlay').style.display='flex';
-}
-function closeConf(){document.getElementById('conf-overlay').style.display='none';}
-
-// ========== CUSTOMERS ANALYTICS ==========
-function renderCustomers(){
-  const custMap={};
-  allQ.filter(q=>q.status==='approved'&&q.customer).forEach(q=>{
-    if(!custMap[q.customer])custMap[q.customer]={name:q.customer,tot:0,cnt:0};
-    custMap[q.customer].tot+=(q.total||0);
-    custMap[q.customer].cnt++;
-  });
-  const arr=Object.values(custMap).sort((a,b)=>b.tot-a.tot);
-  const top5=arr.slice(0,5);
-  const ctx=document.getElementById('ch-topcust').getContext('2d');
-  if(chTop)chTop.destroy();
-  chTop=new Chart(ctx,{type:'bar',data:{labels:top5.map(c=>c.name.slice(0,15)),datasets:[{data:top5.map(c=>c.tot),backgroundColor:'rgba(30,136,229,.8)',borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{callback:v=>'฿'+fmt(v)}},x:{grid:{display:false}}}}});
-  const ctx2=document.getElementById('ch-custpie').getContext('2d');
-  if(chPie)chPie.destroy();
-  const colors=['#1e88e5','#43a047','#f57c00','#8e24aa','#e53935','#00acc1','#6d4c41','#546e7a'];
-  chPie=new Chart(ctx2,{type:'pie',data:{labels:top5.map(c=>c.name.slice(0,12)),datasets:[{data:top5.map(c=>c.tot),backgroundColor:colors.slice(0,top5.length),borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:11}}}}}});
-  const rl=document.getElementById('rank-list');
-  if(!arr.length){rl.innerHTML='<div style="padding:40px;text-align:center;color:var(--text2)">ยังไม่มีข้อมูล</div>';return;}
-  rl.innerHTML=arr.map((c,i)=>`<div style="display:flex;align-items:center;padding:14px 0;border-bottom:1px solid var(--border)"><div style="width:36px;height:36px;border-radius:50%;background:${i<3?'var(--blue)':'#e3e8f0'};color:${i<3?'#fff':'var(--navy)'};display:flex;align-items:center;justify-content:center;font-weight:700;margin-right:14px;flex-shrink:0">${i+1}</div><div style="flex:1"><div style="font-weight:600">${c.name}</div><div style="font-size:12px;color:var(--text2)">${c.cnt} ออเดอร์</div></div><div style="text-align:right"><div style="font-weight:700;color:var(--blue)">฿${fmt(c.tot)}</div></div></div>`).join('');
-}
-
-// ========== QUOTATIONS ==========
-function renderQTable(){
-  const search=(document.getElementById('qf-search')?.value||'').toLowerCase();
-  const stat=document.getElementById('qf-status')?.value||'';
-  const mon=document.getElementById('qf-month')?.value||'';
-  let rows=allQ.filter(q=>{
-    if(stat&&q.status!==stat)return false;
-    if(mon&&(!q.date||q.date.slice(0,7)!==mon))return false;
-    if(search&&!(q.customer||'').toLowerCase().includes(search)&&!(q.number||'').toLowerCase().includes(search))return false;
-    return true;
-  });
-  const tb=document.getElementById('q-tb');
-  if(!rows.length){tb.innerHTML='<tr><td colspan="7"><div class="empty"><div class="ei">📄</div><p>ยังไม่มีข้อมูล</p></div></td></tr>';return;}
-  tb.innerHTML=rows.map(q=>{
-    const num=q.number||'-';const cust=q.customer||'-';
-    return`<tr><td><b>${num}</b></td><td>${cust}</td><td>${(q.items||[]).map(it=>it.name||it.product_name||'').filter(Boolean).join(', ').slice(0,40)||'-'}</td><td>฿${fmt(q.total||0)}</td><td><span class="badge ${SB[q.status]||'b-gray'}">${SL[q.status]||q.status}</span></td><td>${q.date||'-'}</td><td style="white-space:nowrap"><button class="btn btn-sm btn-outline" onclick="printQ('${q.id}')" title="พิมพ์/PDF">🖨️</button> <button class="btn btn-sm btn-outline" onclick="openQModal('${q.id}')">✏️</button> <button class="btn btn-sm btn-danger" onclick="openConf('ลบใบเสนอราคา','ลบ ${num.replace(/'/g,'')}?',()=>deleteQ('${q.id}'))">🗑️</button></td></tr>`;
-  }).join('');
-}
-function filterQ(){renderQTable();}
-function populateMonthFilter(){
-  const sel=document.getElementById('qf-month');if(!sel)return;
-  const months=new Set(allQ.map(q=>q.date?q.date.slice(0,7):null).filter(Boolean));
-  const sorted=[...months].sort().reverse();
-  sel.innerHTML='<option value="">ทุกเดือน</option>'+sorted.map(m=>`<option value="${m}">${m}</option>`).join('');
-}
-function populateCustDatalist(){
-  const dl=document.getElementById('cust-list');if(!dl)return;
-  const names=new Set([...allQ.map(q=>q.customer),...allC.map(c=>c.company_name)].filter(Boolean));
-  dl.innerHTML=[...names].map(n=>`<option value="${n}">`).join('');
-}
-function buildContactOptions(selectedCompany=''){
-  return '<option value="">-- เลือกลูกค้า --</option>'+
-    allC.map(c=>`<option value="${(c.company_name||'').replace(/"/g,'&quot;')}" data-contact="${(c.contact_name||'').replace(/"/g,'&quot;')}" data-phone="${(c.phone||'').replace(/"/g,'&quot;')}"${c.company_name===selectedCompany?' selected':''}>${c.company_name||''}</option>`).join('');
-}
-function buildProductOptions(selectedName=''){
-  return '<option value="">-- เลือกสินค้า --</option>'+
-    allP.map(p=>`<option value="${(p.name||'').replace(/"/g,'&quot;')}" data-price="${p.price||0}" data-unit="${(p.unit||'').replace(/"/g,'&quot;')}"${p.name===selectedName?' selected':''}>${p.code?p.code+' – ':''} ${p.name||''}</option>`).join('');
-}
-function onQCustChange(){
-  const sel=document.getElementById('qm-cust');
-  const opt=sel.options[sel.selectedIndex];
-  document.getElementById('qm-contact').value=opt?.dataset?.contact||'';
-  document.getElementById('qm-phone').value=opt?.dataset?.phone||'';
-}
-function onSOCustChange(){
-  const sel=document.getElementById('som-cust');
-  const opt=sel.options[sel.selectedIndex];
-  document.getElementById('som-contact').value=opt?.dataset?.contact||'';
-  document.getElementById('som-phone').value=opt?.dataset?.phone||'';
-}
-function onItemSel(sel){
-  const opt=sel.options[sel.selectedIndex];
-  const row=sel.closest('.item-row');
-  const priceInput=row.querySelector('.it-price');
-  const unitInput=row.querySelector('.it-unit');
-  if(priceInput&&opt?.dataset?.price!==undefined) priceInput.value=parseFloat(opt.dataset.price)||0;
-  if(unitInput&&opt?.dataset?.unit!==undefined) unitInput.value=opt.dataset.unit||'';
-}
-function openQModal(id){
-  editId=id||null;
-  document.getElementById('q-modal-title').textContent=id?'แก้ไขใบเสนอราคา':'สร้างใบเสนอราคาใหม่';
-  if(id){
-    const q=allQ.find(x=>x.id===id);if(!q)return;
-    document.getElementById('qm-num').value=q.number||'';
-    document.getElementById('qm-date').value=q.date||'';
-    document.getElementById('qm-cust').value=q.customer||'';
-    document.getElementById('qm-contact').value=q.contact_name||'';
-    document.getElementById('qm-phone').value=q.contact_phone||'';
-    document.getElementById('qm-addr').value=q.customer_address||'';
-    document.getElementById('qm-status').value=q.status||'draft';
-    document.getElementById('qm-validity').value=q.validity_days||30;
-    document.getElementById('qm-note').value=q.note||'';
-    iIdx=0;document.getElementById('items-wrap').innerHTML='';
-    (q.items||[]).forEach(it=>addItem(it));
-  } else {
-    document.getElementById('qm-num').value='กำลังสร้าง...';
-    genQNumber().then(n=>document.getElementById('qm-num').value=n);
-    document.getElementById('qm-date').value=new Date().toISOString().split('T')[0];
-    document.getElementById('qm-cust').value='';document.getElementById('qm-contact').value='';
-    document.getElementById('qm-phone').value='';document.getElementById('qm-addr').value='';document.getElementById('qm-status').value='draft';
-    document.getElementById('qm-validity').value=30;document.getElementById('qm-note').value='';
-    iIdx=0;document.getElementById('items-wrap').innerHTML='';addItem();
-  }
-  calcTotals();
-  populateCustDatalist();
-  document.getElementById('q-modal').style.display='flex';
-}
-function addItem(it){
-  const idx=iIdx++;const div=document.createElement('div');
-  div.className='item-row';div.id='irow-'+idx;
-  div.innerHTML=`<input type="text" placeholder="ชื่อสินค้า" class="it-name" value="${(it?.name||it?.product_name||'').replace(/"/g,'&quot;')}" oninput="calcTotals()"><input type="number" min="1" class="it-qty" value="${it?.qty||1}" oninput="calcTotals()"><input type="text" placeholder="หน่วย" class="it-unit" value="${(it?.unit||'').replace(/"/g,'&quot;')}" list="unit-list" style="padding:8px 6px"><input type="number" min="0" step="0.01" class="it-price" value="${it?.price||it?.unit_price||0}" oninput="calcTotals()"><button class="btn btn-sm btn-danger" onclick="document.getElementById('irow-${idx}').remove();calcTotals()">✕</button>`;
-  document.getElementById('items-wrap').appendChild(div);calcTotals();
-}
-function calcTotals(){
-  let sub=0;
-  document.querySelectorAll('#items-wrap .item-row').forEach(r=>{sub+=(parseFloat(r.querySelector('.it-qty')?.value||0))*(parseFloat(r.querySelector('.it-price')?.value||0));});
-  const vat=sub*0.07;
-  document.getElementById('sub-disp').textContent='฿'+fmt(sub);
-  document.getElementById('vat-disp').textContent='฿'+fmt(vat);
-  document.getElementById('tot-disp').textContent='฿'+fmt(sub+vat);
-}
-async function saveQ(){
-  const items=[...document.querySelectorAll('#items-wrap .item-row')].map(r=>({name:r.querySelector('.it-name').value,qty:parseFloat(r.querySelector('.it-qty').value)||1,unit:r.querySelector('.it-unit')?.value||'',price:parseFloat(r.querySelector('.it-price').value)||0,total:(parseFloat(r.querySelector('.it-qty').value)||1)*(parseFloat(r.querySelector('.it-price').value)||0)})).filter(it=>it.name.trim());
-  const sub=items.reduce((a,it)=>a+it.total,0);
-  const payload={number:document.getElementById('qm-num').value.trim(),date:document.getElementById('qm-date').value,customer:document.getElementById('qm-cust').value.trim(),contact_name:document.getElementById('qm-contact').value.trim(),contact_phone:document.getElementById('qm-phone').value.trim(),customer_address:document.getElementById('qm-addr').value.trim(),status:document.getElementById('qm-status').value,validity_days:parseInt(document.getElementById('qm-validity').value)||30,note:document.getElementById('qm-note').value.trim(),items,subtotal:sub,vat:sub*0.07,total:sub*1.07,user_id:currentUser.id};
-  const {error}=editId?await db.from('quotations').update(payload).eq('id',editId):await db.from('quotations').insert(payload);
-  if(error){toast('บันทึกไม่สำเร็จ: '+error.message,'error');return;}
-  closeModal('q-modal');toast('บันทึกสำเร็จ','success');loadQ();
-}
-async function deleteQ(id){
-  const {error}=await db.from('quotations').delete().eq('id',id);
-  if(error){toast('ลบไม่สำเร็จ','error');return;}
-  toast('ลบแล้ว','success');loadQ();
-}
-
-// ========== PRODUCTS ==========
-function renderPTable(){
-  const search=(document.getElementById('pf-search')?.value||'').toLowerCase();
-  let rows=allP.filter(p=>!search||(p.name||'').toLowerCase().includes(search)||(p.code||'').toLowerCase().includes(search));
-  const tb=document.getElementById('p-tb');
-  if(!rows.length){tb.innerHTML='<tr><td colspan="6"><div class="empty"><div class="ei">📦</div><p>ยังไม่มีสินค้า</p></div></td></tr>';return;}
-  tb.innerHTML=rows.map(p=>`<tr><td>${p.code||'-'}</td><td><b>${p.name||'-'}</b></td><td>${p.type||'-'}</td><td>฿${fmt(p.price||0)}</td><td>${p.unit||'-'}</td><td style="white-space:nowrap"><button class="btn btn-sm btn-outline" onclick="openPModal('${p.id}')">✏️</button> <button class="btn btn-sm btn-danger" onclick="openConf('ลบสินค้า','ลบ ${(p.name||'').replace(/'/g,'')}?',()=>deleteP('${p.id}'))">🗑️</button></td></tr>`).join('');
-}
-function filterP(){renderPTable();}
-function openPModal(id){
-  editId=id||null;
-  document.getElementById('p-modal-title').textContent=id?'แก้ไขสินค้า':'เพิ่มสินค้า';
-  if(id){const p=allP.find(x=>x.id===id);if(!p)return;document.getElementById('pm-code').value=p.code||'';document.getElementById('pm-type').value=p.type||'LDPE';document.getElementById('pm-name').value=p.name||'';document.getElementById('pm-price').value=p.price||0;document.getElementById('pm-unit').value=p.unit||'ชิ้น';document.getElementById('pm-desc').value=p.description||'';}
-  else{['pm-code','pm-name','pm-desc'].forEach(i=>document.getElementById(i).value='');document.getElementById('pm-price').value=0;document.getElementById('pm-type').value='LDPE';document.getElementById('pm-unit').value='ชิ้น';}
-  document.getElementById('p-modal').style.display='flex';
-}
-async function saveP(){
-  const payload={code:document.getElementById('pm-code').value.trim(),type:document.getElementById('pm-type').value,name:document.getElementById('pm-name').value.trim(),price:parseFloat(document.getElementById('pm-price').value)||0,unit:document.getElementById('pm-unit').value,description:document.getElementById('pm-desc').value.trim(),user_id:currentUser.id};
-  if(!payload.name){toast('กรุณากรอกชื่อสินค้า','error');return;}
-  const {error}=editId?await db.from('products').update(payload).eq('id',editId):await db.from('products').insert(payload);
-  if(error){toast('บันทึกไม่สำเร็จ: '+error.message,'error');return;}
-  closeModal('p-modal');toast('บันทึกสำเร็จ','success');loadP();
-}
-async function deleteP(id){const {error}=await db.from('products').delete().eq('id',id);if(error){toast('ลบไม่สำเร็จ','error');return;}toast('ลบแล้ว','success');loadP();}
-
-// ========== CONTACTS ==========
-function renderCTable(){
-  const search=(document.getElementById('cf-search')?.value||'').toLowerCase();
-  let rows=allC.filter(c=>!search||(c.company_name||'').toLowerCase().includes(search)||(c.contact_name||'').toLowerCase().includes(search));
-  const tb=document.getElementById('c-tb');
-  if(!rows.length){tb.innerHTML='<tr><td colspan="6"><div class="empty"><div class="ei">👥</div><p>ยังไม่มีลูกค้า</p></div></td></tr>';return;}
-  tb.innerHTML=rows.map(c=>`<tr><td><b>${c.company_name||'-'}</b></td><td>${c.contact_name||'-'}</td><td>${c.phone||'-'}</td><td>${c.email||'-'}</td><td>${(c.address||'-').slice(0,40)}</td><td style="white-space:nowrap"><button class="btn btn-sm btn-outline" onclick="openCModal('${c.id}')">✏️</button> <button class="btn btn-sm btn-danger" onclick="openConf('ลบลูกค้า','ลบ ${(c.company_name||'').replace(/'/g,'')}?',()=>deleteC('${c.id}'))">🗑️</button></td></tr>`).join('');
-}
-function filterC(){renderCTable();}
-function openCModal(id){
-  editId=id||null;
-  document.getElementById('c-modal-title').textContent=id?'แก้ไขลูกค้า':'เพิ่มลูกค้า';
-  if(id){const c=allC.find(x=>x.id===id);if(!c)return;document.getElementById('cm-company').value=c.company_name||'';document.getElementById('cm-name').value=c.contact_name||'';document.getElementById('cm-phone').value=c.phone||'';document.getElementById('cm-email').value=c.email||'';document.getElementById('cm-line').value=c.line_id||'';document.getElementById('cm-address').value=c.address||'';document.getElementById('cm-taxid').value=c.tax_id||'';document.getElementById('cm-note').value=c.note||'';}
-  else{['cm-company','cm-name','cm-phone','cm-email','cm-line','cm-address','cm-taxid','cm-note'].forEach(i=>document.getElementById(i).value='');}
-  document.getElementById('c-modal').style.display='flex';
-}
-async function saveC(){
-  const payload={company_name:document.getElementById('cm-company').value.trim(),contact_name:document.getElementById('cm-name').value.trim(),phone:document.getElementById('cm-phone').value.trim(),email:document.getElementById('cm-email').value.trim(),line_id:document.getElementById('cm-line').value.trim(),address:document.getElementById('cm-address').value.trim(),tax_id:document.getElementById('cm-taxid').value.trim(),note:document.getElementById('cm-note').value.trim(),user_id:currentUser.id};
-  if(!payload.company_name){toast('กรุณากรอกชื่อบริษัท','error');return;}
-  const {error}=editId?await db.from('contacts').update(payload).eq('id',editId):await db.from('contacts').insert(payload);
-  if(error){toast('บันทึกไม่สำเร็จ: '+error.message,'error');return;}
-  closeModal('c-modal');toast('บันทึกสำเร็จ','success');loadC();
-}
-async function deleteC(id){const {error}=await db.from('contacts').delete().eq('id',id);if(error){toast('ลบไม่สำเร็จ','error');return;}toast('ลบแล้ว','success');loadC();}
-
-// ========== SUPPLIERS ==========
-async function loadS(){
-  const {data}=await db.from('suppliers').select('*').order('created_at',{ascending:false});
-  allS=data||[];renderSTable();
-}
-function renderSTable(){
-  const search=(document.getElementById('sf-search')?.value||'').toLowerCase();
-  let rows=allS.filter(s=>!search||(s.name||'').toLowerCase().includes(search)||(s.code||'').toLowerCase().includes(search));
-  const tb=document.getElementById('s-tb');
-  if(!rows.length){tb.innerHTML='<tr><td colspan="7"><div class="empty"><div class="ei">🏭</div><p>ยังไม่มีซัพพลายเออร์</p></div></td></tr>';return;}
-  tb.innerHTML=rows.map(s=>`<tr><td>${s.code||'-'}</td><td><b>${s.name||'-'}</b></td><td>${s.contact_name||'-'}</td><td>${s.phone||'-'}</td><td>${(s.products||'-').slice(0,30)}</td><td>${s.payment_terms||'-'}</td><td style="white-space:nowrap"><button class="btn btn-sm btn-outline" onclick="openSModal('${s.id}')">✏️</button> <button class="btn btn-sm btn-danger" onclick="openConf('ลบซัพพลายเออร์','ลบ ${(s.name||'').replace(/'/g,'')}?',()=>deleteS('${s.id}'))">🗑️</button></td></tr>`).join('');
-}
-function filterS(){renderSTable();}
-function openSModal(id){
-  editSId=id||null;
-  document.getElementById('s-modal-title').textContent=id?'แก้ไขซัพพลายเออร์':'เพิ่มซัพพลายเออร์';
-  if(id){const s=allS.find(x=>x.id===id);if(!s)return;document.getElementById('sm-code').value=s.code||'';document.getElementById('sm-name').value=s.name||'';document.getElementById('sm-contact').value=s.contact_name||'';document.getElementById('sm-phone').value=s.phone||'';document.getElementById('sm-email').value=s.email||'';document.getElementById('sm-line').value=s.line_id||'';document.getElementById('sm-products').value=s.products||'';document.getElementById('sm-payment').value=s.payment_terms||'เงินสด';document.getElementById('sm-taxid').value=s.tax_id||'';document.getElementById('sm-address').value=s.address||'';document.getElementById('sm-note').value=s.note||'';}
-  else{['sm-code','sm-name','sm-contact','sm-phone','sm-email','sm-line','sm-products','sm-taxid','sm-address','sm-note'].forEach(i=>document.getElementById(i).value='');document.getElementById('sm-payment').value='เงินสด';}
-  document.getElementById('s-modal').style.display='flex';
-}
-async function saveS(){
-  const payload={code:document.getElementById('sm-code').value.trim(),name:document.getElementById('sm-name').value.trim(),contact_name:document.getElementById('sm-contact').value.trim(),phone:document.getElementById('sm-phone').value.trim(),email:document.getElementById('sm-email').value.trim(),line_id:document.getElementById('sm-line').value.trim(),products:document.getElementById('sm-products').value.trim(),payment_terms:document.getElementById('sm-payment').value,tax_id:document.getElementById('sm-taxid').value.trim(),address:document.getElementById('sm-address').value.trim(),note:document.getElementById('sm-note').value.trim()};
-  if(!payload.name){toast('กรุณากรอกชื่อบริษัท','error');return;}
-  const {error}=editSId?await db.from('suppliers').update(payload).eq('id',editSId):await db.from('suppliers').insert(payload);
-  if(error){toast('บันทึกไม่สำเร็จ: '+error.message,'error');return;}
-  closeModal('s-modal');toast('บันทึกสำเร็จ','success');loadS();
-}
-async function deleteS(id){const {error}=await db.from('suppliers').delete().eq('id',id);if(error){toast('ลบไม่สำเร็จ','error');return;}toast('ลบแล้ว','success');loadS();}
-
-// ========== PURCHASE ORDERS ==========
-async function loadPO(){
-  const {data}=await db.from('purchase_orders').select('*').order('created_at',{ascending:false});
-  allPO=data||[];renderPOTable();
-}
-function renderPOTable(){
-  const search=(document.getElementById('pof-search')?.value||'').toLowerCase();
-  const stat=document.getElementById('pof-status')?.value||'';
-  let rows=allPO.filter(p=>{if(stat&&p.status!==stat)return false;if(search&&!(p.number||'').toLowerCase().includes(search)&&!(p.supplier_name||'').toLowerCase().includes(search))return false;return true;});
-  const tb=document.getElementById('po-tb');
-  if(!rows.length){tb.innerHTML='<tr><td colspan="8"><div class="empty"><div class="ei">📋</div><p>ยังไม่มี PO</p></div></td></tr>';return;}
-  tb.innerHTML=rows.map(p=>`<tr><td><b>${p.number||'-'}</b></td><td>${p.supplier_name||'-'}</td><td>${(p.items||[]).map(it=>it.name||'').filter(Boolean).join(', ').slice(0,30)||'-'}</td><td>฿${fmt(p.total||0)}</td><td><span class="badge ${PO_BADGE[p.status]||'b-gray'}">${PO_STATUS[p.status]||p.status}</span></td><td>${p.order_date||'-'}</td><td>${p.expected_date||'-'}</td><td style="white-space:nowrap"><button class="btn btn-sm btn-outline" onclick="openPOModal('${p.id}')">✏️</button> <button class="btn btn-sm btn-danger" onclick="openConf('ลบ PO','ลบ ${(p.number||'').replace(/'/g,'')}?',()=>deletePO('${p.id}'))">🗑️</button></td></tr>`).join('');
-}
-function filterPO(){renderPOTable();}
-function openPOModal(id){
-  editPOId=id||null;
-  document.getElementById('po-modal-title').textContent=id?'แก้ไข PO':'สร้างใบสั่งซื้อ (PO)';
-  const sel=document.getElementById('pom-supplier');
-  sel.innerHTML='<option value="">-- เลือกซัพพลายเออร์ --</option>'+allS.map(s=>`<option value="${s.id}" data-name="${(s.name||'').replace(/"/g,'&quot;')}">${s.code?s.code+' - ':''}${s.name}</option>`).join('');
-  const qsel=document.getElementById('pom-quote');
-  qsel.innerHTML='<option value="">-- ไม่เชื่อม --</option>'+allQ.filter(q=>q.status!=='cancelled').map(q=>`<option value="${q.id}">${q.number||q.id} - ${q.customer||''}</option>`).join('');
-  if(id){const p=allPO.find(x=>x.id===id);if(!p)return;document.getElementById('pom-num').value=p.number||'';document.getElementById('pom-date').value=p.order_date||'';document.getElementById('pom-supplier').value=p.supplier_id||'';document.getElementById('pom-expected').value=p.expected_date||'';document.getElementById('pom-status').value=p.status||'pending';document.getElementById('pom-quote').value=p.quote_id||'';document.getElementById('pom-note').value=p.note||'';poIIdx=0;document.getElementById('po-items-wrap').innerHTML='';(p.items||[]).forEach(it=>addPOItem(it));}
-  else{document.getElementById('pom-num').value='กำลังสร้าง...';genPONumber().then(n=>document.getElementById('pom-num').value=n);['pom-expected','pom-note'].forEach(i=>document.getElementById(i).value='');document.getElementById('pom-date').value=new Date().toISOString().split('T')[0];document.getElementById('pom-supplier').value='';document.getElementById('pom-status').value='pending';document.getElementById('pom-quote').value='';poIIdx=0;document.getElementById('po-items-wrap').innerHTML='';addPOItem();}
-  calcPOTotals();document.getElementById('po-modal').style.display='flex';
-}
-function addPOItem(it){
-  const idx=poIIdx++;const div=document.createElement('div');div.className='item-row';div.id='poirow-'+idx;
-  div.innerHTML=`<input type="text" placeholder="ชื่อสินค้า/วัตถุดิบ" class="it-name" value="${(it?.name||'').replace(/"/g,'&quot;')}" oninput="calcPOTotals()"><input type="number" min="1" class="it-qty" value="${it?.qty||1}" oninput="calcPOTotals()"><input type="text" placeholder="หน่วย" class="it-unit" value="${(it?.unit||'').replace(/"/g,'&quot;')}" list="unit-list" style="padding:8px 6px"><input type="number" min="0" step="0.01" class="it-price" value="${it?.price||0}" oninput="calcPOTotals()"><button class="btn btn-sm btn-danger" onclick="document.getElementById('poirow-${idx}').remove();calcPOTotals()">✕</button>`;
-  document.getElementById('po-items-wrap').appendChild(div);calcPOTotals();
-}
-function calcPOTotals(){
-  let sub=0;document.querySelectorAll('#po-items-wrap .item-row').forEach(r=>{sub+=(parseFloat(r.querySelector('.it-qty')?.value||0))*(parseFloat(r.querySelector('.it-price')?.value||0));});
-  const vat=sub*0.07;document.getElementById('po-sub-disp').textContent='฿'+fmt(sub);document.getElementById('po-vat-disp').textContent='฿'+fmt(vat);document.getElementById('po-tot-disp').textContent='฿'+fmt(sub+vat);
-}
-async function savePO(){
-  const supEl=document.getElementById('pom-supplier');const supId=supEl.value;const supName=supEl.options[supEl.selectedIndex]?.getAttribute('data-name')||'';
-  const items=[...document.querySelectorAll('#po-items-wrap .item-row')].map(r=>({name:r.querySelector('.it-name').value,qty:parseFloat(r.querySelector('.it-qty').value)||1,unit:r.querySelector('.it-unit')?.value||'',price:parseFloat(r.querySelector('.it-price').value)||0,total:(parseFloat(r.querySelector('.it-qty').value)||1)*(parseFloat(r.querySelector('.it-price').value)||0)})).filter(it=>it.name.trim());
-  const sub=items.reduce((a,it)=>a+it.total,0);
-  const payload={number:document.getElementById('pom-num').value.trim(),order_date:document.getElementById('pom-date').value,supplier_id:supId||null,supplier_name:supName,expected_date:document.getElementById('pom-expected').value||null,status:document.getElementById('pom-status').value,quote_id:document.getElementById('pom-quote').value||null,note:document.getElementById('pom-note').value.trim(),items,subtotal:sub,vat:sub*0.07,total:sub*1.07};
-  if(!supId){toast('กรุณาเลือกซัพพลายเออร์','error');return;}
-  const {error}=editPOId?await db.from('purchase_orders').update(payload).eq('id',editPOId):await db.from('purchase_orders').insert(payload);
-  if(error){toast('บันทึกไม่สำเร็จ: '+error.message,'error');return;}
-  closeModal('po-modal');toast('บันทึกสำเร็จ','success');loadPO();
-}
-async function deletePO(id){const {error}=await db.from('purchase_orders').delete().eq('id',id);if(error){toast('ลบไม่สำเร็จ','error');return;}toast('ลบแล้ว','success');loadPO();}
-
-// ========== ROLES ==========
-async function loadRoles(){
-  const {data}=await db.from('user_roles').select('*').order('created_at',{ascending:false});
-  allRoles=data||[];
-  rebuildSigners();
-  if(myRole==='director') renderRolesTable();
-}
-function rebuildSigners(){
-  // ล้างแล้วสร้างใหม่จาก DB
-  Object.keys(SIGNERS).forEach(k=>delete SIGNERS[k]);
-  allRoles.forEach(r=>{if(r.employee_code) SIGNERS[r.employee_code]={name:r.display_name||'',title:r.title||''};});
-}
-function renderRolesTable(){
-  const tb=document.getElementById('roles-tb');
-  if(!allRoles.length){tb.innerHTML='<tr><td colspan="6"><div class="empty"><div class="ei">👤</div><p>ยังไม่มีผู้ใช้</p></div></td></tr>';return;}
-  tb.innerHTML=allRoles.map(r=>`<tr><td>${r.email||'-'}</td><td>${r.display_name||'-'}</td><td><code style="background:#f0f4f8;padding:2px 6px;border-radius:4px;font-size:12px">${r.employee_code||'-'}</code></td><td style="font-size:12px;color:var(--text2)">${r.title||'-'}</td><td><span class="badge ${ROLE_BADGES[r.role]||'b-gray'}">${ROLE_LABELS[r.role]||r.role}</span></td><td style="white-space:nowrap"><button class="btn btn-sm btn-outline" onclick="openRoleModal('${r.id}')">✏️</button> <button class="btn btn-sm btn-danger" onclick="openConf('ลบสิทธิ์','ลบ ${(r.email||'').replace(/'/g,'')}?',()=>deleteRole('${r.id}'))">🗑️</button></td></tr>`).join('');
-}
-function openRoleModal(id){
-  editRoleId=id||null;
-  document.getElementById('role-modal-title').textContent=id?'แก้ไขผู้ใช้':'เพิ่มผู้ใช้';
-  if(id){
-    const r=allRoles.find(x=>x.id===id);if(!r)return;
-    document.getElementById('rm-email').value=r.email||'';
-    document.getElementById('rm-name').value=r.display_name||'';
-    document.getElementById('rm-code').value=r.employee_code||'';
-    document.getElementById('rm-title').value=r.title||'';
-    document.getElementById('rm-role').value=r.role||'sales';
-  } else {
-    document.getElementById('rm-email').value='';
-    document.getElementById('rm-name').value='';
-    document.getElementById('rm-code').value='';
-    document.getElementById('rm-title').value='';
-    document.getElementById('rm-role').value='sales';
-  }
-  document.getElementById('role-modal').style.display='flex';
-}
-async function saveRole(){
-  const email=document.getElementById('rm-email').value.trim();
-  if(!email){toast('กรุณากรอกอีเมล','error');return;}
-  const payload={email,display_name:document.getElementById('rm-name').value.trim(),employee_code:document.getElementById('rm-code').value,title:document.getElementById('rm-title').value.trim(),role:document.getElementById('rm-role').value};
-  const {error}=editRoleId?await db.from('user_roles').update(payload).eq('id',editRoleId):await db.from('user_roles').insert(payload);
-  if(error){toast('บันทึกไม่สำเร็จ: '+error.message,'error');return;}
-  closeModal('role-modal');toast('บันทึกสำเร็จ','success');loadRoles();
-}
-async function deleteRole(id){const {error}=await db.from('user_roles').delete().eq('id',id);if(error){toast('ลบไม่สำเร็จ','error');return;}toast('ลบแล้ว','success');loadRoles();}
-
-// ========== AUTO NUMBER GENERATORS ==========
-async function genQNumber(){
-  const yr=new Date().getFullYear()+543;
-  const prefix='SP'+yr;
-  const {data}=await db.from('quotations').select('number').like('number',prefix+'%').order('number',{ascending:false}).limit(1);
-  const last=(data?.[0]?.number||'').replace(prefix,'');
-  const seq=(parseInt(last)||0)+1;
-  return prefix+String(seq).padStart(3,'0');
-}
-async function genPONumber(){
-  const yr=new Date().getFullYear()+543;
-  const prefix='PO'+yr;
-  const {data}=await db.from('purchase_orders').select('number').like('number',prefix+'%').order('number',{ascending:false}).limit(1);
-  const last=(data?.[0]?.number||'').replace(prefix,'');
-  const seq=(parseInt(last)||0)+1;
-  return prefix+String(seq).padStart(3,'0');
-}
-async function genSONumber(){
-  const yr=new Date().getFullYear()+543;
-  const prefix='SO'+yr;
-  const {data}=await db.from('sale_orders').select('number').like('number',prefix+'%').order('number',{ascending:false}).limit(1);
-  const last=(data?.[0]?.number||'').replace(prefix,'');
-  const seq=(parseInt(last)||0)+1;
-  return prefix+String(seq).padStart(3,'0');
-}
-
-// ========== PRINT ==========
-const CO_NAME='บริษัท วันฟอร์ออล แพคเกจจิ้ง จำกัด';
-const CO_ADDR='555/17 บางเพรียง บางบ่อ สมุทรปราการ 10560';
-const CO_TEL='097-154-8638';
-const CO_TAX='0115566014924';
-const CO_LINE='@004isack';
-const CO_EMAIL='sales@oneforallpackaging.com';
-
-let _printDocNum='';
-function closePrint(){document.getElementById('print-overlay').classList.remove('open');}
-function doPrint(){
-  const old=document.title;
-  if(_printDocNum) document.title=_printDocNum;
-  window.print();
-  setTimeout(()=>{document.title=old;},1500);
-}
-
-function buildCompanyHeader(docType,docNum,docDate){
-  return`<div class="print-hdr"><div class="print-hdr-left"><img src="logo-icon.png" class="print-hdr-logo" onerror="this.style.display='none'"><div><h1>${CO_NAME}</h1><p>${CO_ADDR}<br>โทร ${CO_TEL} &nbsp;|&nbsp; ${CO_EMAIL}<br>เลขประจำตัวผู้เสียภาษีอากร ${CO_TAX}</p></div></div><div class="print-docinfo"><div class="print-doc-type">${docType||''}</div><div class="pnum">${docNum||'-'}</div><div class="pdate">วันที่ ${docDate||'-'}</div></div></div>`;
-}
-const SIGNERS={
-  'SALE1':{name:'ณัฐดนัย ประทุมสิทธิ์',title:'Sales Executive'},
-  'SALE2':{name:'',title:'Sales Executive'},
-  'MANAGER':{name:'',title:'Manager'},
-};
-function buildSignerOptions(){
-  return'<option value="">-- เลือกผู้ลงนาม --</option>'+Object.entries(SIGNERS).map(([code,s])=>`<option value="${code}">${code}${s.name?' – '+s.name:''}</option>`).join('');
-}
-function updateSigner(){
-  const sel=document.querySelector('.signer-sel');
-  const code=sel?.value||'';
-  const s=SIGNERS[code];
-  const el=document.getElementById('signer-display');
-  if(el)el.innerHTML=s&&s.name?`${s.name}<br><span style="font-size:10px;font-weight:400;color:#8a9ab0">${s.title}</span>`:'&nbsp;';
-}
-
-function buildItemsTable(items){
-  const rows=(items||[]).map((it,i)=>`<tr><td>${i+1}. ${it.name||it.product_name||''}</td><td>${fmt(it.qty||1)}</td><td>${it.unit||''}</td><td>${fmt(it.price||it.unit_price||0)}</td><td>${fmt((it.qty||1)*(it.price||it.unit_price||0))}</td></tr>`).join('');
-  return`<table class="print-items-tbl"><thead><tr><th>รายการ</th><th>จำนวน</th><th>หน่วย</th><th>ราคา/หน่วย</th><th>จำนวนเงิน</th></tr></thead><tbody>${rows}</tbody></table>`;
-}
-
-function buildTotals(sub,vat,total){
-  return`<div class="print-totals-wrap"><table class="print-totals-tbl"><tr><td>ราคาก่อนภาษี</td><td>฿${fmt(sub)}</td></tr><tr><td>VAT 7%</td><td>฿${fmt(vat)}</td></tr><tr class="print-grand-row"><td>รวมทั้งสิ้น</td><td>฿${fmt(total)}</td></tr></table></div>`;
-}
-
-function printQ(id){
-  const q=allQ.find(x=>x.id===id);if(!q)return;
-  const sub=q.subtotal||(q.items||[]).reduce((a,it)=>a+(it.qty||1)*(it.price||0),0);
-  const vat=q.vat||sub*0.07;
-  const total=q.total||sub+vat;
-  const validity=q.validity_days||30;
-  const html=buildCompanyHeader('ใบเสนอราคา',q.number,q.date)+`
-  <div class="print-custbox">
-    <h4>เสนอราคาแก่</h4>
-    <div class="pcname">${q.customer||'-'}</div>
-    <div class="pcdet">${q.contact_name?'ผู้ติดต่อ: '+q.contact_name:''}${q.contact_phone?' &nbsp;โทร '+q.contact_phone:''}</div>
-    ${q.customer_address?`<div class="pcdet" style="margin-top:4px">${q.customer_address.replace(/\n/g,'<br>')}</div>`:''}
+<!-- MODAL: AR Invoice -->
+<div class="modal-overlay" id="ar-modal">
+  <div class="modal">
+    <h2 id="ar-modal-title">สร้างใบแจ้งหนี้ (AR)</h2>
+    <div class="form-row">
+      <div class="fg"><label>เลขที่</label><input type="text" id="arm-num" placeholder="INV-2569-001"></div>
+      <div class="fg"><label>วันที่</label><input type="date" id="arm-date"></div>
+      <div class="fg full"><label>ลูกค้า</label><input type="text" id="arm-customer" list="ar-cust-list"><datalist id="ar-cust-list"></datalist></div>
+      <div class="fg"><label>ครบกำหนด (วัน)</label><input type="number" id="arm-credit-days" value="30" min="0"></div>
+      <div class="fg"><label>อ้างอิง Q/SO</label>
+        <select id="arm-ref"><option value="">-- ไม่มี --</option></select>
+      </div>
+      <div class="fg"><label>ยอดก่อน VAT (฿)</label><input type="number" id="arm-subtotal" step="0.01" oninput="calcARTotal()"></div>
+      <div class="fg"><label>VAT 7% (฿)</label><input type="number" id="arm-vat" step="0.01" readonly style="background:#f0f4f8"></div>
+      <div class="fg"><label>ยอดรวม (฿)</label><input type="number" id="arm-total" step="0.01" readonly style="background:#f0f4f8;font-weight:700"></div>
+      <div class="fg"><label>ชำระแล้ว (฿)</label><input type="number" id="arm-paid" value="0" step="0.01" oninput="calcARStatus()"></div>
+      <div class="fg"><label>สถานะ</label>
+        <select id="arm-status"><option value="draft">ร่าง</option><option value="sent">ส่งแล้ว</option><option value="partial">ชำระบางส่วน</option><option value="paid">ชำระแล้ว</option><option value="overdue">เกินกำหนด</option></select>
+      </div>
+      <div class="fg full"><label>หมายเหตุ</label><textarea id="arm-note" rows="2"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('ar-modal')">ยกเลิก</button>
+      <button class="btn btn-blue" onclick="saveAR()">💾 บันทึก</button>
+    </div>
   </div>
-  ${buildItemsTable(q.items)}
-  ${buildTotals(sub,vat,total)}
-  ${q.note?`<div class="print-note-box">📝 ${q.note}</div>`:''}
-  <div class="print-sign-row">
-    <div class="print-sign"><select class="signer-sel" onchange="updateSigner()">${buildSignerOptions()}</select><div class="sign-space"></div><div class="sign-line">ผู้มีอำนาจลงนาม / Authorized Signature<br><span id="signer-display">&nbsp;</span></div></div>
-    <div class="print-sign"><div class="sign-space"></div><div class="sign-line">ผู้รับมอบอำนาจ / Customer Acceptance</div></div>
-  </div>
-  <div class="print-validity-note">ใบเสนอราคานี้มีอายุ ${validity} วัน นับจากวันที่ออกเอกสาร</div>`;
-  _printDocNum=q.number||'ใบเสนอราคา';
-  document.getElementById('print-body').innerHTML=html;
-  // Auto-select ผู้ลงนามตาม user ที่ login อยู่
-  if(currentProfile?.employee_code){
-    const sel=document.querySelector('.signer-sel');
-    if(sel){sel.value=currentProfile.employee_code;updateSigner();}
-  }
-  document.getElementById('print-overlay').classList.add('open');
-}
+</div>
 
-function printSO(id){
-  const so=allSO.find(x=>x.id===id);if(!so)return;
-  const sub=so.subtotal||(so.items||[]).reduce((a,it)=>a+(it.qty||1)*(it.price||0),0);
-  const vat=so.vat||sub*0.07;
-  const total=so.total||sub+vat;
-  const html=buildCompanyHeader('ใบสั่งขาย',so.number,so.date)+`
-  <div class="print-custbox">
-    <h4>ลูกค้า</h4>
-    <div class="pcname">${so.customer||'-'}</div>
-    <div class="pcdet">${so.contact_name?'ผู้ติดต่อ: '+so.contact_name:''}${so.contact_phone?' &nbsp;โทร '+so.contact_phone:''}</div>
-    ${so.delivery_date?`<div class="pcdet" style="margin-top:6px;color:#1565c0;font-weight:600">📦 กำหนดส่ง: ${so.delivery_date}</div>`:''}
+<!-- MODAL: AP Bill -->
+<div class="modal-overlay" id="ap-modal">
+  <div class="modal">
+    <h2 id="ap-modal-title">สร้างใบวางบิล (AP)</h2>
+    <div class="form-row">
+      <div class="fg"><label>เลขที่</label><input type="text" id="apm-num" placeholder="BILL-2569-001"></div>
+      <div class="fg"><label>วันที่</label><input type="date" id="apm-date"></div>
+      <div class="fg full"><label>ซัพพลายเออร์</label>
+        <select id="apm-supplier"><option value="">-- เลือกซัพพลาย --</option></select>
+      </div>
+      <div class="fg"><label>เครดิต (วัน)</label><input type="number" id="apm-credit-days" value="30" min="0"></div>
+      <div class="fg"><label>อ้างอิง PO</label>
+        <select id="apm-ref"><option value="">-- ไม่มี --</option></select>
+      </div>
+      <div class="fg"><label>ยอดก่อน VAT (฿)</label><input type="number" id="apm-subtotal" step="0.01" oninput="calcAPTotal()"></div>
+      <div class="fg"><label>VAT 7% (฿)</label><input type="number" id="apm-vat" step="0.01" readonly style="background:#f0f4f8"></div>
+      <div class="fg"><label>ยอดรวม (฿)</label><input type="number" id="apm-total" step="0.01" readonly style="background:#f0f4f8;font-weight:700"></div>
+      <div class="fg"><label>ชำระแล้ว (฿)</label><input type="number" id="apm-paid" value="0" step="0.01"></div>
+      <div class="fg"><label>สถานะ</label>
+        <select id="apm-status"><option value="pending">รอชำระ</option><option value="partial">ชำระบางส่วน</option><option value="paid">ชำระแล้ว</option><option value="overdue">เกินกำหนด</option></select>
+      </div>
+      <div class="fg full"><label>หมายเหตุ</label><textarea id="apm-note" rows="2"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('ap-modal')">ยกเลิก</button>
+      <button class="btn btn-blue" onclick="saveAP()">💾 บันทึก</button>
+    </div>
   </div>
-  ${buildItemsTable(so.items)}
-  ${buildTotals(sub,vat,total)}
-  ${so.note?`<div class="print-note-box">📝 ${so.note}</div>`:''}
-  <div class="print-sign-row">
-    <div class="print-sign"><select class="signer-sel" onchange="updateSigner()">${buildSignerOptions()}</select><div class="sign-space"></div><div class="sign-line">ผู้อนุมัติ / Approved By<br><span id="signer-display">&nbsp;</span></div></div>
-    <div class="print-sign"><div class="sign-space"></div><div class="sign-line">ผู้รับสินค้า / Received By</div></div>
-  </div>`;
-  _printDocNum=so.number||'ใบสั่งขาย';
-  document.getElementById('print-body').innerHTML=html;
-  // Auto-select ผู้ลงนามตาม user ที่ login อยู่
-  if(currentProfile?.employee_code){
-    const sel=document.querySelector('.signer-sel');
-    if(sel){sel.value=currentProfile.employee_code;updateSigner();}
-  }
-  document.getElementById('print-overlay').classList.add('open');
-}
+</div>
 
-// ========== SALE ORDERS ==========
-async function loadSO(){
-  const {data}=await db.from('sale_orders').select('*').order('created_at',{ascending:false});
-  allSO=data||[];renderSOTable();populateSOCustDatalist();
-}
-function renderSOTable(){
-  const search=(document.getElementById('sof-search')?.value||'').toLowerCase();
-  const stat=document.getElementById('sof-status')?.value||'';
-  let rows=allSO.filter(s=>{
-    if(stat&&s.status!==stat)return false;
-    if(search&&!(s.customer||'').toLowerCase().includes(search)&&!(s.number||'').toLowerCase().includes(search))return false;
-    return true;
-  });
-  const tb=document.getElementById('so-tb');
-  if(!rows.length){tb.innerHTML='<tr><td colspan="7"><div class="empty"><div class="ei">📋</div><p>ยังไม่มีใบสั่งขาย</p></div></td></tr>';return;}
-  tb.innerHTML=rows.map(s=>{
-    const num=s.number||'-';
-    return`<tr><td><b>${num}</b></td><td>${s.customer||'-'}</td><td>${(s.items||[]).map(it=>it.name||'').filter(Boolean).join(', ').slice(0,40)||'-'}</td><td>฿${fmt(s.total||0)}</td><td><span class="badge ${SO_BADGE[s.status]||'b-gray'}">${SO_STATUS[s.status]||s.status}</span></td><td>${s.date||'-'}</td><td style="white-space:nowrap"><button class="btn btn-sm btn-outline" onclick="printSO('${s.id}')" title="พิมพ์/PDF">🖨️</button> <button class="btn btn-sm btn-outline" onclick="openSOModal('${s.id}')">✏️</button> <button class="btn btn-sm btn-danger" onclick="openConf('ลบใบสั่งขาย','ลบ ${num.replace(/'/g,'')}?',()=>deleteSO('${s.id}'))">🗑️</button></td></tr>`;
-  }).join('');
-}
-function filterSO(){renderSOTable();}
-function populateSOCustDatalist(){/* ไม่ใช้แล้ว */}
-function openSOModal(id){
-  editSOId=id||null;
-  document.getElementById('so-modal-title').textContent=id?'แก้ไขใบสั่งขาย':'สร้างใบสั่งขาย (SO)';
-  const custSel=document.getElementById('som-cust');
-  const qsel=document.getElementById('som-quote');
-  qsel.innerHTML='<option value="">-- ไม่เชื่อม --</option>'+allQ.filter(q=>q.status!=='cancelled').map(q=>`<option value="${q.id}">${q.number||q.id} - ${q.customer||''}</option>`).join('');
-  if(id){
-    const s=allSO.find(x=>x.id===id);if(!s)return;
-    custSel.innerHTML=buildContactOptions(s.customer||'');
-    document.getElementById('som-num').value=s.number||'';
-    document.getElementById('som-date').value=s.date||'';
-    document.getElementById('som-contact').value=s.contact_name||'';
-    document.getElementById('som-phone').value=s.contact_phone||'';
-    document.getElementById('som-status').value=s.status||'pending';
-    document.getElementById('som-delivery').value=s.delivery_date||'';
-    document.getElementById('som-quote').value=s.quote_id||'';
-    document.getElementById('som-note').value=s.note||'';
-    soIIdx=0;document.getElementById('so-items-wrap').innerHTML='';
-    (s.items||[]).forEach(it=>addSOItem(it));
-  } else {
-    custSel.innerHTML=buildContactOptions();
-    document.getElementById('som-num').value='กำลังสร้าง...';
-    genSONumber().then(n=>document.getElementById('som-num').value=n);
-    document.getElementById('som-date').value=new Date().toISOString().split('T')[0];
-    document.getElementById('som-contact').value='';
-    document.getElementById('som-phone').value='';document.getElementById('som-status').value='pending';
-    document.getElementById('som-delivery').value='';document.getElementById('som-quote').value='';
-    document.getElementById('som-note').value='';
-    soIIdx=0;document.getElementById('so-items-wrap').innerHTML='';addSOItem();
-  }
-  calcSOTotals();
-  document.getElementById('so-modal').style.display='flex';
-}
-function addSOItem(it){
-  const idx=soIIdx++;const div=document.createElement('div');div.className='item-row';div.id='soirow-'+idx;
-  const pName=it?.name||it?.product_name||'';
-  div.innerHTML=`<select class="it-name" onchange="onItemSel(this);calcSOTotals()">${buildProductOptions(pName)}</select><input type="number" min="1" class="it-qty" value="${it?.qty||1}" oninput="calcSOTotals()"><input type="text" placeholder="หน่วย" class="it-unit" value="${(it?.unit||'').replace(/"/g,'&quot;')}" list="unit-list" style="padding:8px 6px"><input type="number" min="0" step="0.01" class="it-price" value="${it?.price||it?.unit_price||0}" oninput="calcSOTotals()"><button class="btn btn-sm btn-danger" onclick="document.getElementById('soirow-${idx}').remove();calcSOTotals()">✕</button>`;
-  document.getElementById('so-items-wrap').appendChild(div);calcSOTotals();
-}
-function calcSOTotals(){
-  let sub=0;document.querySelectorAll('#so-items-wrap .item-row').forEach(r=>{sub+=(parseFloat(r.querySelector('.it-qty')?.value||0))*(parseFloat(r.querySelector('.it-price')?.value||0));});
-  const vat=sub*0.07;
-  document.getElementById('so-sub-disp').textContent='฿'+fmt(sub);
-  document.getElementById('so-vat-disp').textContent='฿'+fmt(vat);
-  document.getElementById('so-tot-disp').textContent='฿'+fmt(sub+vat);
-}
-async function saveSO(){
-  const items=[...document.querySelectorAll('#so-items-wrap .item-row')].map(r=>({name:r.querySelector('.it-name').value,qty:parseFloat(r.querySelector('.it-qty').value)||1,unit:r.querySelector('.it-unit')?.value||'',price:parseFloat(r.querySelector('.it-price').value)||0,total:(parseFloat(r.querySelector('.it-qty').value)||1)*(parseFloat(r.querySelector('.it-price').value)||0)})).filter(it=>it.name.trim());
-  const sub=items.reduce((a,it)=>a+it.total,0);
-  const payload={number:document.getElementById('som-num').value.trim(),date:document.getElementById('som-date').value,customer:document.getElementById('som-cust').value.trim(),contact_name:document.getElementById('som-contact').value.trim(),contact_phone:document.getElementById('som-phone').value.trim(),status:document.getElementById('som-status').value,delivery_date:document.getElementById('som-delivery').value||null,quote_id:document.getElementById('som-quote').value||null,note:document.getElementById('som-note').value.trim(),items,subtotal:sub,vat:sub*0.07,total:sub*1.07};
-  if(!payload.customer){toast('กรุณากรอกชื่อลูกค้า','error');return;}
-  const {error}=editSOId?await db.from('sale_orders').update(payload).eq('id',editSOId):await db.from('sale_orders').insert(payload);
-  if(error){toast('บันทึกไม่สำเร็จ: '+error.message,'error');return;}
-  closeModal('so-modal');toast('บันทึกสำเร็จ','success');loadSO();
-}
-async function deleteSO(id){const {error}=await db.from('sale_orders').delete().eq('id',id);if(error){toast('ลบไม่สำเร็จ','error');return;}toast('ลบแล้ว','success');loadSO();}
-</script>
-<datalist id="unit-list">
-  <option value="ใบ"><option value="ชิ้น"><option value="กก."><option value="ลูก">
-  <option value="แผ่น"><option value="ม้วน"><option value="กล่อง"><option value="ถุง">
-  <option value="เมตร"><option value="ลิตร"><option value="โหล"><option value="ห่อ">
-  <option value="ปีก"><option value="อัน"><option value="คู่"><option value="ชุด">
-</datalist>
-</body>
-</html>
+<!-- MODAL: Income/Expense Transaction -->
+<div class="modal-overlay" id="txn-modal">
+  <div class="modal" style="max-width:500px">
+    <h2 id="txn-modal-title">บันทึกรายได้/ค่าใช้จ่าย</h2>
+    <div class="form-row">
+      <div class="fg"><label>ประเภท</label>
+        <select id="txnm-type"><option value="income">รายได้</option><option value="expense">ค่าใช้จ่าย</option></select>
+      </div>
+      <div class="fg"><label>วันที่</label><input type="date" id="txnm-date"></div>
+      <div class="fg"><label>หมวดหมู่</label><input type="text" id="txnm-category" placeholder="เช่น ค่าเช่า, รายได้จากการขาย"></div>
+      <div class="fg"><label>รหัสบัญชี</label>
+        <select id="txnm-account"><option value="">-- เลือกบัญชี --</option></select>
+      </div>
+      <div class="fg full"><label>รายละเอียด</label><input type="text" id="txnm-desc" placeholder="รายละเอียดรายการ"></div>
+      <div class="fg"><label>จำนวนเงิน (฿)</label><input type="number" id="txnm-amount" step="0.01" min="0"></div>
+      <div class="fg"><label>มี VAT?</label>
+        <select id="txnm-has-vat"><option value="0">ไม่มี VAT</option><option value="1">มี VAT 7%</option></select>
+      </div>
+      <div class="fg full"><label>หมายเหตุ</label><textarea id="txnm-note" rows="2"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('txn-modal')">ยกเลิก</button>
+      <button class="btn btn-blue" onclick="saveTxn()">💾 บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Bank Account -->
+<div class="modal-overlay" id="bank-acc-modal">
+  <div class="modal" style="max-width:460px">
+    <h2 id="bank-acc-modal-title">บัญชีธนาคาร</h2>
+    <div class="form-row">
+      <div class="fg full"><label>ชื่อบัญชี</label><input type="text" id="bankam-name" placeholder="เช่น กระแสรายวัน SCB"></div>
+      <div class="fg"><label>ธนาคาร</label><input type="text" id="bankam-bank" placeholder="เช่น SCB, KBank"></div>
+      <div class="fg"><label>เลขบัญชี</label><input type="text" id="bankam-number" placeholder="XXX-X-XXXXX-X"></div>
+      <div class="fg"><label>ยอดเริ่มต้น (฿)</label><input type="number" id="bankam-balance" value="0" step="0.01"></div>
+      <div class="fg"><label>ประเภท</label>
+        <select id="bankam-type"><option value="current">กระแสรายวัน</option><option value="savings">ออมทรัพย์</option><option value="cash">เงินสด</option></select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('bank-acc-modal')">ยกเลิก</button>
+      <button class="btn btn-blue" onclick="saveBankAcc()">💾 บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Bank Transaction -->
+<div class="modal-overlay" id="bank-txn-modal">
+  <div class="modal" style="max-width:480px">
+    <h2 id="bank-txn-modal-title">บันทึกรายการเดินบัญชี</h2>
+    <div class="form-row">
+      <div class="fg full"><label>บัญชีธนาคาร</label>
+        <select id="btxnm-account"><option value="">-- เลือกบัญชี --</option></select>
+      </div>
+      <div class="fg"><label>ประเภท</label>
+        <select id="btxnm-type"><option value="deposit">รับเงิน</option><option value="withdrawal">จ่ายเงิน</option></select>
+      </div>
+      <div class="fg"><label>วันที่</label><input type="date" id="btxnm-date"></div>
+      <div class="fg full"><label>รายละเอียด</label><input type="text" id="btxnm-desc" placeholder="รายละเอียดรายการ"></div>
+      <div class="fg"><label>จำนวนเงิน (฿)</label><input type="number" id="btxnm-amount" step="0.01" min="0"></div>
+      <div class="fg"><label>อ้างอิง</label><input type="text" id="btxnm-ref" placeholder="เลขที่เช็ค, โอน..."></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('bank-txn-modal')">ยกเลิก</button>
+      <button class="btn btn-blue" onclick="saveBankTxn()">💾 บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Journal Entry -->
+<div class="modal-overlay" id="journal-modal">
+  <div class="modal">
+    <h2 id="journal-modal-title">บันทึกสมุดรายวัน</h2>
+    <div class="form-row">
+      <div class="fg"><label>วันที่</label><input type="date" id="jrnm-date"></div>
+      <div class="fg"><label>เลขที่อ้างอิง</label><input type="text" id="jrnm-ref" placeholder="JV-001"></div>
+      <div class="fg full"><label>คำอธิบาย</label><input type="text" id="jrnm-desc" placeholder="รายละเอียดรายการ"></div>
+      <div class="fg"><label>บัญชีเดบิต (Dr.)</label>
+        <select id="jrnm-debit"><option value="">-- เลือกบัญชี --</option></select>
+      </div>
+      <div class="fg"><label>บัญชีเครดิต (Cr.)</label>
+        <select id="jrnm-credit"><option value="">-- เลือกบัญชี --</option></select>
+      </div>
+      <div class="fg"><label>จำนวนเงิน (฿)</label><input type="number" id="jrnm-amount" step="0.01" min="0"></div>
+      <div class="fg full"><label>หมายเหตุ</label><textarea id="jrnm-note" rows="2"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('journal-modal')">ยกเลิก</button>
+      <button class="btn btn-blue" onclick="saveJournal()">💾 บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Fixed Asset -->
+<div class="modal-overlay" id="asset-modal">
+  <div class="modal">
+    <h2 id="asset-modal-title">เพิ่มสินทรัพย์ถาวร</h2>
+    <div class="form-row">
+      <div class="fg"><label>รหัสสินทรัพย์</label><input type="text" id="assetm-code" placeholder="FA-001"></div>
+      <div class="fg"><label>หมวดหมู่</label>
+        <select id="assetm-category">
+          <option value="land">ที่ดิน</option><option value="building">อาคาร</option>
+          <option value="machinery">เครื่องจักร</option><option value="vehicle">ยานพาหนะ</option>
+          <option value="equipment">อุปกรณ์สำนักงาน</option><option value="other">อื่นๆ</option>
+        </select>
+      </div>
+      <div class="fg full"><label>ชื่อสินทรัพย์</label><input type="text" id="assetm-name" placeholder="ชื่อสินทรัพย์"></div>
+      <div class="fg"><label>วันที่ซื้อ</label><input type="date" id="assetm-date"></div>
+      <div class="fg"><label>ราคาทุน (฿)</label><input type="number" id="assetm-cost" step="0.01" min="0"></div>
+      <div class="fg"><label>มูลค่าซาก (฿)</label><input type="number" id="assetm-salvage" value="0" step="0.01" min="0"></div>
+      <div class="fg"><label>อายุการใช้งาน (ปี)</label><input type="number" id="assetm-life" value="5" min="1"></div>
+      <div class="fg"><label>วิธีคิดค่าเสื่อม</label>
+        <select id="assetm-method"><option value="straight-line">เส้นตรง</option><option value="declining">ยอดลดลง</option></select>
+      </div>
+      <div class="fg full"><label>หมายเหตุ</label><textarea id="assetm-note" rows="2"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('asset-modal')">ยกเลิก</button>
+      <button class="btn btn-blue" onclick="saveAsset()">💾 บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Payroll -->
+<div class="modal-overlay" id="payroll-modal">
+  <div class="modal">
+    <h2 id="payroll-modal-title">บันทึกเงินเดือน</h2>
+    <div class="form-row">
+      <div class="fg full"><label>พนักงาน</label><input type="text" id="prm-name" list="payroll-emp-list"><datalist id="payroll-emp-list"></datalist></div>
+      <div class="fg"><label>ตำแหน่ง</label><input type="text" id="prm-position" placeholder="ตำแหน่ง"></div>
+      <div class="fg"><label>เดือน</label>
+        <select id="prm-month">
+          <option value="1">มกราคม</option><option value="2">กุมภาพันธ์</option><option value="3">มีนาคม</option>
+          <option value="4">เมษายน</option><option value="5">พฤษภาคม</option><option value="6">มิถุนายน</option>
+          <option value="7">กรกฎาคม</option><option value="8">สิงหาคม</option><option value="9">กันยายน</option>
+          <option value="10">ตุลาคม</option><option value="11">พฤศจิกายน</option><option value="12">ธันวาคม</option>
+        </select>
+      </div>
+      <div class="fg"><label>ปี (พ.ศ.)</label><input type="number" id="prm-year" placeholder="2569"></div>
+      <div class="fg"><label>เงินเดือนพื้นฐาน (฿)</label><input type="number" id="prm-basic" step="0.01" oninput="calcPayroll()"></div>
+      <div class="fg"><label>เบี้ยเลี้ยง/โบนัส (฿)</label><input type="number" id="prm-allowance" value="0" step="0.01" oninput="calcPayroll()"></div>
+      <div class="fg"><label>หักอื่นๆ (฿)</label><input type="number" id="prm-deduction" value="0" step="0.01" oninput="calcPayroll()"></div>
+      <div class="fg"><label>ประกันสังคม 5% (฿)</label><input type="number" id="prm-ss" step="0.01" readonly style="background:#f0f4f8"></div>
+      <div class="fg"><label>ภาษีหัก ณ ที่จ่าย (฿)</label><input type="number" id="prm-tax" value="0" step="0.01" oninput="calcPayroll()"></div>
+      <div class="fg"><label>เงินเดือนสุทธิ (฿)</label>
