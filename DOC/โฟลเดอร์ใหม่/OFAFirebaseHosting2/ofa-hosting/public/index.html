@@ -231,11 +231,12 @@ label{font-size:13px;font-weight:600;color:var(--text2)}
 .sign-line{border-top:1.5px solid #aaa;padding-top:8px;font-size:11.5px;color:#5a6a7a;text-align:center}
 .print-validity-note{font-size:10.5px;color:#8a9ab0;text-align:center;margin-top:16px;border-top:1px dashed #dde3ec;padding-top:10px}
 @media print{
-  @page{size:A4;margin:12mm}
+  @page{size:A4;margin:0}
   body>*{display:none!important}
   .print-overlay{display:block!important;position:static!important;background:none!important;overflow:visible!important}
   .print-doc{box-shadow:none!important;border-radius:0!important;max-height:none!important;overflow:visible!important;width:100%!important}
   .print-actions{display:none!important}
+  .print-body{padding:14mm 16mm!important}
   .print-items-tbl td:first-child{white-space:normal;word-break:break-word}
 }
 </style>
@@ -539,6 +540,7 @@ label{font-size:13px;font-weight:600;color:var(--text2)}
       <div class="fg full"><label>ลูกค้า / บริษัท</label><input type="text" id="qm-cust" placeholder="บริษัท..." list="cust-list"><datalist id="cust-list"></datalist></div>
       <div class="fg"><label>ผู้ติดต่อ</label><input type="text" id="qm-contact" placeholder="ชื่อ"></div>
       <div class="fg"><label>โทรศัพท์</label><input type="text" id="qm-phone"></div>
+      <div class="fg full"><label>ที่อยู่ลูกค้า</label><textarea id="qm-addr" placeholder="ที่อยู่ลูกค้า..." rows="2" style="resize:vertical"></textarea></div>
       <div class="fg"><label>สถานะ</label>
         <select id="qm-status"><option value="draft">ร่าง</option><option value="sent">ส่งแล้ว</option><option value="approved">ยืนยัน</option><option value="cancelled">ยกเลิก</option></select>
       </div>
@@ -737,6 +739,13 @@ label{font-size:13px;font-weight:600;color:var(--text2)}
 <div class="print-overlay" id="print-overlay">
   <div class="print-doc" id="print-doc">
     <div class="print-actions">
+      <div style="display:flex;align-items:center;gap:8px;margin-right:auto">
+        <label style="font-size:12px;color:var(--muted);white-space:nowrap">ผู้ลงนาม:</label>
+        <select id="print-signer" onchange="updateSigner()" style="font-size:13px;padding:5px 10px;border:1px solid var(--border);border-radius:6px;min-width:200px">
+          <option value="">-- เลือกผู้ลงนาม --</option>
+          <option value="ณัฐดนัย ประทุมสิทธิ์|Sales Executive">ณัฐดนัย ประทุมสิทธิ์</option>
+        </select>
+      </div>
       <button class="btn btn-outline btn-sm" onclick="closePrint()">✕ ปิด</button>
       <button class="btn btn-blue btn-sm" onclick="doPrint()">🖨️ พิมพ์ / บันทึก PDF</button>
     </div>
@@ -1138,6 +1147,7 @@ function openQModal(id){
     document.getElementById('qm-cust').value=q.customer||'';
     document.getElementById('qm-contact').value=q.contact_name||'';
     document.getElementById('qm-phone').value=q.contact_phone||'';
+    document.getElementById('qm-addr').value=q.customer_address||'';
     document.getElementById('qm-status').value=q.status||'draft';
     document.getElementById('qm-validity').value=q.validity_days||30;
     document.getElementById('qm-note').value=q.note||'';
@@ -1148,7 +1158,7 @@ function openQModal(id){
     genQNumber().then(n=>document.getElementById('qm-num').value=n);
     document.getElementById('qm-date').value=new Date().toISOString().split('T')[0];
     document.getElementById('qm-cust').value='';document.getElementById('qm-contact').value='';
-    document.getElementById('qm-phone').value='';document.getElementById('qm-status').value='draft';
+    document.getElementById('qm-phone').value='';document.getElementById('qm-addr').value='';document.getElementById('qm-status').value='draft';
     document.getElementById('qm-validity').value=30;document.getElementById('qm-note').value='';
     iIdx=0;document.getElementById('items-wrap').innerHTML='';addItem();
   }
@@ -1173,7 +1183,7 @@ function calcTotals(){
 async function saveQ(){
   const items=[...document.querySelectorAll('#items-wrap .item-row')].map(r=>({name:r.querySelector('.it-name').value,qty:parseFloat(r.querySelector('.it-qty').value)||1,unit:r.querySelector('.it-unit')?.value||'',price:parseFloat(r.querySelector('.it-price').value)||0,total:(parseFloat(r.querySelector('.it-qty').value)||1)*(parseFloat(r.querySelector('.it-price').value)||0)})).filter(it=>it.name.trim());
   const sub=items.reduce((a,it)=>a+it.total,0);
-  const payload={number:document.getElementById('qm-num').value.trim(),date:document.getElementById('qm-date').value,customer:document.getElementById('qm-cust').value.trim(),contact_name:document.getElementById('qm-contact').value.trim(),contact_phone:document.getElementById('qm-phone').value.trim(),status:document.getElementById('qm-status').value,validity_days:parseInt(document.getElementById('qm-validity').value)||30,note:document.getElementById('qm-note').value.trim(),items,subtotal:sub,vat:sub*0.07,total:sub*1.07,user_id:currentUser.id};
+  const payload={number:document.getElementById('qm-num').value.trim(),date:document.getElementById('qm-date').value,customer:document.getElementById('qm-cust').value.trim(),contact_name:document.getElementById('qm-contact').value.trim(),contact_phone:document.getElementById('qm-phone').value.trim(),customer_address:document.getElementById('qm-addr').value.trim(),status:document.getElementById('qm-status').value,validity_days:parseInt(document.getElementById('qm-validity').value)||30,note:document.getElementById('qm-note').value.trim(),items,subtotal:sub,vat:sub*0.07,total:sub*1.07,user_id:currentUser.id};
   const {error}=editId?await db.from('quotations').update(payload).eq('id',editId):await db.from('quotations').insert(payload);
   if(error){toast('บันทึกไม่สำเร็จ: '+error.message,'error');return;}
   closeModal('q-modal');toast('บันทึกสำเร็จ','success');loadQ();
@@ -1380,7 +1390,16 @@ function doPrint(){
 }
 
 function buildCompanyHeader(docType,docNum,docDate){
-  return`<div class="print-hdr"><div class="print-hdr-left"><img src="logo.png" class="print-hdr-logo" onerror="this.style.display='none'"><div><h1>${CO_NAME}</h1><p>${CO_ADDR}<br>โทร ${CO_TEL} &nbsp;|&nbsp; ${CO_EMAIL}<br>เลขประจำตัวผู้เสียภาษีอากร ${CO_TAX}</p></div></div><div class="print-docinfo"><div class="print-doc-type">${docType||''}</div><div class="pnum">${docNum||'-'}</div><div class="pdate">วันที่ ${docDate||'-'}</div></div></div>`;
+  return`<div class="print-hdr"><div class="print-hdr-left"><img src="logo-icon.png" class="print-hdr-logo" onerror="this.style.display='none'"><div><h1>${CO_NAME}</h1><p>${CO_ADDR}<br>โทร ${CO_TEL} &nbsp;|&nbsp; ${CO_EMAIL}<br>เลขประจำตัวผู้เสียภาษีอากร ${CO_TAX}</p></div></div><div class="print-docinfo"><div class="print-doc-type">${docType||''}</div><div class="pnum">${docNum||'-'}</div><div class="pdate">วันที่ ${docDate||'-'}</div></div></div>`;
+}
+function getSignerHTML(){
+  const val=document.getElementById('print-signer')?.value||'';
+  if(!val)return'';
+  const[name,title]=val.split('|');
+  return name?`${name}${title?`<br><span style="font-size:10px;font-weight:400;color:#8a9ab0">${title}</span>`:''}`:'';}
+function updateSigner(){
+  const el=document.getElementById('signer-display');
+  if(el)el.innerHTML=getSignerHTML()||'&nbsp;';
 }
 
 function buildItemsTable(items){
@@ -1403,12 +1422,13 @@ function printQ(id){
     <h4>เสนอราคาแก่</h4>
     <div class="pcname">${q.customer||'-'}</div>
     <div class="pcdet">${q.contact_name?'ผู้ติดต่อ: '+q.contact_name:''}${q.contact_phone?' &nbsp;โทร '+q.contact_phone:''}</div>
+    ${q.customer_address?`<div class="pcdet" style="margin-top:4px">${q.customer_address.replace(/\n/g,'<br>')}</div>`:''}
   </div>
   ${buildItemsTable(q.items)}
   ${buildTotals(sub,vat,total)}
   ${q.note?`<div class="print-note-box">📝 ${q.note}</div>`:''}
   <div class="print-sign-row">
-    <div class="print-sign"><div class="sign-space"></div><div class="sign-line">ผู้มีอำนาจลงนาม / Authorized Signature<br>${CO_NAME}</div></div>
+    <div class="print-sign"><div class="sign-space"></div><div class="sign-line">ผู้มีอำนาจลงนาม / Authorized Signature<br><span id="signer-display">${getSignerHTML()||'&nbsp;'}</span></div></div>
     <div class="print-sign"><div class="sign-space"></div><div class="sign-line">ผู้รับมอบอำนาจ / Customer Acceptance</div></div>
   </div>
   <div class="print-validity-note">ใบเสนอราคานี้มีอายุ ${validity} วัน นับจากวันที่ออกเอกสาร</div>`;
@@ -1433,7 +1453,7 @@ function printSO(id){
   ${buildTotals(sub,vat,total)}
   ${so.note?`<div class="print-note-box">📝 ${so.note}</div>`:''}
   <div class="print-sign-row">
-    <div class="print-sign"><div class="sign-space"></div><div class="sign-line">ผู้อนุมัติ / Approved By<br>${CO_NAME}</div></div>
+    <div class="print-sign"><div class="sign-space"></div><div class="sign-line">ผู้อนุมัติ / Approved By<br><span id="signer-display">${getSignerHTML()||'&nbsp;'}</span></div></div>
     <div class="print-sign"><div class="sign-space"></div><div class="sign-line">ผู้รับสินค้า / Received By</div></div>
   </div>`;
   _printDocNum=so.number||'ใบสั่งขาย';
