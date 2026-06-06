@@ -595,8 +595,15 @@ label{font-size:13px;font-weight:600;color:var(--text2)}
         </div>
         <div class="acc-kpi" id="ar-kpi"></div>
         <div class="card">
+          <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+            <button class="btn btn-outline" style="font-size:12px" onclick="setARMonth('')">ทั้งหมด</button>
+            <button class="btn btn-outline" style="font-size:12px" onclick="setARMonth('this')">เดือนนี้</button>
+            <button class="btn btn-outline" style="font-size:12px" onclick="setARMonth('last')">เดือนก่อน</button>
+            <button class="btn btn-outline" style="font-size:12px;color:var(--red)" onclick="setARMonth('overdue')">🔴 เกินกำหนด</button>
+          </div>
           <div class="toolbar">
             <input type="text" id="arf-search" placeholder="🔍 ค้นหา..." oninput="filterAR()">
+            <select id="arf-month" onchange="filterAR()"><option value="">ทุกเดือน</option></select>
             <select id="arf-status" onchange="filterAR()"><option value="">ทุกสถานะ</option><option value="draft">ร่าง</option><option value="sent">ส่งแล้ว</option><option value="partial">ชำระบางส่วน</option><option value="paid">ชำระแล้ว</option><option value="overdue">เกินกำหนด</option></select>
           </div>
           <table><thead><tr><th>เลขที่</th><th>ลูกค้า</th><th>อ้างอิง</th><th>ยอดรวม</th><th>ชำระแล้ว</th><th>คงค้าง</th><th>ครบกำหนด</th><th>สถานะ</th><th>จัดการ</th></tr></thead><tbody id="ar-tb"></tbody></table>
@@ -1995,14 +2002,62 @@ async function loadJournal(){const{data}=await db.from('journal_entries').select
 async function loadAssets(){const{data}=await db.from('fixed_assets').select('*').order('purchase_date',{ascending:false});allAssets=data||[];renderAssets();
 
 // ========== AR ==========
+function _getMonthStr(offset){
+  const d=new Date();d.setMonth(d.getMonth()+offset);
+  return d.toISOString().slice(0,7);
+}
+function setARMonth(v){
+  const sel=document.getElementById('arf-month');if(!sel)return;
+  if(v==='this')sel.value=_getMonthStr(0);
+  else if(v==='last')sel.value=_getMonthStr(-1);
+  else if(v==='overdue'){sel.value='';document.getElementById('arf-status').value='overdue';}
+  else{sel.value='';}
+  renderAR();
+}
+function setRCMonth(v){
+  const sel=document.getElementById('rcf-month');if(!sel)return;
+  if(v==='this')sel.value=_getMonthStr(0);
+  else if(v==='last')sel.value=_getMonthStr(-1);
+  else sel.value='';
+  renderRC();
+}
+function setWHTMonth(v){
+  const sel=document.getElementById('whtf-month');if(!sel)return;
+  if(v==='this')sel.value=_getMonthStr(0);
+  else if(v==='last')sel.value=_getMonthStr(-1);
+  else sel.value='';
+  renderWHT();
+}
+
 function renderAR(){
   const s=document.getElementById('arf-search')?.value.toLowerCase()||'';
   const st=document.getElementById('arf-status')?.value||'';
+  const mo=document.getElementById('arf-month')?.value||'';
   const tb=document.getElementById('ar-tb');if(!tb)return;
-  const rows=allAR.filter(r=>(!s||(r.number+r.customer).toLowerCase().includes(s))&&(!st||r.status===st));
+
+  // Populate month select
+  const mSel=document.getElementById('arf-month');
+  if(mSel&&mSel.options.length<2){
+    const months=[...new Set(allAR.map(r=>r.date?.slice(0,7)).filter(Boolean))].sort().reverse();
+    months.forEach(m=>mSel.insertAdjacentHTML('beforeend',`<option value="${m}">${m}</option>`));
+  }
+
+  const rows=allAR.filter(r=>{
+    if(s&&!(r.number+r.customer).toLowerCase().includes(s))return false;
+    if(st&&r.status!==st)return false;
+    if(mo&&r.date?.slice(0,7)!==mo)return false;
+    return true;
+  });
+
   const kpi=document.getElementById('ar-kpi');
-  if(kpi){const tot=allAR.reduce((a,r)=>a+(r.total||0),0);const paid=allAR.reduce((a,r)=>a+(r.paid||0),0);const ov=allAR.filter(r=>r.status==='overdue').length;
-    kpi.innerHTML=`<div class="kpi-card"><div class="kpi-label">ยอดรวม AR</div><div class="kpi-val">฿${fmt(tot)}</div></div><div class="kpi-card"><div class="kpi-label">ชำระแล้ว</div><div class="kpi-val" style="color:var(--green)">฿${fmt(paid)}</div></div><div class="kpi-card"><div class="kpi-label">คงค้าง</div><div class="kpi-val" style="color:var(--red)">฿${fmt(tot-paid)}</div></div><div class="kpi-card"><div class="kpi-label">เกินกำหนด</div><div class="kpi-val" style="color:var(--red)">${ov} รายการ</div></div>`;}
+  if(kpi){
+    const src=mo?rows:allAR;
+    const tot=src.reduce((a,r)=>a+(r.total||0),0);
+    const paid=src.reduce((a,r)=>a+(r.paid||0),0);
+    const ov=allAR.filter(r=>r.status==='overdue').length;
+    const label=mo?`ยอด ${mo}`:'ยอดรวม AR';
+    kpi.innerHTML=`<div class="kpi-card"><div class="kpi-label">${label}</div><div class="kpi-val">฿${fmt(tot)}</div></div><div class="kpi-card"><div class="kpi-label">ชำระแล้ว</div><div class="kpi-val" style="color:var(--green)">฿${fmt(paid)}</div></div><div class="kpi-card"><div class="kpi-label">คงค้าง</div><div class="kpi-val" style="color:var(--red)">฿${fmt(tot-paid)}</div></div><div class="kpi-card"><div class="kpi-label">เกินกำหนด</div><div class="kpi-val" style="color:var(--red)">${ov} ใบ</div></div>`;
+  }
   tb.innerHTML=rows.length?rows.map(r=>{const due=r.total-r.paid;return`<tr><td><b>${r.number}</b></td><td>${r.customer}</td><td>${r.reference||'-'}</td><td>฿${fmt(r.total)}</td><td>฿${fmt(r.paid||0)}</td><td style="color:var(--red)">฿${fmt(due)}</td><td>${r.due_date||'-'}</td><td><span class="badge ${AR_BADGE[r.status]||'b-gray'}">${AR_STATUS[r.status]||r.status}</span></td><td><button class="btn-icon" onclick="editAR('${r.id}')">✏️</button><button class="btn-icon" onclick="delAR('${r.id}')">🗑️</button></td></tr>`}).join('')
     :'<tr><td colspan="9" class="empty"><div class="ei">💵</div><p>ยังไม่มีรายการ AR</p></td></tr>';
 }
@@ -2350,9 +2405,13 @@ function switchWHTTab(tab){
 
 function renderWHT(){
   const s=document.getElementById('whtf-search')?.value.toLowerCase()||'';
+  const mo=document.getElementById('whtf-month')?.value||'';
   const yr=document.getElementById('whtf-year')?.value||'';
   const tb=document.getElementById('wht-tb');if(!tb)return;
-  const rows=allWHT.filter(r=>r.direction===whtTab&&(!s||r.party.toLowerCase().includes(s))&&(!yr||r.date?.startsWith(yr)));
+  const rows=allWHT.filter(r=>r.direction===whtTab&&(!s||r.party.toLowerCase().includes(s))&&(!yr||r.date?.startsWith(yr))&&(!mo||r.date?.startsWith(mo)));
+  // Populate month select
+  const moSel=document.getElementById('whtf-month');
+  if(moSel&&moSel.options.length<2){const mos=[...new Set(allWHT.map(r=>r.date?.slice(0,7)).filter(Boolean))].sort().reverse();mos.forEach(m=>moSel.insertAdjacentHTML('beforeend',`<option value="${m}">${m}</option>`));}
   const yrSel=document.getElementById('whtf-year');
   if(yrSel&&yrSel.options.length<2){const yrs=[...new Set(allWHT.map(r=>r.date?.slice(0,4)).filter(Boolean))].sort().reverse();yrs.forEach(y=>yrSel.insertAdjacentHTML('beforeend',`<option value="${y}">${y}</option>`));}
   const kpi=document.getElementById('wht-kpi');
