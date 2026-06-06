@@ -1262,6 +1262,7 @@ function toast(msg,type='info'){
   clearTimeout(window._toastT);
   window._toastT=setTimeout(()=>t.classList.remove('show'),3000);
 }
+function openModal(id){document.getElementById(id).style.display='flex';}
 function closeModal(id){document.getElementById(id).style.display='none';}
 function openConf(title,msg,cb){
   document.getElementById('conf-title').textContent=title;
