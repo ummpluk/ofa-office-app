@@ -1195,15 +1195,11 @@ function go(name){
   if(name==='purchase-orders')renderPOTable();
   if(name==='sale-orders')renderSOTable();
   if(name==='roles')renderRolesTable();
-  if(name==='coa')
   if(name==='ar'){renderAR();}
   if(name==='ap'){renderAP();}
   if(name==='income-expense')renderTxn();
   if(name==='vat')renderVAT();
-  if(name==='financial')
   if(name==='bank'){renderBankAccGrid();renderBankTxn();}
-  if(name==='journal')
-  if(name==='fixed-assets')
   }
 
 // ========== DASHBOARD ==========
@@ -1978,8 +1974,8 @@ async function saveSO(){
 async function deleteSO(id){const {error}=await db.from('sale_orders').delete().eq('id',id);if(error){toast('ลบไม่สำเร็จ','error');return;}toast('ลบแล้ว','success');loadSO();}
 
 // ========== ACCOUNTING STATE ==========
-let allCOA=[], allAR=[], allAP=[], allTxn=[], allBankAcc=[], allBankTxn=[], allJournal=[], 
-let editCOAId=null, editARId=null, editAPId=null, editTxnId=null, editBankAccId=null, editBankTxnId=null, editJournalId=null, editAssetId=null, editPayrollId=null;
+let allAR=[], allAP=[], allTxn=[], allBankAcc=[], allBankTxn=[];
+let editARId=null, editAPId=null, editTxnId=null, editBankAccId=null, editBankTxnId=null;
 let vatMonth=null, finYear=null;
 const ACC_PAGES=['ar','ap','income-expense','vat','bank','delivery','receipts','wht'];
 const COA_TYPE_LABEL={asset:'สินทรัพย์',liability:'หนี้สิน',equity:'ส่วนทุน',revenue:'รายได้',expense:'ค่าใช้จ่าย'};
@@ -1990,16 +1986,14 @@ const AP_BADGE={pending:'b-gray',partial:'b-gold',paid:'b-green',overdue:'b-red'
 
 // ========== LOAD ACCOUNTING ==========
 async function loadAccounting(){
-  await Promise.all([loadCOA(),loadAR(),loadAP(),loadTxn(),loadBankAcc(),loadBankTxn(),loadJournal(),loadAssets(),loadPayroll()]);
+  await Promise.all([loadAR(),loadAP(),loadTxn(),loadBankAcc(),loadBankTxn()]);
 }
-async function loadCOA(){const{data}=await db.from('chart_of_accounts').select('*').order('code');allCOA=data||[];renderCOA();}
 async function loadAR(){const{data}=await db.from('accounts_receivable').select('*').order('date',{ascending:false});allAR=data||[];renderAR();}
 async function loadAP(){const{data}=await db.from('accounts_payable').select('*').order('date',{ascending:false});allAP=data||[];renderAP();}
 async function loadTxn(){const{data}=await db.from('transactions').select('*').order('date',{ascending:false});allTxn=data||[];renderTxn();}
 async function loadBankAcc(){const{data}=await db.from('bank_accounts').select('*').order('created_at');allBankAcc=data||[];renderBankAccGrid();}
-async function loadBankTxn(){const{data}=await db.from('bank_transactions').select('*').order('date',{ascending:false});allBankTxn=data||[];renderBankTxn();}
-async function loadJournal(){const{data}=await db.from('journal_entries').select('*').order('date',{ascending:false});allJournal=data||[];renderJournal();}
-async function loadAssets(){const{data}=await db.from('fixed_assets').select('*').order('purchase_date',{ascending:false});allAssets=data||[];renderAssets();
+async function loadBankTxn(){const{data}=await db.from('bank_transactions').select('*').order('date',{ascending:false});allBankTxn=data||[];}
+
 
 // ========== AR ==========
 function _getMonthStr(offset){
@@ -2173,7 +2167,7 @@ function openTxnModal(id){
   document.getElementById('txnm-has-vat').value=d?d.has_vat?'1':'0':'0';
   document.getElementById('txnm-note').value=d?d.note||'':'';
   const sel=document.getElementById('txnm-account');sel.innerHTML='<option value="">-- เลือกบัญชี --</option>';
-  allCOA.forEach(c=>sel.insertAdjacentHTML('beforeend',`<option value="${c.code}"${d?.account_code===c.code?' selected':''}>${c.code} - ${c.name}</option>`));
+  // account_code field kept for legacy data but no COA list
   openModal('txn-modal');
 }
 function editTxn(id){openTxnModal(id);}
