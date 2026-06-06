@@ -421,7 +421,14 @@ label{font-size:13px;font-weight:600;color:var(--text2)}
           <div><div class="page-title">ใบเสนอราคา</div><div class="page-subtitle">จัดการใบเสนอราคาทั้งหมด</div></div>
           <button class="btn btn-blue" onclick="openQModal()">+ สร้างใบใหม่</button>
         </div>
-        <div class="card">
+        <!-- View toggle -->
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <button id="qv-table-btn" class="btn btn-blue" onclick="setQView('table')" style="font-size:13px">📋 ตาราง</button>
+          <button id="qv-cust-btn" class="btn btn-outline" onclick="setQView('customer')" style="font-size:13px">👤 ตามลูกค้า</button>
+        </div>
+
+        <!-- TABLE VIEW -->
+        <div id="qv-table" class="card">
           <div class="toolbar">
             <input type="text" id="qf-search" placeholder="🔍 ค้นหาลูกค้า, เลขที่..." oninput="filterQ()">
             <select id="qf-status" onchange="filterQ()">
@@ -433,6 +440,25 @@ label{font-size:13px;font-weight:600;color:var(--text2)}
           </div>
           <table><thead><tr><th>เลขที่</th><th>ลูกค้า</th><th>สินค้า</th><th>มูลค่า</th><th>สถานะ</th><th>วันที่</th><th>จัดการ</th></tr></thead>
           <tbody id="q-tb"></tbody></table>
+        </div>
+
+        <!-- CUSTOMER VIEW -->
+        <div id="qv-customer" style="display:none">
+          <div class="toolbar" style="margin-bottom:12px">
+            <input type="text" id="qcf-search" placeholder="🔍 ค้นหาลูกค้า..." oninput="filterQCust()">
+            <select id="qcf-status" onchange="filterQCust()">
+              <option value="">ทุกสถานะ</option>
+              <option value="draft">ร่าง</option><option value="sent">ส่งแล้ว</option>
+              <option value="approved">ยืนยัน</option><option value="cancelled">ยกเลิก</option>
+            </select>
+            <select id="qcf-sort" onchange="filterQCust()">
+              <option value="last">ล่าสุดก่อน</option>
+              <option value="value">มูลค่าสูงสุด</option>
+              <option value="count">จำนวนมากสุด</option>
+              <option value="alpha">ชื่อ A-Z</option>
+            </select>
+          </div>
+          <div id="q-cust-cards"></div>
         </div>
       </div>
 
@@ -1285,7 +1311,131 @@ function renderQTable(){
     return`<tr><td><b>${num}</b></td><td>${cust}</td><td>${(q.items||[]).map(it=>it.name||it.product_name||'').filter(Boolean).join(', ').slice(0,40)||'-'}</td><td>฿${fmt(q.total||0)}</td><td><span class="badge ${SB[q.status]||'b-gray'}">${SL[q.status]||q.status}</span></td><td>${q.date||'-'}</td><td style="white-space:nowrap"><button class="btn btn-sm btn-outline" onclick="printQ('${q.id}')" title="พิมพ์/PDF">🖨️</button> <button class="btn btn-sm btn-outline" onclick="openQModal('${q.id}')">✏️</button> <button class="btn btn-sm btn-danger" onclick="openConf('ลบใบเสนอราคา','ลบ ${num.replace(/'/g,'')}?',()=>deleteQ('${q.id}'))">🗑️</button></td></tr>`;
   }).join('');
 }
-function filterQ(){renderQTable();}
+function filterQ(){renderQTable();if(typeof qView!=='undefined'&&qView==='customer')renderQByCustomer();}
+function filterQCust(){renderQByCustomer();}
+
+let qView='table';
+function setQView(v){
+  qView=v;
+  document.getElementById('qv-table').style.display=v==='table'?'':'none';
+  document.getElementById('qv-customer').style.display=v==='customer'?'':'none';
+  document.getElementById('qv-table-btn').className=v==='table'?'btn btn-blue':'btn btn-outline';
+  document.getElementById('qv-cust-btn').className=v==='customer'?'btn btn-blue':'btn btn-outline';
+  if(v==='customer')renderQByCustomer();
+}
+
+function renderQByCustomer(){
+  const search=(document.getElementById('qcf-search')?.value||'').toLowerCase();
+  const stat=document.getElementById('qcf-status')?.value||'';
+  const sortBy=document.getElementById('qcf-sort')?.value||'last';
+  const container=document.getElementById('q-cust-cards');
+  if(!container)return;
+
+  const map={};
+  allQ.forEach(q=>{
+    if(stat&&q.status!==stat)return;
+    const key=q.customer||'(ไม่ระบุลูกค้า)';
+    if(!map[key])map[key]={name:key,quotes:[],total:0,lastDate:''};
+    map[key].quotes.push(q);
+    map[key].total+=(q.total||0);
+    if(!map[key].lastDate||q.date>map[key].lastDate)map[key].lastDate=q.date||'';
+  });
+
+  let groups=Object.values(map).filter(g=>!search||g.name.toLowerCase().includes(search));
+  if(sortBy==='last')groups.sort((a,b)=>b.lastDate.localeCompare(a.lastDate));
+  else if(sortBy==='value')groups.sort((a,b)=>b.total-a.total);
+  else if(sortBy==='count')groups.sort((a,b)=>b.quotes.length-a.quotes.length);
+  else if(sortBy==='alpha')groups.sort((a,b)=>a.name.localeCompare(b.name,'th'));
+
+  if(!groups.length){
+    container.innerHTML='<div class="card" style="text-align:center;padding:40px;color:#999"><div style="font-size:40px">👤</div><p>ไม่พบลูกค้า</p></div>';
+    return;
+  }
+
+  container.innerHTML=groups.map(g=>{
+    const approved=g.quotes.filter(q=>q.status==='approved').length;
+    const pending=g.quotes.filter(q=>q.status==='draft'||q.status==='sent').length;
+    const cancelled=g.quotes.filter(q=>q.status==='cancelled').length;
+    const convRate=g.quotes.length?Math.round(approved/g.quotes.length*100):0;
+    const cardId='qc_'+g.name.replace(/[^a-zA-Z0-9]/g,'_');
+    const custEnc=g.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+
+    const rows=g.quotes
+      .sort((a,b)=>(b.date||'').localeCompare(a.date||''))
+      .map(q=>{
+        const num=(q.number||'-').replace(/'/g,'');
+        const prods=(q.items||[]).map(it=>it.name||it.product_name||'').filter(Boolean).join(', ').slice(0,35)||'-';
+        return `<tr>
+          <td><b>${q.number||'-'}</b></td>
+          <td>${prods}</td>
+          <td style="text-align:right">฿${fmt(q.total||0)}</td>
+          <td><span class="badge ${SB[q.status]||'b-gray'}">${SL[q.status]||q.status}</span></td>
+          <td>${q.date||'-'}</td>
+          <td style="white-space:nowrap">
+            <button class="btn btn-sm btn-outline" onclick="printQ('${q.id}')">🖨️</button>
+            <button class="btn btn-sm btn-outline" onclick="openQModal('${q.id}')">✏️</button>
+            <button class="btn btn-sm btn-danger" onclick="openConf('ลบ','ลบ ${num}?',()=>deleteQ('${q.id}'))">🗑️</button>
+          </td>
+        </tr>`;
+      }).join('');
+
+    return `<div class="card" style="margin-bottom:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:4px 0" onclick="toggleQCard('${cardId}')">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:40px;height:40px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;flex-shrink:0">${g.name.charAt(0)||'?'}</div>
+          <div>
+            <div style="font-weight:600;font-size:15px">${g.name}</div>
+            <div style="font-size:12px;color:#888">ล่าสุด: ${g.lastDate||'-'} &nbsp;·&nbsp; ${g.quotes.length} ใบ &nbsp;·&nbsp; อนุมัติ ${convRate}%</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;justify-content:flex-end">
+          <div style="text-align:right">
+            <div style="font-size:11px;color:#888">มูลค่ารวม</div>
+            <div style="font-weight:700;color:var(--green)">฿${fmt(g.total)}</div>
+          </div>
+          <div style="display:flex;gap:4px">
+            ${pending?`<span class="badge b-blue">${pending} รอ</span>`:''}
+            ${approved?`<span class="badge b-green">${approved} ✓</span>`:''}
+            ${cancelled?`<span class="badge b-gray">${cancelled} ยก</span>`:''}
+          </div>
+          <button class="btn btn-sm btn-blue" onclick="event.stopPropagation();newQForCust('${custEnc}')">+ ใบใหม่</button>
+          <span id="${cardId}-arrow" style="font-size:18px;color:#aaa;width:20px;text-align:center">▼</span>
+        </div>
+      </div>
+      <div id="${cardId}" style="display:none;margin-top:12px;overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:13px">
+          <thead><tr style="background:#f5f7fa">
+            <th style="padding:6px 10px;text-align:left">เลขที่</th>
+            <th style="padding:6px 10px;text-align:left">สินค้า</th>
+            <th style="padding:6px 10px;text-align:right">มูลค่า</th>
+            <th style="padding:6px 10px;text-align:center">สถานะ</th>
+            <th style="padding:6px 10px;text-align:center">วันที่</th>
+            <th style="padding:6px 10px">จัดการ</th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleQCard(id){
+  const el=document.getElementById(id);
+  const arrow=document.getElementById(id+'-arrow');
+  if(!el)return;
+  const open=el.style.display==='block';
+  el.style.display=open?'none':'block';
+  if(arrow)arrow.textContent=open?'▼':'▲';
+}
+
+function newQForCust(custName){
+  openQModal();
+  setTimeout(()=>{
+    const sel=document.getElementById('qm-cust');
+    if(sel)sel.value=custName;
+    onQCustChange();
+  },100);
+}
 function populateMonthFilter(){
   const sel=document.getElementById('qf-month');if(!sel)return;
   const months=new Set(allQ.map(q=>q.date?q.date.slice(0,7):null).filter(Boolean));
