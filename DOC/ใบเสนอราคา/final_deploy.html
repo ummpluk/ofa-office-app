@@ -294,15 +294,9 @@ label{font-size:13px;font-weight:600;color:var(--text2)}
         </div>
         <div class="nav-section">
           <div class="nav-label">การขาย</div>
-          <div class="nav-item" onclick="go('monthly')"><span class="ico">📈</span>ยอดขายรายเดือน</div>
-          <div class="nav-item" onclick="go('customers')"><span class="ico">🏆</span>ลูกค้าซื้อบ่อย</div>
+          <div class="nav-item" onclick="go('monthly')"><span class="ico">📈</span>ยอดขาย</div>
           <div class="nav-item" onclick="go('quotations')"><span class="ico">📄</span>ใบเสนอราคา</div>
           <div class="nav-item" onclick="go('sale-orders')"><span class="ico">📋</span>ใบสั่งขาย (SO)</div>
-          <div class="nav-item" onclick="go('delivery-notes')"><span class="ico">🚚</span>ใบส่งสินค้า (DN)</div>
-          <div class="nav-item" onclick="go('tax-invoices')"><span class="ico">🧾</span>ใบกำกับภาษี (TI)</div>
-          <div class="nav-item" onclick="go('receipts')"><span class="ico">💰</span>ใบเสร็จรับเงิน (RC)</div>
-          <div class="nav-item" onclick="go('wht-docs')"><span class="ico">📋</span>ใบหักภาษี ณ ที่จ่าย (WHT)</div>
-          <div class="nav-item" onclick="go('credit-notes')"><span class="ico">📝</span>ใบลดหนี้ (CN)</div>
         </div>
         <div class="nav-section">
           <div class="nav-label">ข้อมูล</div>
@@ -320,16 +314,16 @@ label{font-size:13px;font-weight:600;color:var(--text2)}
         </div>
         <div class="nav-section" id="nav-accounting" style="display:none">
           <div class="nav-label">บัญชี</div>
-          <div class="nav-item" onclick="go('coa')"><span class="ico">📒</span>ผังบัญชี</div>
+          <div class="nav-item" onclick="go('delivery-notes')"><span class="ico">🚚</span>ใบส่งสินค้า (DN)</div>
+          <div class="nav-item" onclick="go('tax-invoices')"><span class="ico">🧾</span>ใบกำกับภาษี (TI)</div>
+          <div class="nav-item" onclick="go('receipts')"><span class="ico">💰</span>ใบเสร็จรับเงิน (RC)</div>
+          <div class="nav-item" onclick="go('wht-docs')"><span class="ico">📋</span>ใบหักภาษี ณ ที่จ่าย (WHT)</div>
+          <div class="nav-item" onclick="go('credit-notes')"><span class="ico">📝</span>ใบลดหนี้ (CN)</div>
           <div class="nav-item" onclick="go('ar')"><span class="ico">💵</span>ลูกหนี้ (AR)</div>
           <div class="nav-item" onclick="go('ap')"><span class="ico">💸</span>เจ้าหนี้ (AP)</div>
           <div class="nav-item" onclick="go('income-expense')"><span class="ico">📊</span>รายได้/ค่าใช้จ่าย</div>
           <div class="nav-item" onclick="go('vat')"><span class="ico">🧾</span>รายงาน VAT</div>
-          <div class="nav-item" onclick="go('financial')"><span class="ico">📈</span>งบการเงิน</div>
           <div class="nav-item" onclick="go('bank')"><span class="ico">🏦</span>เงินสด/ธนาคาร</div>
-          <div class="nav-item" onclick="go('journal')"><span class="ico">📔</span>สมุดรายวัน</div>
-          <div class="nav-item" onclick="go('fixed-assets')"><span class="ico">🏗️</span>สินทรัพย์ถาวร</div>
-          <div class="nav-item" onclick="go('payroll')"><span class="ico">👷</span>เงินเดือน</div>
         </div>
       </div>
       <div class="sidebar-footer">
@@ -382,7 +376,7 @@ label{font-size:13px;font-weight:600;color:var(--text2)}
       <!-- MONTHLY -->
       <div class="section" id="sec-monthly">
         <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
-          <div><div class="page-title">ยอดขายรายเดือน</div><div class="page-subtitle">วิเคราะห์แยกตามเดือน</div></div>
+          <div><div class="page-title">ยอดขาย</div><div class="page-subtitle">วิเคราะห์แยกตามเดือน</div></div>
           <div class="year-sel">
             <button class="yr-btn" onclick="chgYear(-1)">‹</button>
             <div class="yr-val" id="yr-disp">2568</div>
@@ -399,18 +393,14 @@ label{font-size:13px;font-weight:600;color:var(--text2)}
           <table><thead><tr><th>เดือน</th><th>จำนวนใบ</th><th>ยืนยัน</th><th>ยอดรวม (บาท)</th><th>เทียบเดือนก่อน</th></tr></thead>
           <tbody id="mo-tb"></tbody></table>
         </div>
-      </div>
-
-      <!-- CUSTOMERS -->
-      <div class="section" id="sec-customers">
-        <div class="page-header"><div class="page-title">ลูกค้าซื้อบ่อย</div><div class="page-subtitle">อันดับตามยอดรวมและจำนวนออเดอร์</div></div>
-        <div class="charts-grid">
-          <div class="chart-card"><h3>Top 5 ยอดสูงสุด</h3><p>เรียงตามมูลค่ารวม</p><div class="chart-wrap"><canvas id="ch-topcust"></canvas></div></div>
-          <div class="chart-card"><h3>สัดส่วนยอดขาย</h3><p>แบ่งตามลูกค้า</p><div class="chart-wrap"><canvas id="ch-custpie"></canvas></div></div>
-        </div>
-        <div class="card">
-          <div class="card-header"><div><h3>อันดับลูกค้า</h3><p>เรียงตามมูลค่าสะสม</p></div></div>
-          <div class="rank-list" id="rank-list"><div style="padding:40px;text-align:center;color:var(--text2)">กำลังโหลด...</div></div>
+        <div class="card" style="margin-top:22px">
+          <div class="card-header">
+            <div><h3>ดูแยกตามลูกค้า</h3><p>จำนวนครั้งที่ขาย และจำนวนใบเสนอราคาของลูกค้าแต่ละราย</p></div>
+            <select id="mo-cust-sel" onchange="renderCustomerDetail()" style="padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;background:#fff;font-family:inherit;min-width:220px">
+              <option value="">-- เลือกลูกค้า --</option>
+            </select>
+          </div>
+          <div id="cust-detail"><div style="padding:40px;text-align:center;color:var(--text2)">เลือกลูกค้าเพื่อดูรายละเอียด</div></div>
         </div>
       </div>
 
@@ -1276,7 +1266,7 @@ let allQ=[], allP=[], allC=[], allSO=[], currentUser=null;
 let currentProfile=null;
 let editId=null, editCol=null, confirmCb=null;
 let curYear=new Date().getFullYear();
-let chMon=null, chStat=null, chMonFull=null, chTop=null, chPie=null;
+let chMon=null, chStat=null, chMonFull=null;
 let iIdx=0;
 let editSOId=null, soIIdx=0;
 let allDN=[], allTI=[], allRC=[], allWHT=[], allCN=[];
@@ -1455,7 +1445,6 @@ function go(name){
     if(n.getAttribute('onclick')?.includes("'"+name+"'"))n.classList.add('active');
   });
   if(name==='monthly')renderMonthly();
-  if(name==='customers')renderCustomers();
   if(name==='dashboard')renderDashboard();
   if(name==='suppliers')renderSTable();
   if(name==='purchase-orders')renderPOTable();
@@ -1551,6 +1540,32 @@ function renderMonthly(){
     const chStr=ch!==null?`<span style="color:${ch>=0?'var(--green)':'var(--red)'}">${ch>=0?'▲ +':'▼ '}${ch}%</span>`:'-';
     return`<tr><td>${TMF[m.m]}</td><td>${m.cnt}</td><td>${m.ap}</td><td>฿${fmt(m.tot)}</td><td>${chStr}</td></tr>`;
   }).join('');
+  populateMoCustSelect();
+}
+
+function populateMoCustSelect(){
+  const sel=document.getElementById('mo-cust-sel');
+  const cur=sel.value;
+  const names=[...new Set(allQ.map(q=>q.customer).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'th'));
+  sel.innerHTML='<option value="">-- เลือกลูกค้า --</option>'+names.map(n=>`<option value="${n.replace(/"/g,'&quot;')}">${n}</option>`).join('');
+  if(names.includes(cur))sel.value=cur;
+}
+
+function renderCustomerDetail(){
+  const name=document.getElementById('mo-cust-sel').value;
+  const box=document.getElementById('cust-detail');
+  if(!name){box.innerHTML='<div style="padding:40px;text-align:center;color:var(--text2)">เลือกลูกค้าเพื่อดูรายละเอียด</div>';return;}
+  const qs=allQ.filter(q=>q.customer===name);
+  const sold=qs.filter(q=>q.status==='approved');
+  const totSold=sold.reduce((a,q)=>a+(q.total||0),0);
+  box.innerHTML=`
+    <div class="month-summary-grid" style="margin-bottom:18px">
+      <div class="month-stat"><div class="val">${sold.length}</div><div class="lbl">จำนวนครั้งที่ขาย (ยืนยันแล้ว)</div></div>
+      <div class="month-stat"><div class="val">${qs.length}</div><div class="lbl">เคยเสนอราคาทั้งหมด</div></div>
+      <div class="month-stat"><div class="val">฿${fmt(totSold)}</div><div class="lbl">ยอดขายสะสม</div></div>
+    </div>
+    <table><thead><tr><th>เลขที่</th><th>วันที่</th><th>รายการ</th><th>มูลค่า</th><th>สถานะ</th></tr></thead>
+    <tbody>${qs.length?qs.map(q=>`<tr><td><b>${q.number||'-'}</b></td><td>${q.date||'-'}</td><td>${(q.items||[]).map(it=>it.name||'').filter(Boolean).join(', ').slice(0,40)||'-'}</td><td>฿${fmt(q.total||0)}</td><td><span class="badge ${SB[q.status]||'b-gray'}">${SL[q.status]||q.status}</span></td></tr>`).join(''):'<tr><td colspan="5" class="empty"><div class="ei">📄</div><p>ยังไม่มีข้อมูล</p></div></td></tr>'}</tbody></table>`;
 }
 
 // ========== HELPERS ==========
@@ -1570,28 +1585,6 @@ function openConf(title,msg,cb){
   document.getElementById('conf-overlay').style.display='flex';
 }
 function closeConf(){document.getElementById('conf-overlay').style.display='none';}
-
-// ========== CUSTOMERS ANALYTICS ==========
-function renderCustomers(){
-  const custMap={};
-  allQ.filter(q=>q.status==='approved'&&q.customer).forEach(q=>{
-    if(!custMap[q.customer])custMap[q.customer]={name:q.customer,tot:0,cnt:0};
-    custMap[q.customer].tot+=(q.total||0);
-    custMap[q.customer].cnt++;
-  });
-  const arr=Object.values(custMap).sort((a,b)=>b.tot-a.tot);
-  const top5=arr.slice(0,5);
-  const ctx=document.getElementById('ch-topcust').getContext('2d');
-  if(chTop)chTop.destroy();
-  chTop=new Chart(ctx,{type:'bar',data:{labels:top5.map(c=>c.name.slice(0,15)),datasets:[{data:top5.map(c=>c.tot),backgroundColor:'rgba(30,136,229,.8)',borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{callback:v=>'฿'+fmt(v)}},x:{grid:{display:false}}}}});
-  const ctx2=document.getElementById('ch-custpie').getContext('2d');
-  if(chPie)chPie.destroy();
-  const colors=['#1e88e5','#43a047','#f57c00','#8e24aa','#e53935','#00acc1','#6d4c41','#546e7a'];
-  chPie=new Chart(ctx2,{type:'pie',data:{labels:top5.map(c=>c.name.slice(0,12)),datasets:[{data:top5.map(c=>c.tot),backgroundColor:colors.slice(0,top5.length),borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:11}}}}}});
-  const rl=document.getElementById('rank-list');
-  if(!arr.length){rl.innerHTML='<div style="padding:40px;text-align:center;color:var(--text2)">ยังไม่มีข้อมูล</div>';return;}
-  rl.innerHTML=arr.map((c,i)=>`<div style="display:flex;align-items:center;padding:14px 0;border-bottom:1px solid var(--border)"><div style="width:36px;height:36px;border-radius:50%;background:${i<3?'var(--blue)':'#e3e8f0'};color:${i<3?'#fff':'var(--navy)'};display:flex;align-items:center;justify-content:center;font-weight:700;margin-right:14px;flex-shrink:0">${i+1}</div><div style="flex:1"><div style="font-weight:600">${c.name}</div><div style="font-size:12px;color:var(--text2)">${c.cnt} ออเดอร์</div></div><div style="text-align:right"><div style="font-weight:700;color:var(--blue)">฿${fmt(c.tot)}</div></div></div>`).join('');
-}
 
 // ========== QUOTATIONS ==========
 function renderQTable(){
