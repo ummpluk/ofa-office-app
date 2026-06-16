@@ -395,10 +395,10 @@ label{font-size:13px;font-weight:600;color:var(--text2)}
         </div>
         <div class="card" style="margin-top:22px">
           <div class="card-header">
-            <div><h3>ดูแยกตามลูกค้า</h3><p>ค้นหาด้วยชื่อลูกค้า (ไม่ต้องพิมพ์เต็มคำ) หรือเลขที่ใบเสนอราคา</p></div>
-            <input type="text" id="mo-search" placeholder="🔍 ค้นหาชื่อลูกค้า หรือ เลขที่ใบเสนอราคา..." oninput="renderCustomerDetail()" style="padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;background:#fff;font-family:inherit;min-width:260px">
+            <div><h3>ดูแยกตามลูกค้า</h3><p>ค้นหาด้วยชื่อลูกค้า (ไม่ต้องพิมพ์เต็มคำ) หรือเลขที่ใบสั่งขาย (SO) — ค้นหาใบเสนอราคาไปที่หน้า "ใบเสนอราคา"</p></div>
+            <input type="text" id="mo-search" placeholder="🔍 ค้นหาชื่อลูกค้า หรือ เลขที่ใบสั่งขาย..." oninput="renderCustomerDetail()" style="padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;background:#fff;font-family:inherit;min-width:260px">
           </div>
-          <div id="cust-detail"><div style="padding:40px;text-align:center;color:var(--text2)">พิมพ์ชื่อลูกค้าหรือเลขที่ใบเสนอราคาเพื่อดูรายละเอียด</div></div>
+          <div id="cust-detail"><div style="padding:40px;text-align:center;color:var(--text2)">พิมพ์ชื่อลูกค้าหรือเลขที่ใบสั่งขายเพื่อดูรายละเอียด</div></div>
         </div>
       </div>
 
@@ -1543,32 +1543,34 @@ function renderMonthly(){
 function renderCustomerDetail(){
   const term=(document.getElementById('mo-search').value||'').trim().toLowerCase();
   const box=document.getElementById('cust-detail');
-  if(!term){box.innerHTML='<div style="padding:40px;text-align:center;color:var(--text2)">พิมพ์ชื่อลูกค้าหรือเลขที่ใบเสนอราคาเพื่อดูรายละเอียด</div>';return;}
-  const matches=allQ.filter(q=>(q.customer||'').toLowerCase().includes(term)||(q.number||'').toLowerCase().includes(term));
+  if(!term){box.innerHTML='<div style="padding:40px;text-align:center;color:var(--text2)">พิมพ์ชื่อลูกค้าหรือเลขที่ใบสั่งขายเพื่อดูรายละเอียด</div>';return;}
+  const matches=allSO.filter(s=>(s.customer||'').toLowerCase().includes(term)||(s.number||'').toLowerCase().includes(term));
   if(!matches.length){box.innerHTML='<div style="padding:40px;text-align:center;color:var(--text2)">ไม่พบข้อมูล</div>';return;}
-  const custNames=[...new Set(matches.map(q=>q.customer).filter(Boolean))];
-  const rowHtml=q=>`<tr><td><b>${q.number||'-'}</b></td><td>${q.date||'-'}</td><td>${(q.items||[]).map(it=>it.name||'').filter(Boolean).join(', ').slice(0,40)||'-'}</td><td>฿${fmt(q.total||0)}</td><td><span class="badge ${SB[q.status]||'b-gray'}">${SL[q.status]||q.status}</span></td></tr>`;
+  const custNames=[...new Set(matches.map(s=>s.customer).filter(Boolean))];
+  const actHtml=s=>`<td><button class="btn btn-sm btn-outline" onclick="go('sale-orders');openSOModal('${s.id}')">จัดการ</button></td>`;
+  const rowHtml=s=>`<tr><td><b>${s.number||'-'}</b></td><td>${s.date||'-'}</td><td>${(s.items||[]).map(it=>it.name||'').filter(Boolean).join(', ').slice(0,40)||'-'}</td><td>฿${fmt(s.total||0)}</td><td><span class="badge ${SO_BADGE[s.status]||'b-gray'}">${SO_STATUS[s.status]||s.status}</span></td>${actHtml(s)}</tr>`;
   if(custNames.length===1){
-    // คำค้นเข้าตรงลูกค้าเดียว → โชว์สรุป + ใบทั้งหมดของลูกค้านี้ (ไม่จำกัดแค่ที่ตรงคำค้น)
+    // คำค้นเข้าตรงลูกค้าเดียว → โชว์สรุป + ใบสั่งขายทั้งหมดของลูกค้านี้ (ไม่จำกัดแค่ที่ตรงคำค้น)
     const name=custNames[0];
-    const qs=allQ.filter(q=>q.customer===name);
-    const sold=qs.filter(q=>q.status==='approved');
-    const totSold=sold.reduce((a,q)=>a+(q.total||0),0);
+    const sos=allSO.filter(s=>s.customer===name);
+    const sold=sos.filter(s=>s.status!=='cancelled');
+    const totSold=sold.reduce((a,s)=>a+(s.total||0),0);
+    const qCnt=allQ.filter(q=>q.customer===name).length;
     box.innerHTML=`
       <div style="padding:14px 0 4px;font-weight:700;color:var(--navy)">${name}</div>
       <div class="month-summary-grid" style="margin-bottom:18px">
-        <div class="month-stat"><div class="val">${sold.length}</div><div class="lbl">จำนวนครั้งที่ขาย (ยืนยันแล้ว)</div></div>
-        <div class="month-stat"><div class="val">${qs.length}</div><div class="lbl">เคยเสนอราคาทั้งหมด</div></div>
+        <div class="month-stat"><div class="val">${sold.length}</div><div class="lbl">จำนวนครั้งที่ขาย (ไม่รวมยกเลิก)</div></div>
+        <div class="month-stat"><div class="val">${qCnt}</div><div class="lbl">เคยเสนอราคาทั้งหมด</div></div>
         <div class="month-stat"><div class="val">฿${fmt(totSold)}</div><div class="lbl">ยอดขายสะสม</div></div>
       </div>
-      <table><thead><tr><th>เลขที่</th><th>วันที่</th><th>รายการ</th><th>มูลค่า</th><th>สถานะ</th></tr></thead>
-      <tbody>${qs.map(rowHtml).join('')}</tbody></table>`;
+      <table><thead><tr><th>เลขที่</th><th>วันที่</th><th>รายการ</th><th>มูลค่า</th><th>สถานะ</th><th>จัดการ</th></tr></thead>
+      <tbody>${sos.map(rowHtml).join('')}</tbody></table>`;
   }else{
     // คำค้นเข้าหลายลูกค้า → โชว์ตารางรวมทุกใบที่ตรงคำค้น
     box.innerHTML=`
       <div style="padding:14px 0 4px;color:var(--text2);font-size:13px">พบ ${custNames.length} ลูกค้า, ${matches.length} ใบ</div>
-      <table><thead><tr><th>เลขที่</th><th>ลูกค้า</th><th>วันที่</th><th>มูลค่า</th><th>สถานะ</th></tr></thead>
-      <tbody>${matches.map(q=>`<tr><td><b>${q.number||'-'}</b></td><td>${q.customer||'-'}</td><td>${q.date||'-'}</td><td>฿${fmt(q.total||0)}</td><td><span class="badge ${SB[q.status]||'b-gray'}">${SL[q.status]||q.status}</span></td></tr>`).join('')}</tbody></table>`;
+      <table><thead><tr><th>เลขที่</th><th>ลูกค้า</th><th>วันที่</th><th>มูลค่า</th><th>สถานะ</th><th>จัดการ</th></tr></thead>
+      <tbody>${matches.map(s=>`<tr><td><b>${s.number||'-'}</b></td><td>${s.customer||'-'}</td><td>${s.date||'-'}</td><td>฿${fmt(s.total||0)}</td><td><span class="badge ${SO_BADGE[s.status]||'b-gray'}">${SO_STATUS[s.status]||s.status}</span></td>${actHtml(s)}</tr>`).join('')}</tbody></table>`;
   }
 }
 
